@@ -1,0 +1,44 @@
+{
+  "definition": {
+    "info": {
+      "title": "API V1 Documentation",
+      "version": "1.0.0",
+      "description": "V1 Version of the API"
+    },
+    "tags": [
+      {
+        "name": "auth",
+        "description": "Authentication routes"
+      }
+    ],
+    "definitions": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "required": true,
+            "unique": true
+          },
+          "fullname": {
+            "type": "string",
+            "required": true
+          },
+          "mail": {
+            "type": "string"
+          },
+          "mailNonITB": {
+            "type": "string"
+          },
+          "ou": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "apis": ["./routes/*.js"]
+}
