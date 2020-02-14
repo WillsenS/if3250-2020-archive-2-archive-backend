@@ -1,17 +1,21 @@
 image: node:latest
 
-before_script:
-  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
-  - npm install --progress=false
+cache:
+  paths:
+  - node_modules/
   
 stages:
+  - lint
   - test
   - integration
   - production
 
 lint:
-  stage: test
+  stage: lint
   script:
+    - npm install
+    - npm install eslint \
+      eslint-config-airbnb
     - npm run lint
 
 test:
