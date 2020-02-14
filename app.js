@@ -21,6 +21,7 @@ const app = express();
  */
 dotenv.config({ path: '.env' });
 
+const documentationv1 = require('./routes/documentationv1');
 const apiv1 = require('./routes/apiv1');
 
 /**
@@ -71,6 +72,7 @@ app.use(checkSSORedirect());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use('/documentation/v1', documentationv1);
 app.use('/api/v1', setApiVersion('1.0'), apiv1);
 
 /**

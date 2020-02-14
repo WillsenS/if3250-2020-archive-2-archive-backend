@@ -1,9 +1,13 @@
 /* eslint-disable dot-notation */
 const axios = require('axios');
 const convert = require('xml-js');
-
 const User = require('../models/User');
 
+/**
+ * Router that will check ticket from SSO ITB
+ * if the ticket is match, then user is authentication.
+ * @param {ticket} req.query User object that's being stored in the request object.
+ */
 exports.checkSSORedirect = () => {
   return async (req, res, next) => {
     const { ticket } = req.query;
@@ -75,11 +79,17 @@ exports.checkSSORedirect = () => {
   };
 };
 
+/**
+ * Handling user sign in by redirect to SSO ITB.
+ */
 exports.signInSSO = (req, res) => {
   const redirectURL = `https%3A%2F%2F${req.headers.host}${req.baseUrl}`;
   res.redirect(`https://login.itb.ac.id/cas/login?service=${redirectURL}`);
 };
 
+/**
+ * Handling user sign out by removing user session from database.
+ */
 exports.postSignout = async (req, res) => {
   try {
     return req.session.destroy(err => {
@@ -93,7 +103,7 @@ exports.postSignout = async (req, res) => {
         });
       }
 
-      req.user = null;
+      req.session.user = null;
       return res.json({
         apiVersion: res.locals.apiVersion,
         message: 'Successfully logged out'
