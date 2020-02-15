@@ -19,6 +19,9 @@ ssh ubuntu@${STAGING_SERVER} 'bash' < ./deploy/clone.sh
 echo MONGODB_URI=$MONGODB_URI >> .env
 echo BASE_URL=$BASE_URL >> .env
 echo SESSION_SECRET=$SESSION_SECRET >> .env
+echo SSL_KEY=$SSL_KEY >> .env
+echo SSL_CRT=$SSL_CRT >> .env
+echo SSL_CA_BUNDLE=$SSL_CA_BUNDLE >> .env
 
 scp ./.env ubuntu@${STAGING_SERVER}:/home/ubuntu/archive-backend/
 
