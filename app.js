@@ -10,6 +10,9 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
+const https = require('https');
+const http = require('http');
+const fs = require('fs');
 
 const { checkSSORedirect } = require('./handlers/user');
 const { setApiVersion } = require('./middlewares/api');
@@ -109,14 +112,38 @@ if (process.env.NODE_ENV === 'development') {
 /**
  * Start Express server.
  */
-app.listen(app.get('port'), () => {
-  console.log(
-    '%s App is running at http://localhost:%d in %s mode',
-    chalk.green('✓'),
-    app.get('port'),
-    app.get('env')
-  );
-  console.log('  Press CTRL-C to stop\n');
-});
+if (process.env.NODE_ENV === 'development') {
+  app.listen(app.get('port'), () => {
+    console.log(
+      '%s App is running at http://localhost:%d in %s mode',
+      chalk.green('✓'),
+      app.get('port'),
+      app.get('env')
+    );
+    console.log('  Press CTRL-C to stop\n');
+  });
+} else if (process.env.NODE_ENV === 'production') {
+  const httpsOptions = {
+    key: fs.readFileSync(process.env.SSL_KEY),
+    cert: fs.readFileSync(process.env.SSL_CRT),
+    ca: [fs.readFileSync(process.env.SSL_CA_BUNDLE)]
+  };
+
+  // create the HTTPS server on port 443
+  https.createServer(httpsOptions, app).listen(443, function() {
+    console.log('Node.js Express HTTPS Server Listening on Port 443');
+  });
+
+  // create an HTTP server on port 80 and redirect to HTTPS
+  http
+    .createServer(function(req, res) {
+      // 301 redirect (reclassifies google listings)
+      res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
+      res.end();
+    })
+    .listen(80, function() {
+      console.log('Node.js Express HTTPS Server Listening on Port 80');
+    });
+}
 
 module.exports = app;
