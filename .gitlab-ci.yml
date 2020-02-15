@@ -30,6 +30,8 @@ deployToStaging:
   environment:
     name: staging
     url: https://demoapp.my.id/
+  only:
+    - develop
 
 deployToProduction:
   stage: production
