@@ -1,0 +1,41 @@
+cache:
+  paths:
+  - node_modules
+
+image: node:alpine
+
+before_script:
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - npm install --progress=false
+  
+stages:
+  - test
+  - integration
+  - production
+
+lint:
+  stage: test
+  script:
+    - npm run lint
+
+test:
+  stage: test
+  script:
+    - npm run test
+
+deployToStaging:
+  stage: integration
+  script:
+    - bash deploy/deploy-staging.sh
+  environment:
+    name: staging
+    url: https://demoapp.my.id/
+
+deployToProduction:
+  stage: production
+  image: node:alpine
+  script:
+    - echo "No production server configuration"
+  only:
+    - master
+  when: manual
