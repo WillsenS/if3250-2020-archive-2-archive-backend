@@ -10,22 +10,17 @@ exports.getSwaggerConfiguration = (req, res) => {
 };
 
 exports.getIndexContent = (req, res) => {
-  let indexContent = fs
-    .readFileSync(`${pathToSwaggerUi}/index.html`)
-    .toString();
+  let indexContent = fs.readFileSync(`${pathToSwaggerUi}/index.html`).toString();
   if (process.env.NODE_ENV === 'development') {
-    indexContent = indexContent
-    .replace(
+    indexContent = indexContent.replace(
       'https://petstore.swagger.io/v2/swagger.json',
       `http://localhost:${process.env.PORT || 3000}/documentation/v1/swagger.json`
     );
   } else if (process.env.NODE_ENV === 'production') {
-    indexContent = indexContent
-    .replace(
+    indexContent = indexContent.replace(
       'https://petstore.swagger.io/v2/swagger.json',
       `${process.env.BASE_URL}/documentation/v1/swagger.json`
     );
   }
   res.send(indexContent);
 };
-
