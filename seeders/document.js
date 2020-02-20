@@ -1,3 +1,4 @@
+/* eslint-disable */
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const Document = require('../models/Document');
@@ -152,7 +153,7 @@ const execute = async () => {
       }
     ];
 
-    for (let i = 0; i < dataDocument.length; i++) {
+    for (let i = 0; i < dataDocument.length; i += 1) {
       dataDocument[i].file = foundFile[i]._id;
     }
 
@@ -165,4 +166,5 @@ const execute = async () => {
   }
 };
 
+/* eslint-enable */
 execute();

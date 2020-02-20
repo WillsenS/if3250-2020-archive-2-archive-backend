@@ -1,6 +1,7 @@
 const express = require('express');
 const { isAuthenticated, isNonAuthenticated } = require('../middlewares/user');
 const { signInSSO, postSignout } = require('../handlers/user');
+const { searchDocument } = require('../handlers/document');
 
 const r = express.Router();
 
@@ -81,5 +82,26 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
   const { user } = req.session;
   res.json(user);
 });
+
+/**
+ * @swagger
+ *
+ * /search:
+ *   get:
+ *     summary: "Search document by query"
+ *     tags:
+ *     - "document"
+ *     description: "Retrieve document that it's data relevant with the query"
+ *     produces:
+ *     - application/json
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       401:
+ *         description: "Not authenticated"
+ *       500:
+ *         description: "Caught exception on server"
+ */
+r.get('/search', searchDocument);
 
 module.exports = r;
