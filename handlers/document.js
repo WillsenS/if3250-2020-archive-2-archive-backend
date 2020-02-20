@@ -21,7 +21,7 @@ exports.searchDocument = async (req, res) => {
     .skip((page - 1) * limit);
 
   const baseLink = `${process.env.BASE_URL}/api/v1/search?q=${q}`;
-  const nextLink = countDocument / page > 0 ? `${baseLink}&page=${page + 1}` : null;
+  const nextLink = countDocument / (page * limit) > 1 ? `${baseLink}&page=${page + 1}` : null;
   const prevLink = page !== 1 ? `${baseLink}&page=${page - 1}` : null;
 
   res.json({
