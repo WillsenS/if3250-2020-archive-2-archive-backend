@@ -17,7 +17,7 @@ This is the backend system that will support ppid-frontend.
 MONGODB_URI=mongodb://localhost:27017/archive-backend
 BASE_URL=http://localhost:3000
 SESSION_SECRET=pP1D1tB2020!
-
+NODE_ENV=development
 ```
 
 There are 2 types of documentation, api documentation for swagger and jsdoc documentation for helpers and methods
