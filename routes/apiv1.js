@@ -43,12 +43,6 @@ r.get('/auth/signin', isNonAuthenticated, signInSSO);
  *     - "auth"
  *     produces:
  *       - application/json
- *     parameters:
- *       - name: "token"
- *         in: "body"
- *         required: "true"
- *         description: "Firebase token"
- *         type: "string"
  *     responses:
  *       200:
  *         description: "Successfully logged out"
@@ -94,6 +88,12 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  *     description: "Retrieve document that it's data relevant with the query"
  *     produces:
  *     - application/json
+ *     parameters:
+ *       - name: "q"
+ *         in: "query"
+ *         required: "false"
+ *         description: "query"
+ *         type: "string"
  *     responses:
  *       200:
  *         description: "Success operation"
