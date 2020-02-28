@@ -4,7 +4,6 @@ sudo su
 
 chmod 755 /home/ubuntu/archive-backend/
 cd /home/ubuntu/archive-backend/
-export NODE_ENV=production
 
 # Stop the previous pm2
 echo "Killing previous pm2 and removing pm2..."

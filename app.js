@@ -122,7 +122,7 @@ if (process.env.NODE_ENV === 'development') {
     );
     console.log('  Press CTRL-C to stop\n');
   });
-} else if (process.env.NODE_ENV === 'production') {
+} else if (process.env.NODE_ENV === 'staging') {
   const httpsOptions = {
     key: fs.readFileSync(process.env.SSL_KEY),
     cert: fs.readFileSync(process.env.SSL_CRT),

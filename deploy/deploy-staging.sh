@@ -13,9 +13,10 @@ sudo bash -c 'echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config'
 
 # Deploy to staging server
 echo "Deploying to ${STAGING_SERVER}"
-ssh ubuntu@${STAGING_SERVER} 'bash' < ./deploy/clone.sh
+ssh ubuntu@${STAGING_SERVER} 'bash' < ./deploy/clone-staging.sh
 
 # Create .env variables
+echo NODE_ENV=staging >> .env
 echo MONGODB_URI=$MONGODB_URI >> .env
 echo BASE_URL=$BASE_URL >> .env
 echo SESSION_SECRET=$SESSION_SECRET >> .env
@@ -25,4 +26,4 @@ echo SSL_CA_BUNDLE=$SSL_CA_BUNDLE >> .env
 
 scp ./.env ubuntu@${STAGING_SERVER}:/home/ubuntu/archive-backend/
 
-ssh ubuntu@${STAGING_SERVER} 'bash' < ./deploy/updateAndRestart.sh
+ssh ubuntu@${STAGING_SERVER} 'bash' < ./deploy/update-restart-staging.sh
