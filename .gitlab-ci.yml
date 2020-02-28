@@ -35,7 +35,6 @@ deployToStaging:
 
 deployToProduction:
   stage: production
-  image: node:alpine
   script:
     - echo "No production server configuration"
   only:
