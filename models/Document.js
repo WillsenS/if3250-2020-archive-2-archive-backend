@@ -1,5 +1,14 @@
 const mongoose = require('mongoose');
 
+/**
+ * Document Interface
+ * @typedef {Object} Document
+ * @property {String} kode Kode dari arsip
+ * @property {String} judul Judul dari arsip
+ * @property {String} keterangan Keterangan dari arsip
+ * @property {String} lokasi Lokasi arsip
+ * @property {String} file File arsip
+ */
 const documentSchema = new mongoose.Schema(
   {
     kode: {
