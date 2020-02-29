@@ -1,7 +1,7 @@
 const express = require('express');
 const { isAuthenticated, isNonAuthenticated } = require('../middlewares/user');
 const { signInSSO, postSignout } = require('../handlers/user');
-const { searchDocument } = require('../handlers/document');
+const { searchDocument, uploadArchive, postUploadArchive } = require('../handlers/document');
 
 const r = express.Router();
 
@@ -103,5 +103,9 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  *         description: "Caught exception on server"
  */
 r.get('/search', searchDocument);
+
+r.get('/upload', uploadArchive);
+
+r.post('/upload', postUploadArchive);
 
 module.exports = r;

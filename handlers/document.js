@@ -1,4 +1,6 @@
 /* eslint-disable no-await-in-loop */
+const formidable = require('formidable');
+const mv = require('mv');
 const Document = require('../models/Document');
 const { translateFiltersMongoose } = require('../helpers');
 
@@ -69,4 +71,27 @@ exports.searchDocument = async (req, res) => {
   } catch (err) {
     console.error(err);
   }
+};
+
+exports.uploadArchive = (req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/html' });
+  res.write('<form action="upload" method="post" enctype="multipart/form-data">');
+  res.write('<input type="file" name="filetoupload"><br>');
+  res.write('<input type="submit">');
+  res.write('</form>');
+  return res.end();
+};
+
+exports.postUploadArchive = async (req, res) => {
+  const form = new formidable.IncomingForm();
+  form.parse(req, function(err, fields, files) {
+    const oldpath = files.filetoupload.path;
+    const newpath = process.env.NODE_PATH + process.env.UPLOAD_DIR + files.filetoupload.name;
+    mv(oldpath, newpath, function() {
+      res.json({
+        apiVersion: res.locals.apiVersion,
+        message: 'Successfully added and uploaded archive'
+      });
+    });
+  });
 };
