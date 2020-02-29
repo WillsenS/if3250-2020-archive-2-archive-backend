@@ -2,7 +2,9 @@ const Document = require('../models/Document');
 const { translateFiltersMongoose } = require('../helpers');
 
 exports.searchDocument = async (req, res) => {
-  let { q, page, filters } = req.query;
+  let { q, page } = req.query;
+  const { filters } = req.query;
+  let options = null;
 
   q = q || '';
   page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
@@ -43,7 +45,7 @@ exports.searchDocument = async (req, res) => {
   const filterAttr = ['lokasi'];
   const filtersCandidate = [];
   filterAttr.forEach(val => {
-    let arr = [];
+    const arr = [];
 
     findDocument.forEach(doc => {
       if (!arr.includes(doc[val])) arr.push(doc[val]);
@@ -59,7 +61,7 @@ exports.searchDocument = async (req, res) => {
     count: countDocument,
     page,
     filtersCandidate,
-    nextLink: nextLink,
-    prevLink: prevLink
+    nextLink,
+    prevLink
   });
 };
