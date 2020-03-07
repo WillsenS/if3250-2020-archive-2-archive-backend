@@ -1,7 +1,12 @@
 const express = require('express');
 const { isAuthenticated, isNonAuthenticated } = require('../middlewares/user');
 const { signInSSO, postSignout } = require('../handlers/user');
-const { searchDocument, uploadArchive, postUploadArchive } = require('../handlers/document');
+const {
+  searchDocument,
+  uploadArchive,
+  postUploadArchive,
+  deleteArchive
+} = require('../handlers/document');
 
 const r = express.Router();
 
@@ -105,6 +110,9 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
 r.get('/search', searchDocument);
 
 r.post('/upload', postUploadArchive);
+
+// eslint-disable-next-line
+r.delete('/delete', deleteArchive);
 
 /*
  * Routes for testing pages
