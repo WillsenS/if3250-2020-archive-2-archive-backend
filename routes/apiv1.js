@@ -104,8 +104,11 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  */
 r.get('/search', searchDocument);
 
-r.get('/upload', uploadArchive);
-
 r.post('/upload', postUploadArchive);
+
+/*
+ * Routes for testing pages
+ */
+r.get('/upload', uploadArchive);
 
 module.exports = r;
