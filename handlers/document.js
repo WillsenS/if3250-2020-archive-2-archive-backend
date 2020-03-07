@@ -121,7 +121,6 @@ const buildModel = async (file, fields, saveOption) => {
       lokasi: fields.location
     }
   ];
-  console.log(dataDocument);
 
   if (saveOption === NEW_ARCHIVE || saveOption === EDIT_ARCHIVE_NEW_FILE) {
     // Create new file object
@@ -141,7 +140,8 @@ const buildModel = async (file, fields, saveOption) => {
     console.info(result);
 
     // eslint-disable-next-line
-    dataDocument.file = result[0]._id;
+    dataDocument[0].file = result[0]._id;
+    console.log(dataDocument);
 
     if (saveOption === NEW_ARCHIVE) {
       // Create new document, with attr 'file' referenced to the newly file
@@ -194,16 +194,20 @@ exports.postEditArchive = async (req, res) => {
 
 exports.deleteArchive = async (req, res) => {
   const { id } = req.body;
+  console.log(id);
 
   const foundDocument = await Document.find({ _id: id });
-
-  File.updateMany({}, { $pull: { files: { _id: foundDocument.file } } }, err => {
-    if (err) throw err;
-  });
+  console.log(foundDocument);
 
   // eslint-disable-next-line
-  Document.updateMany({}, { $pull: { documents: { _id: foundDocument._id } } }, err => {
+  let result = File.deleteOne({ _id: foundDocument[0].file  }, err => {
     if (err) throw err;
+    else console.log('File is deleted');
+  });
+  // eslint-disable-next-line
+  result = Document.deleteOne({ _id: id }, err => {
+    if (err) throw err;
+    else console.log('Document is deleted');
   });
 
   res.json({
