@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const File = require('../models/File');
 
 /**
  * Document Interface

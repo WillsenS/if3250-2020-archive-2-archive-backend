@@ -1,4 +1,4 @@
-const operators = require('./operators.js');
+const operators = require('./operators');
 
 /**
  * Translate query string of filter into mongoose query operator object
@@ -77,8 +77,8 @@ exports.translateMongooseFilter = filterString => {
           return result;
       }
     }
-    return result;
   });
+  return result;
 };
 
 /**

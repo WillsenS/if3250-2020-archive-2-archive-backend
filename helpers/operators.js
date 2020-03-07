@@ -28,11 +28,11 @@ module.exports = {
   },
   // Equal operator
   '==': (first, second) => {
-    return first === second;
+    return first == second;
   },
   // Not equeal operator
   '!=': (first, second) => {
-    return first !== second;
+    return first != second;
   },
   // Or operator
   ',': (first, second) => {
