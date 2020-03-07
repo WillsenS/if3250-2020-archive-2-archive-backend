@@ -88,8 +88,8 @@ const connect = new Promise((resolve, reject) => {
   resolve('Mongoose is connected');
 });
 
-/* eslint-disable */
 const saveModel = (connector, Resource, data) =>
+  // eslint-disable-next-line
   new Promise(async (resolve, reject) => {
     try {
       const connection = await connector;
@@ -108,7 +108,111 @@ const saveModel = (connector, Resource, data) =>
     }
   });
 
-/* eslint-enable */
+const NEW_ARCHIVE = 'new';
+const EDIT_ARCHIVE = 'edit';
+const EDIT_ARCHIVE_NEW_FILE = 'edit-upload';
+
+const buildModel = async (file, fields, saveOption) => {
+  const dataDocument = [
+    {
+      kode: fields.code,
+      judul: fields.title,
+      keterangan: fields.description,
+      lokasi: fields.location
+    }
+  ];
+  console.log(dataDocument);
+
+  if (saveOption === NEW_ARCHIVE || saveOption === EDIT_ARCHIVE_NEW_FILE) {
+    // Create new file object
+    const dataFile = [
+      {
+        originalname: file.filetoupload.name,
+        encoding: 'undefined-encoding',
+        filename: file.filetoupload.name,
+        mimetype: file.filetoupload.type,
+        size: file.filetoupload.size,
+        path: process.env.UPLOAD_DIR + file.filetoupload.name
+      }
+    ];
+    console.log(dataFile);
+
+    const result = await saveModel(connect, File, dataFile);
+    console.info(result);
+
+    // eslint-disable-next-line
+    dataDocument.file = result[0]._id;
+
+    if (saveOption === NEW_ARCHIVE) {
+      // Create new document, with attr 'file' referenced to the newly file
+      const resultDocument = await saveModel(connect, Document, dataDocument);
+      console.info(resultDocument);
+    } else if (saveOption === EDIT_ARCHIVE_NEW_FILE) {
+      // Update existing document, with attr 'file' referenced to the newly upload file
+    }
+  } else if (saveOption === EDIT_ARCHIVE) {
+    // Update existing document, with attr 'file' unchanged
+  }
+};
+
+exports.getArchiveDetail = async (req, res) => {
+  res.json({
+    apiVersion: res.locals.apiVersion,
+    message: 'Successfully retrieved archive',
+    data: {}
+  });
+};
+
+exports.postUploadArchive = async (req, res) => {
+  const form = new formidable.IncomingForm();
+
+  form.parse(req, async function(err, fields, file) {
+    buildModel(file, fields, NEW_ARCHIVE);
+
+    const oldpath = file.filetoupload.path;
+    const newpath =
+      process.env.NODE_PATH +
+      process.env.PUBLIC_DIR +
+      process.env.UPLOAD_DIR +
+      file.filetoupload.name;
+
+    mv(oldpath, newpath, function() {
+      res.json({
+        apiVersion: res.locals.apiVersion,
+        message: 'Successfully added and uploaded archive'
+      });
+    });
+  });
+};
+
+exports.postEditArchive = async (req, res) => {
+  res.json({
+    apiVersion: res.locals.apiVersion,
+    message: 'Successfully edited archive'
+  });
+};
+
+exports.deleteArchive = async (req, res) => {
+  const { id } = req.body;
+
+  const foundDocument = await Document.find({ _id: id });
+
+  File.updateMany({}, { $pull: { files: { _id: foundDocument.file } } }, err => {
+    if (err) throw err;
+  });
+
+  // eslint-disable-next-line
+  Document.updateMany({}, { $pull: { documents: { _id: foundDocument._id } } }, err => {
+    if (err) throw err;
+  });
+
+  res.json({
+    apiVersion: res.locals.apiVersion,
+    message: 'Successfully deleted archive data. Archive file still exist'
+  });
+};
+
+// Pages for testing
 
 exports.uploadArchive = (req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -121,57 +225,4 @@ exports.uploadArchive = (req, res) => {
   res.write('<input type="submit">');
   res.write('</form>');
   return res.end();
-};
-
-exports.postUploadArchive = async (req, res) => {
-  const form = new formidable.IncomingForm();
-
-  form.parse(req, async function(err, fields, files) {
-    const oldpath = files.filetoupload.path;
-    const newpath =
-      process.env.NODE_PATH +
-      process.env.PUBLIC_DIR +
-      process.env.UPLOAD_DIR +
-      files.filetoupload.name;
-
-    const data = [
-      {
-        originalname: files.filetoupload.name,
-        encoding: 'undefined-encoding',
-        filename: files.filetoupload.name,
-        mimetype: files.filetoupload.type,
-        size: files.filetoupload.size,
-        path: process.env.UPLOAD_DIR + files.filetoupload.name
-      }
-    ];
-
-    console.log(data);
-
-    const result = await saveModel(connect, File, data);
-    console.info(result);
-
-    /* eslint-disable */
-    const dataDocument = [
-      {
-        kode: fields.code,
-        judul: fields.title,
-        keterangan: fields.description,
-        lokasi: fields.location,
-        file: result[0]._id
-      }
-    ];
-    /* eslint-enable */
-
-    console.log(dataDocument);
-
-    const resultDocument = await saveModel(connect, Document, dataDocument);
-    console.info(resultDocument);
-
-    mv(oldpath, newpath, function() {
-      res.json({
-        apiVersion: res.locals.apiVersion,
-        message: 'Successfully added and uploaded archive'
-      });
-    });
-  });
 };
