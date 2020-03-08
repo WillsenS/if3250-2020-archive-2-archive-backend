@@ -77,8 +77,9 @@ exports.translateMongooseFilter = filterString => {
           return result;
       }
     }
+
+    return result;
   });
-  return result;
 };
 
 /**
