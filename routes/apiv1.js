@@ -1,7 +1,13 @@
 const express = require('express');
 const { isAuthenticated, isNonAuthenticated } = require('../middlewares/user');
 const { signInSSO, postSignout } = require('../handlers/user');
-const { searchDocument } = require('../handlers/document');
+const {
+  searchDocument,
+  uploadArchive,
+  postUploadArchive,
+  patchEditArchive,
+  deleteArchive
+} = require('../handlers/document');
 
 const r = express.Router();
 
@@ -103,5 +109,17 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  *         description: "Caught exception on server"
  */
 r.get('/search', searchDocument);
+
+r.post('/upload', postUploadArchive);
+
+r.patch('/edit/:id', patchEditArchive);
+
+// eslint-disable-next-line
+r.delete('/delete/:id', deleteArchive);
+
+/*
+ * Routes for testing pages
+ */
+r.get('/upload', uploadArchive);
 
 module.exports = r;

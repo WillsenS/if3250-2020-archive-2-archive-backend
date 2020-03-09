@@ -29,7 +29,7 @@ deployToStaging:
     - bash deploy/deploy-staging.sh
   environment:
     name: staging
-    url: https://demoapp.my.id/
+    url: https://api.demoapp.my.id/
   only:
     - develop
 
