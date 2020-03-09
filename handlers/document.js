@@ -109,7 +109,6 @@ const saveModel = (connector, Resource, data) =>
   });
 
 const NEW_ARCHIVE = 'new';
-const EDIT_ARCHIVE = 'edit';
 const EDIT_ARCHIVE_NEW_FILE = 'edit-upload';
 
 const buildModel = async (file, fields, saveOption) => {
@@ -150,8 +149,6 @@ const buildModel = async (file, fields, saveOption) => {
     } else if (saveOption === EDIT_ARCHIVE_NEW_FILE) {
       // Update existing document, with attr 'file' referenced to the newly upload file
     }
-  } else if (saveOption === EDIT_ARCHIVE) {
-    // Update existing document, with attr 'file' unchanged
   }
 };
 
@@ -185,15 +182,39 @@ exports.postUploadArchive = async (req, res) => {
   });
 };
 
-exports.postEditArchive = async (req, res) => {
-  res.json({
-    apiVersion: res.locals.apiVersion,
-    message: 'Successfully edited archive'
+exports.patchEditArchive = async (req, res) => {
+  const { id } = req.params;
+  const form = new formidable.IncomingForm();
+
+  form.parse(req, async function(err, fields) {
+    const foundDocument = await Document.find({ _id: id });
+
+    const dataDocument = {
+      kode: fields.code,
+      judul: fields.title,
+      keterangan: fields.description,
+      lokasi: fields.location,
+      file: foundDocument[0].file
+    };
+
+    Document.findOneAndUpdate(
+      { _id: id },
+      dataDocument,
+      { upsert: false, useFindAndModify: false },
+      function(e, doc) {
+        if (e) throw e;
+        console.log(doc);
+        res.json({
+          apiVersion: res.locals.apiVersion,
+          message: 'Successfully edited archive'
+        });
+      }
+    );
   });
 };
 
 exports.deleteArchive = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
   console.log(id);
 
   const foundDocument = await Document.find({ _id: id });
