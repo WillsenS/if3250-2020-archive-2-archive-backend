@@ -5,6 +5,7 @@ const {
   searchDocument,
   uploadArchive,
   postUploadArchive,
+  patchEditArchive,
   deleteArchive
 } = require('../handlers/document');
 
@@ -111,8 +112,10 @@ r.get('/search', searchDocument);
 
 r.post('/upload', postUploadArchive);
 
+r.patch('/edit/:id', patchEditArchive);
+
 // eslint-disable-next-line
-r.delete('/delete', deleteArchive);
+r.delete('/delete/:id', deleteArchive);
 
 /*
  * Routes for testing pages
