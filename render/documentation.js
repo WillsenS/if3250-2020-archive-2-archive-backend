@@ -14,7 +14,7 @@ exports.getIndexContent = (req, res) => {
   if (process.env.NODE_ENV === 'development') {
     indexContent = indexContent.replace(
       'https://petstore.swagger.io/v2/swagger.json',
-      `http://localhost:${process.env.PORT || 3000}/documentation/v1/swagger.json`
+      `http://localhost:${process.env.PORT || 3001}/documentation/v1/swagger.json`
     );
   } else if (process.env.NODE_ENV === 'staging') {
     indexContent = indexContent.replace(
