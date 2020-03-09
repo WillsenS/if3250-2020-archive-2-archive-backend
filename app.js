@@ -9,6 +9,7 @@ const errorHandler = require('errorhandler');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const cors = require('cors');
 const MongoStore = require('connect-mongo')(session);
 const https = require('https');
 const http = require('http');
@@ -65,15 +66,28 @@ app.use(
  * Express configuration.
  */
 app.set('host', process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
-app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 3000);
+app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 3001);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+app.use(
+  cors({
+    origin: true,
+    credentials: true
+  })
+);
 app.use(expressStatusMonitor());
 app.use(compression());
 app.use(checkSSORedirect());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(
+  '/',
+  express['static'](path.join(__dirname, 'public'), {
+    maxAge: 31557600000
+  })
+);
 
 app.use('/documentation/v1', documentationv1);
 app.use('/api/v1', setApiVersion('1.0'), apiv1);
@@ -113,7 +127,7 @@ if (process.env.NODE_ENV === 'development') {
  * Start Express server.
  */
 if (process.env.NODE_ENV === 'development') {
-  app.listen(app.get('port'), () => {
+  app.listen(3001, () => {
     console.log(
       '%s App is running at http://localhost:%d in %s mode',
       chalk.green('✓'),
@@ -138,7 +152,7 @@ if (process.env.NODE_ENV === 'development') {
   http
     .createServer(function(req, res) {
       // 301 redirect (reclassifies google listings)
-      res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
+      res.writeHead(app.get('port'), { Location: `https://${req.headers.host}${req.url}` });
       res.end();
     })
     .listen(80, function() {
