@@ -120,3 +120,19 @@ exports.postSignout = async (req, res) => {
     });
   }
 };
+
+exports.getUsers = async (req, res) => {
+  res.json({
+    apiVersion: res.locals.apiVersion,
+    message: 'Successfully retrieved archive',
+    data: {}
+  });
+};
+
+exports.getUserDetail = async (req, res) => {
+  res.json({
+    apiVersion: res.locals.apiVersion,
+    message: 'Successfully retrieved archive',
+    data: {}
+  });
+};

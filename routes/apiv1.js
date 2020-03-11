@@ -3,6 +3,7 @@ const { isAuthenticated, isNonAuthenticated } = require('../middlewares/user');
 const { signInSSO, postSignout } = require('../handlers/user');
 const {
   searchDocument,
+  getArchiveDetail,
   uploadArchive,
   postUploadArchive,
   patchEditArchive,
@@ -109,6 +110,8 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  *         description: "Caught exception on server"
  */
 r.get('/search', searchDocument);
+
+r.get('/detail/:id', getArchiveDetail);
 
 r.post('/upload', postUploadArchive);
 

@@ -112,6 +112,10 @@ const NEW_ARCHIVE = 'new';
 const EDIT_ARCHIVE_NEW_FILE = 'edit-upload';
 
 const buildModel = async (file, fields, saveOption) => {
+  if (!file.filetoupload) {
+    throw new Error('Uploaded file not found');
+  }
+
   const dataDocument = [
     {
       kode: fields.code,
@@ -164,21 +168,32 @@ exports.postUploadArchive = async (req, res) => {
   const form = new formidable.IncomingForm();
 
   form.parse(req, async function(err, fields, file) {
-    buildModel(file, fields, NEW_ARCHIVE);
+    try {
+      await buildModel(file, fields, NEW_ARCHIVE);
 
-    const oldpath = file.filetoupload.path;
-    const newpath =
-      process.env.NODE_PATH +
-      process.env.PUBLIC_DIR +
-      process.env.UPLOAD_DIR +
-      file.filetoupload.name;
+      if (!file.filetoupload) {
+        throw new Error('Uploaded file not found');
+      }
+      const oldpath = file.filetoupload.path;
+      const newpath =
+        process.env.NODE_PATH +
+        process.env.PUBLIC_DIR +
+        process.env.UPLOAD_DIR +
+        file.filetoupload.name;
 
-    mv(oldpath, newpath, function() {
-      res.json({
-        apiVersion: res.locals.apiVersion,
-        message: 'Successfully added and uploaded archive'
+      mv(oldpath, newpath, function() {
+        res.json({
+          apiVersion: res.locals.apiVersion,
+          message: 'Successfully added and uploaded archive'
+        });
       });
-    });
+    } catch (e) {
+      console.error(e);
+      res.status(400).json({
+        apiVersion: res.locals.apiVersion,
+        message: 'Error. Bad request'
+      });
+    }
   });
 };
 
@@ -187,54 +202,81 @@ exports.patchEditArchive = async (req, res) => {
   const form = new formidable.IncomingForm();
 
   form.parse(req, async function(err, fields) {
-    const foundDocument = await Document.find({ _id: id });
+    try {
+      const foundDocument = await Document.find({ _id: id });
 
-    const dataDocument = {
-      kode: fields.code,
-      judul: fields.title,
-      keterangan: fields.description,
-      lokasi: fields.location,
-      file: foundDocument[0].file
-    };
+      const dataDocument = {
+        kode: fields.code,
+        judul: fields.title,
+        keterangan: fields.description,
+        lokasi: fields.location,
+        file: foundDocument[0].file
+      };
 
-    Document.findOneAndUpdate(
-      { _id: id },
-      dataDocument,
-      { upsert: false, useFindAndModify: false },
-      function(e, doc) {
-        if (e) throw e;
-        console.log(doc);
-        res.json({
-          apiVersion: res.locals.apiVersion,
-          message: 'Successfully edited archive'
-        });
-      }
-    );
+      Document.findOneAndUpdate(
+        { _id: id },
+        dataDocument,
+        { upsert: false, useFindAndModify: false },
+        function(e, doc) {
+          if (e) {
+            console.error(e);
+            res.status(400).json({
+              apiVersion: res.locals.apiVersion,
+              message: 'Error. Bad request'
+            });
+          }
+          console.log(doc);
+          res.json({
+            apiVersion: res.locals.apiVersion,
+            message: 'Successfully edited archive'
+          });
+        }
+      );
+    } catch (e) {
+      console.error(e);
+      res.status(400).json({
+        apiVersion: res.locals.apiVersion,
+        message: 'Error. Bad request'
+      });
+    }
   });
 };
 
 exports.deleteArchive = async (req, res) => {
-  const { id } = req.params;
-  console.log(id);
+  try {
+    const { id } = req.params;
+    const foundDocument = await Document.find({ _id: id });
 
-  const foundDocument = await Document.find({ _id: id });
-  console.log(foundDocument);
+    // eslint-disable-next-line
+    let result = File.deleteOne({ _id: foundDocument[0].file  }, err => {
+      if (err) {
+        res.status(400).json({
+          apiVersion: res.locals.apiVersion,
+          message: 'Error. Bad request'
+        });
+      }
+    });
+    // eslint-disable-next-line
+    result = Document.deleteOne({ _id: id }, err => {
+      if (err) {
+        res.status(400).json({
+          apiVersion: res.locals.apiVersion,
+          message: 'Error. Bad request'
+        });
+      }
+    });
 
-  // eslint-disable-next-line
-  let result = File.deleteOne({ _id: foundDocument[0].file  }, err => {
-    if (err) throw err;
-    else console.log('File is deleted');
-  });
-  // eslint-disable-next-line
-  result = Document.deleteOne({ _id: id }, err => {
-    if (err) throw err;
-    else console.log('Document is deleted');
-  });
-
-  res.json({
-    apiVersion: res.locals.apiVersion,
-    message: 'Successfully deleted archive data. Archive file still exist'
-  });
+    res.json({
+      apiVersion: res.locals.apiVersion,
+      message: 'Successfully deleted archive data. Archive file still exist'
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({
+      apiVersion: res.locals.apiVersion,
+      message: 'Error. Bad request'
+    });
+  }
 };
 
 // Pages for testing

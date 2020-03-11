@@ -1,6 +1,10 @@
 const request = require('supertest');
 const app = require('../../app');
 
+/*
+ * SEARCH TEST
+ */
+
 const filterCandidate = ['lokasi', 'kode'];
 
 describe('Search Endpoints without Query', () => {
@@ -59,5 +63,33 @@ describe('Search Endpoints with Query and Filter', () => {
     filterCandidate.forEach(val => {
       expect(filtersCandidate[val].length >= 0).toEqual(true);
     });
+  });
+});
+
+/*
+ * ARCHIVE TEST
+ */
+
+describe('Upload archive without data', () => {
+  it('should return error response with status 400', async () => {
+    const res = await request(app).post('/api/v1/upload');
+
+    expect(res.statusCode).toEqual(400);
+  });
+});
+
+describe('Edit archive with invalid id', () => {
+  it('should return error response with status 400', async () => {
+    const res = await request(app).patch('/api/v1/edit/abcd');
+
+    expect(res.statusCode).toEqual(400);
+  });
+});
+
+describe('Delete archive with invalid id', () => {
+  it('should return error response with status 400', async () => {
+    const res = await request(app)['delete']('/api/v1/delete/abcd');
+
+    expect(res.statusCode).toEqual(400);
   });
 });
