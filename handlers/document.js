@@ -1,9 +1,8 @@
 /* eslint-disable no-await-in-loop */
 const formidable = require('formidable');
 const mv = require('mv');
-const mongoose = require('mongoose');
 const Document = require('../models/Document');
-const { translateFiltersMongoose } = require('../helpers');
+const { translateFiltersMongoose, saveModel } = require('../helpers');
 const File = require('../models/File');
 
 exports.searchDocument = async (req, res) => {
@@ -75,43 +74,10 @@ exports.searchDocument = async (req, res) => {
   }
 };
 
-const connect = new Promise((resolve, reject) => {
-  mongoose.connect(process.env.MONGODB_URI, {
-    useUnifiedTopology: true,
-    useFindAndModify: true,
-    useCreateIndex: true,
-    useNewUrlParser: true
-  });
-  mongoose.connection.on('error', err => {
-    reject(err);
-  });
-  resolve('Mongoose is connected');
-});
-
-const saveModel = (connector, Resource, data) =>
-  // eslint-disable-next-line
-  new Promise(async (resolve, reject) => {
-    try {
-      const connection = await connector;
-      if (connection) {
-        const promiseArray = data.map(item => {
-          const newItem = new Resource(item);
-          return newItem.save();
-        });
-
-        const result = await Promise.all(promiseArray);
-        resolve(result);
-      }
-      throw new Error('Connection could not be established');
-    } catch (e) {
-      reject(e);
-    }
-  });
-
 const NEW_ARCHIVE = 'new';
 const EDIT_ARCHIVE_NEW_FILE = 'edit-upload';
 
-const buildModel = async (file, fields, saveOption) => {
+const buildArchive = async (file, fields, saveOption) => {
   if (!file.filetoupload) {
     throw new Error('Uploaded file not found');
   }
@@ -139,7 +105,7 @@ const buildModel = async (file, fields, saveOption) => {
     ];
     console.log(dataFile);
 
-    const result = await saveModel(connect, File, dataFile);
+    const result = await saveModel(File, dataFile);
     console.info(result);
 
     // eslint-disable-next-line
@@ -148,7 +114,7 @@ const buildModel = async (file, fields, saveOption) => {
 
     if (saveOption === NEW_ARCHIVE) {
       // Create new document, with attr 'file' referenced to the newly file
-      const resultDocument = await saveModel(connect, Document, dataDocument);
+      const resultDocument = await saveModel(Document, dataDocument);
       console.info(resultDocument);
     } else if (saveOption === EDIT_ARCHIVE_NEW_FILE) {
       // Update existing document, with attr 'file' referenced to the newly upload file
@@ -169,7 +135,7 @@ exports.postUploadArchive = async (req, res) => {
 
   form.parse(req, async function(err, fields, file) {
     try {
-      await buildModel(file, fields, NEW_ARCHIVE);
+      await buildArchive(file, fields, NEW_ARCHIVE);
 
       if (!file.filetoupload) {
         throw new Error('Uploaded file not found');

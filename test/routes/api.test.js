@@ -1,6 +1,8 @@
 const request = require('supertest');
 const app = require('../../app');
 
+jest.setTimeout(10000);
+
 /*
  * SEARCH TEST
  */
