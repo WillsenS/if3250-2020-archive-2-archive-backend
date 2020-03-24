@@ -125,25 +125,39 @@ exports.postSignout = async (req, res) => {
   }
 };
 
-exports.getUsers = async (req, res) => {
+const findUsers = async (page, q, res) => {
   try {
-    let { page } = req.query;
-    page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
-
+    let baseLink;
+    let searchQuery;
     const limit = 5;
-    const foundUser = await User.find()
+
+    if (q) {
+      searchQuery = {
+        $text: {
+          $search: q
+            .split(' ')
+            .map(str => `"${str}"`)
+            .join(' ')
+        }
+      };
+      baseLink = `${process.env.BASE_URL}/api/v1/user-search?q=${q}`;
+    } else {
+      searchQuery = {};
+      baseLink = `${process.env.BASE_URL}/api/v1/users?`;
+    }
+
+    const countUser = await User.countDocuments(searchQuery);
+    const foundUser = await User.find(searchQuery)
       .limit(limit)
       .skip((page - 1) * limit);
 
-    const countUser = await User.countDocuments();
     const totalPages = Math.ceil(countUser / limit);
-    const baseLink = `${process.env.BASE_URL}/api/v1/users`;
-    const nextLink = totalPages > page ? `${baseLink}?page=${page + 1}` : '#';
-    const prevLink = page > 1 ? `${baseLink}?page=${page - 1}` : '#';
+    const nextLink = totalPages > page ? `${baseLink}page=${page + 1}` : '#';
+    const prevLink = page > 1 ? `${baseLink}page=${page - 1}` : '#';
 
     res.json({
       apiVersion: res.locals.apiVersion,
-      message: 'Successfully retrieved all users',
+      message: 'Successfully retrieved users',
       count: countUser,
       currentPage: page,
       totalPages,
@@ -151,6 +165,27 @@ exports.getUsers = async (req, res) => {
       prevLink,
       data: foundUser
     });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+exports.getUsers = async (req, res) => {
+  try {
+    let { page } = req.query;
+    page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
+
+    await findUsers(page, null, res);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+exports.searchUser = async (req, res) => {
+  try {
+    const { q, page } = req.query;
+
+    await findUsers(page, q, res);
   } catch (err) {
     console.error(err);
   }
