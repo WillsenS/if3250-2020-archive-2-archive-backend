@@ -1,6 +1,7 @@
 /* eslint-disable dot-notation */
 const axios = require('axios');
 const convert = require('xml-js');
+const formidable = require('formidable');
 const User = require('../models/User');
 
 const { defaultURL } = require('../config');
@@ -120,6 +121,104 @@ exports.postSignout = async (req, res) => {
         code: 500,
         message: 'Error occured during signing out process'
       }
+    });
+  }
+};
+
+exports.getUsers = async (req, res) => {
+  const countUser = await User.countDocuments();
+  const allUser = await User.find();
+
+  res.json({
+    apiVersion: res.locals.apiVersion,
+    message: 'Successfully retrieved all users',
+    draw: 0,
+    recordsTotal: countUser,
+    recordsFiltered: countUser,
+    data: allUser
+  });
+};
+
+exports.getUserDetail = async (req, res) => {
+  const { id } = req.params;
+  const foundUser = await User.find({ _id: id });
+
+  res.json({
+    apiVersion: res.locals.apiVersion,
+    message: 'Successfully retrieved user detail',
+    data: foundUser[0]
+  });
+};
+
+exports.patchEditUser = async (req, res) => {
+  const { id } = req.params;
+  const form = new formidable.IncomingForm();
+
+  form.parse(req, async function(err, fields) {
+    try {
+      const dataUser = [
+        {
+          username: fields.username,
+          fullname: fields.fullname,
+          mail: fields.mail,
+          mailNonITB: fields.mailNonITB,
+          ou: fields.ou,
+          status: fields.status
+        }
+      ];
+
+      User.findOneAndUpdate(
+        { _id: id },
+        dataUser,
+        { upsert: false, useFindAndModify: false },
+        function(e, doc) {
+          if (e) {
+            console.error(e);
+            res.status(400).json({
+              apiVersion: res.locals.apiVersion,
+              message: 'Error. Bad request'
+            });
+          }
+          console.log(doc);
+          res.json({
+            apiVersion: res.locals.apiVersion,
+            message: 'Successfully edited archive'
+          });
+        }
+      );
+    } catch (e) {
+      console.error(e);
+      res.status(400).json({
+        apiVersion: res.locals.apiVersion,
+        message: 'Error. Bad request'
+      });
+    }
+  });
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // eslint-disable-next-line
+    result = User.deleteOne({ _id: id }, err => {
+      if (err) {
+        res.status(400).json({
+          apiVersion: res.locals.apiVersion,
+          message: 'Error. Bad request'
+        });
+      }
+    });
+
+    res.json({
+      apiVersion: res.locals.apiVersion,
+      message: 'Successfully deleted archive data. Archive file still exist'
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({
+      apiVersion: res.locals.apiVersion,
+      message: 'Error. Bad request'
     });
   }
 };
