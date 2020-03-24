@@ -3,6 +3,8 @@ const axios = require('axios');
 const convert = require('xml-js');
 const User = require('../models/User');
 
+const { defaultURL } = require('../config');
+
 /**
  * Router that will check ticket from SSO ITB
  * if the ticket is match, then user is authentication.
@@ -11,13 +13,14 @@ const User = require('../models/User');
 exports.checkSSORedirect = () => {
   return async (req, res, next) => {
     const { ticket } = req.query;
-    const redirectURL = `https://${req.headers.host}${req.path}`;
 
     if (ticket != null) {
       try {
         const response = await axios.get(
-          `https://login.itb.ac.id/cas/serviceValidate?ticket=${ticket}&service=${redirectURL}`
+          `https://login.itb.ac.id/cas/serviceValidate?ticket=${ticket}&service=${defaultURL}`
         );
+
+        console.log(response);
 
         const result = await JSON.parse(
           convert.xml2json(response.data, { compact: true, spaces: 4 })
@@ -29,7 +32,7 @@ exports.checkSSORedirect = () => {
           serviceResponse['cas:authenticationFailure']['_attributes'] &&
           serviceResponse['cas:authenticationFailure']['_attributes']['code'] === 'INVALID_TICKET'
         ) {
-          return res.redirect(`https://login.itb.ac.id/cas/login?service=${redirectURL}`);
+          return res.redirect(`https://login.itb.ac.id/cas/login?service=${defaultURL}`);
         }
 
         const successResponse = serviceResponse['cas:authenticationSuccess'];
