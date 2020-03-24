@@ -126,17 +126,34 @@ exports.postSignout = async (req, res) => {
 };
 
 exports.getUsers = async (req, res) => {
-  const countUser = await User.countDocuments();
-  const allUser = await User.find();
+  try {
+    let { page } = req.query;
+    page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
 
-  res.json({
-    apiVersion: res.locals.apiVersion,
-    message: 'Successfully retrieved all users',
-    draw: 0,
-    recordsTotal: countUser,
-    recordsFiltered: countUser,
-    data: allUser
-  });
+    const limit = 5;
+    const foundUser = await User.find()
+      .limit(limit)
+      .skip((page - 1) * limit);
+
+    const countUser = await User.countDocuments();
+    const totalPages = Math.ceil(countUser / limit);
+    const baseLink = `${process.env.BASE_URL}/api/v1/users`;
+    const nextLink = totalPages > page ? `${baseLink}?page=${page + 1}` : '#';
+    const prevLink = page > 1 ? `${baseLink}?page=${page - 1}` : '#';
+
+    res.json({
+      apiVersion: res.locals.apiVersion,
+      message: 'Successfully retrieved all users',
+      count: countUser,
+      currentPage: page,
+      totalPages,
+      nextLink,
+      prevLink,
+      data: foundUser
+    });
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 exports.getUserDetail = async (req, res) => {
