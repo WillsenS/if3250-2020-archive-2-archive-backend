@@ -2,7 +2,7 @@
 const formidable = require('formidable');
 const mv = require('mv');
 const Document = require('../models/Document');
-const { translateFiltersMongoose, saveModel } = require('../helpers');
+const { translateFiltersMongoose, saveModel, sendResponse } = require('../helpers');
 const File = require('../models/File');
 
 exports.searchDocument = async (req, res) => {
@@ -60,7 +60,7 @@ exports.searchDocument = async (req, res) => {
       filtersCandidate[val] = findDistictAttribute.sort();
     }
 
-    res.json({
+    return sendResponse(res, 200, 'OK', {
       data: findDocument,
       count: countDocument,
       currentPage: page,
@@ -71,6 +71,7 @@ exports.searchDocument = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
   }
 };
 
@@ -123,11 +124,14 @@ const buildArchive = async (file, fields, saveOption) => {
 };
 
 exports.getArchiveDetail = async (req, res) => {
-  res.json({
-    apiVersion: res.locals.apiVersion,
-    message: 'Successfully retrieved archive',
-    data: {}
-  });
+  try {
+    const { id } = req.params;
+    const findDocument = await Document.find({ _id: id });
+    return sendResponse(res, 200, 'Successfully retrieved archive', { data: findDocument });
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
 };
 
 exports.postUploadArchive = async (req, res) => {
@@ -147,18 +151,15 @@ exports.postUploadArchive = async (req, res) => {
         process.env.UPLOAD_DIR +
         file.filetoupload.name;
 
+      console.log(newpath);
       mv(oldpath, newpath, function() {
-        res.json({
-          apiVersion: res.locals.apiVersion,
-          message: 'Successfully added and uploaded archive'
-        });
+        return 1;
       });
+
+      return sendResponse(res, 200, 'Successfully added and uploaded archive');
     } catch (e) {
       console.error(e);
-      res.status(400).json({
-        apiVersion: res.locals.apiVersion,
-        message: 'Error. Bad request'
-      });
+      return sendResponse(res, 400, 'Error. Bad request');
     }
   });
 };
@@ -179,31 +180,15 @@ exports.patchEditArchive = async (req, res) => {
         file: foundDocument[0].file
       };
 
-      Document.findOneAndUpdate(
-        { _id: id },
-        dataDocument,
-        { upsert: false, useFindAndModify: false },
-        function(e, doc) {
-          if (e) {
-            console.error(e);
-            res.status(400).json({
-              apiVersion: res.locals.apiVersion,
-              message: 'Error. Bad request'
-            });
-          }
-          console.log(doc);
-          res.json({
-            apiVersion: res.locals.apiVersion,
-            message: 'Successfully edited archive'
-          });
-        }
-      );
+      Document.findOneAndUpdate({ _id: id }, dataDocument, {
+        upsert: false,
+        useFindAndModify: false
+      });
+
+      return sendResponse(res, 200, 'Successfully edited archive');
     } catch (e) {
       console.error(e);
-      res.status(400).json({
-        apiVersion: res.locals.apiVersion,
-        message: 'Error. Bad request'
-      });
+      return sendResponse(res, 400, 'Error. Bad request');
     }
   });
 };
@@ -214,34 +199,14 @@ exports.deleteArchive = async (req, res) => {
     const foundDocument = await Document.find({ _id: id });
 
     // eslint-disable-next-line
-    let result = File.deleteOne({ _id: foundDocument[0].file  }, err => {
-      if (err) {
-        res.status(400).json({
-          apiVersion: res.locals.apiVersion,
-          message: 'Error. Bad request'
-        });
-      }
-    });
+    let result = File.deleteOne({ _id: foundDocument[0].file  });
     // eslint-disable-next-line
-    result = Document.deleteOne({ _id: id }, err => {
-      if (err) {
-        res.status(400).json({
-          apiVersion: res.locals.apiVersion,
-          message: 'Error. Bad request'
-        });
-      }
-    });
+    result = Document.deleteOne({ _id: id });
 
-    res.json({
-      apiVersion: res.locals.apiVersion,
-      message: 'Successfully deleted archive data. Archive file still exist'
-    });
+    return sendResponse(res, 200, 'Successfully deleted archive data. Archive file still exist');
   } catch (err) {
     console.error(err);
-    res.status(400).json({
-      apiVersion: res.locals.apiVersion,
-      message: 'Error. Bad request'
-    });
+    return sendResponse(res, 400, 'Error. Bad request');
   }
 };
 
