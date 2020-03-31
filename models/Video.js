@@ -11,50 +11,12 @@ const File = require('../models/File');
  * @property {String} lokasi Lokasi arsip
  * @property {String} file File arsip
  */
+const Id = mongoose.Types.ObjectId;
 const documentSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      unique: false
-    },
-    type: {
-      type: String,
-      required: true,
-      unique: false
-    },
-    judul: {
-      type: String,
-      required: true
-    },
-    code: {
-      type: String,
-      required: true
-    },
-    location: {
-      type: String,
-      required: true
-    },
-    description: {
-      type: String,
-      required: true
-    },
-    date: {
-      type: Date,
-      required: true
-    },
-    dateUploaded: {
-      type: Date,
-      required: true
-    },
-    archiveLocation: {
-      type: String,
-      required: true
-    },
-    mime: {
-      type: String,
-      required: true,
-      required: true
+    archive: {
+      type: Id,
+      ref: 'Archive'
     },
     narrator: {
       type: String,
@@ -75,10 +37,6 @@ const documentSchema = new mongoose.Schema(
     hak_akses: {
       type: [String],
       required: true
-    },
-    file: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'File'
     }
   },
   { timestamps: true }
