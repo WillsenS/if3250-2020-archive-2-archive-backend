@@ -54,7 +54,6 @@ const documentSchema = new mongoose.Schema(
     },
     mime: {
       type: String,
-      required: true,
       required: true
     },
     hak_akses: {

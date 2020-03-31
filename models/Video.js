@@ -37,4 +37,3 @@ const documentSchema = new mongoose.Schema(
 const Document = mongoose.model('Video', documentSchema);
 
 module.exports = Document;
-
