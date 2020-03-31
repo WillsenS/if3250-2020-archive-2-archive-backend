@@ -34,7 +34,6 @@ const documentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-documentSchema.index({ judul: 'audio', keterangan: 'audio' });
 const Document = mongoose.model('Audio', documentSchema);
 
 module.exports = Document;

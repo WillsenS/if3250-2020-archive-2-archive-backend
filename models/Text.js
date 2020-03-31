@@ -25,20 +25,11 @@ const documentSchema = new mongoose.Schema(
     author: {
       type: String,
       required: true
-    },
-    hak_akses: {
-      type: [String],
-      required: true
-    },
-    unit_kerja_terkait: {
-      type: [String],
-      required: true
     }
   },
   { timestamps: true }
 );
 
-documentSchema.index({ judul: 'text', keterangan: 'text' });
 const Document = mongoose.model('Text', documentSchema);
 
 module.exports = Document;

@@ -29,20 +29,11 @@ const documentSchema = new mongoose.Schema(
     activityDescription: {
       type: String,
       required: true
-    },
-    unit_kerja_terkait: {
-      type: [String],
-      required: true
-    },
-    hak_akses: {
-      type: [String],
-      required: true
     }
   },
   { timestamps: true }
 );
 
-documentSchema.index({ judul: 'video', keterangan: 'video' });
 const Document = mongoose.model('Video', documentSchema);
 
 module.exports = Document;

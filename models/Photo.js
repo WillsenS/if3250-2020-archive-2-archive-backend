@@ -34,7 +34,6 @@ const documentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-documentSchema.index({ judul: 'photo', keterangan: 'photo' });
 const Document = mongoose.model('Photo', documentSchema);
 
 module.exports = Document;

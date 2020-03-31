@@ -77,7 +77,7 @@ const documentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-documentSchema.index({ judul: 'archive', keterangan: 'archive' });
+documentSchema.index({ judul: 'text', keterangan: 'text' });
 const Document = mongoose.model('Archive', documentSchema);
 
 module.exports = Document;
