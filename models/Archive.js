@@ -11,6 +11,7 @@ const File = require('../models/File');
  * Document Interface
  * @typedef {Object} Document
  * @property {String} judul Judul arsip
+ * @property {String} tipe Tipe arsip Audio/Video/Text/Photo
  * @property {String} nomor Nomor arsip
  * @property {String} pola Pola klasifikasi arsip
  * @property {String} lokasi_kegiatan Lokasi kegiatan atau lokasi pembuatan arsip
@@ -29,6 +30,10 @@ const Id = mongoose.Schema.Types.ObjectId;
 const documentSchema = new mongoose.Schema(
   {
     judul: {
+      type: String,
+      required: true
+    },
+    tipe: {
       type: String,
       required: true
     },
