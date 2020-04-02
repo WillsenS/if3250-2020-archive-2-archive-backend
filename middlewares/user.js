@@ -23,14 +23,14 @@ const isValid = async user => {
  */
 exports.isAuthenticated = async (req, res, next) => {
   const bearerHeader = req.headers.authorization;
+
   if (bearerHeader) {
     const bearer = bearerHeader.split(' ');
     const bearerToken = bearer[1];
 
     const decode = jwt.verify(bearerToken, secret);
-
     const valid = await isValid(decode.user);
-    console.log(valid);
+
     if (decode.user && valid) {
       req.session.user = decode.user;
       return next();

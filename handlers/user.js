@@ -24,8 +24,6 @@ exports.checkSSORedirect = () => {
           `https://login.itb.ac.id/cas/serviceValidate?ticket=${ticket}&service=${defaultURL}`
         );
 
-        console.log(response);
-
         const result = await JSON.parse(
           convert.xml2json(response.data, { compact: true, spaces: 4 })
         );
