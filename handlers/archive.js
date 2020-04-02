@@ -1,9 +1,8 @@
 /* eslint-disable no-await-in-loop */
 const formidable = require('formidable');
 const mv = require('mv');
-const mongoose = require('mongoose');
 const Document = require('../models/Document');
-const { translateFiltersMongoose } = require('../helpers');
+const { translateFiltersMongoose, saveModel, sendResponse } = require('../helpers');
 const File = require('../models/File');
 
 exports.searchDocument = async (req, res) => {
@@ -61,7 +60,7 @@ exports.searchDocument = async (req, res) => {
       filtersCandidate[val] = findDistictAttribute.sort();
     }
 
-    res.json({
+    return sendResponse(res, 200, 'OK', {
       data: findDocument,
       count: countDocument,
       currentPage: page,
@@ -72,46 +71,18 @@ exports.searchDocument = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
   }
 };
-
-const connect = new Promise((resolve, reject) => {
-  mongoose.connect(process.env.MONGODB_URI, {
-    useUnifiedTopology: true,
-    useFindAndModify: true,
-    useCreateIndex: true,
-    useNewUrlParser: true
-  });
-  mongoose.connection.on('error', err => {
-    reject(err);
-  });
-  resolve('Mongoose is connected');
-});
-
-const saveModel = (connector, Resource, data) =>
-  // eslint-disable-next-line
-  new Promise(async (resolve, reject) => {
-    try {
-      const connection = await connector;
-      if (connection) {
-        const promiseArray = data.map(item => {
-          const newItem = new Resource(item);
-          return newItem.save();
-        });
-
-        const result = await Promise.all(promiseArray);
-        resolve(result);
-      }
-      throw new Error('Connection could not be established');
-    } catch (e) {
-      reject(e);
-    }
-  });
 
 const NEW_ARCHIVE = 'new';
 const EDIT_ARCHIVE_NEW_FILE = 'edit-upload';
 
-const buildModel = async (file, fields, saveOption) => {
+const buildArchive = async (file, fields, saveOption) => {
+  if (!file.filetoupload) {
+    throw new Error('Uploaded file not found');
+  }
+
   const dataDocument = [
     {
       kode: fields.code,
@@ -126,7 +97,6 @@ const buildModel = async (file, fields, saveOption) => {
     const dataFile = [
       {
         originalname: file.filetoupload.name,
-        encoding: 'undefined-encoding',
         filename: file.filetoupload.name,
         mimetype: file.filetoupload.type,
         size: file.filetoupload.size,
@@ -135,7 +105,7 @@ const buildModel = async (file, fields, saveOption) => {
     ];
     console.log(dataFile);
 
-    const result = await saveModel(connect, File, dataFile);
+    const result = await saveModel(File, dataFile);
     console.info(result);
 
     // eslint-disable-next-line
@@ -144,7 +114,7 @@ const buildModel = async (file, fields, saveOption) => {
 
     if (saveOption === NEW_ARCHIVE) {
       // Create new document, with attr 'file' referenced to the newly file
-      const resultDocument = await saveModel(connect, Document, dataDocument);
+      const resultDocument = await saveModel(Document, dataDocument);
       console.info(resultDocument);
     } else if (saveOption === EDIT_ARCHIVE_NEW_FILE) {
       // Update existing document, with attr 'file' referenced to the newly upload file
@@ -153,32 +123,43 @@ const buildModel = async (file, fields, saveOption) => {
 };
 
 exports.getArchiveDetail = async (req, res) => {
-  res.json({
-    apiVersion: res.locals.apiVersion,
-    message: 'Successfully retrieved archive',
-    data: {}
-  });
+  try {
+    const { id } = req.params;
+    const findDocument = await Document.find({ _id: id });
+    return sendResponse(res, 200, 'Successfully retrieved archive', { data: findDocument });
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
 };
 
 exports.postUploadArchive = async (req, res) => {
   const form = new formidable.IncomingForm();
 
   form.parse(req, async function(err, fields, file) {
-    buildModel(file, fields, NEW_ARCHIVE);
+    try {
+      await buildArchive(file, fields, NEW_ARCHIVE);
 
-    const oldpath = file.filetoupload.path;
-    const newpath =
-      process.env.NODE_PATH +
-      process.env.PUBLIC_DIR +
-      process.env.UPLOAD_DIR +
-      file.filetoupload.name;
+      if (!file.filetoupload) {
+        throw new Error('Uploaded file not found');
+      }
+      const oldpath = file.filetoupload.path;
+      const newpath =
+        process.env.NODE_PATH +
+        process.env.PUBLIC_DIR +
+        process.env.UPLOAD_DIR +
+        file.filetoupload.name;
 
-    mv(oldpath, newpath, function() {
-      res.json({
-        apiVersion: res.locals.apiVersion,
-        message: 'Successfully added and uploaded archive'
+      console.log(newpath);
+      mv(oldpath, newpath, function() {
+        return 1;
       });
-    });
+
+      return sendResponse(res, 200, 'Successfully added and uploaded archive');
+    } catch (e) {
+      console.error(e);
+      return sendResponse(res, 400, 'Error. Bad request');
+    }
   });
 };
 
@@ -187,54 +168,45 @@ exports.patchEditArchive = async (req, res) => {
   const form = new formidable.IncomingForm();
 
   form.parse(req, async function(err, fields) {
-    const foundDocument = await Document.find({ _id: id });
+    try {
+      const foundDocument = await Document.find({ _id: id });
 
-    const dataDocument = {
-      kode: fields.code,
-      judul: fields.title,
-      keterangan: fields.description,
-      lokasi: fields.location,
-      file: foundDocument[0].file
-    };
+      const dataDocument = {
+        kode: fields.code,
+        judul: fields.title,
+        keterangan: fields.description,
+        lokasi: fields.location,
+        file: foundDocument[0].file
+      };
 
-    Document.findOneAndUpdate(
-      { _id: id },
-      dataDocument,
-      { upsert: false, useFindAndModify: false },
-      function(e, doc) {
-        if (e) throw e;
-        console.log(doc);
-        res.json({
-          apiVersion: res.locals.apiVersion,
-          message: 'Successfully edited archive'
-        });
-      }
-    );
+      Document.findOneAndUpdate({ _id: id }, dataDocument, {
+        upsert: false,
+        useFindAndModify: false
+      });
+
+      return sendResponse(res, 200, 'Successfully edited archive');
+    } catch (e) {
+      console.error(e);
+      return sendResponse(res, 400, 'Error. Bad request');
+    }
   });
 };
 
 exports.deleteArchive = async (req, res) => {
-  const { id } = req.params;
-  console.log(id);
+  try {
+    const { id } = req.params;
+    const foundDocument = await Document.find({ _id: id });
 
-  const foundDocument = await Document.find({ _id: id });
-  console.log(foundDocument);
+    // eslint-disable-next-line
+    let result = File.deleteOne({ _id: foundDocument[0].file  });
+    // eslint-disable-next-line
+    result = Document.deleteOne({ _id: id });
 
-  // eslint-disable-next-line
-  let result = File.deleteOne({ _id: foundDocument[0].file  }, err => {
-    if (err) throw err;
-    else console.log('File is deleted');
-  });
-  // eslint-disable-next-line
-  result = Document.deleteOne({ _id: id }, err => {
-    if (err) throw err;
-    else console.log('Document is deleted');
-  });
-
-  res.json({
-    apiVersion: res.locals.apiVersion,
-    message: 'Successfully deleted archive data. Archive file still exist'
-  });
+    return sendResponse(res, 200, 'Successfully deleted archive data. Archive file still exist');
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
 };
 
 // Pages for testing

@@ -33,12 +33,16 @@ const userSchema = new mongoose.Schema(
     },
     status: {
       type: String
+    },
+    role: {
+      type: Number,
+      required: true
     }
   },
   { timestamps: true }
 );
 
-// Normalize user emal
+// Normalize user email
 userSchema.pre('save', function removeDotGmail(next) {
   const user = this;
   if (!user.mail || !user.mailNonITB) {
@@ -50,6 +54,7 @@ userSchema.pre('save', function removeDotGmail(next) {
   return next();
 });
 
+userSchema.index({ fullname: 'text', username: 'text', ou: 'text', mail: 'text' });
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

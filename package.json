@@ -7,7 +7,7 @@
     "start": "nodemon app.js",
     "lint": "./node_modules/.bin/eslint .",
     "lint-fix": "./node_modules/.bin/eslint . --fix",
-    "test": "jest --passWithNoTests"
+    "test": "jest --forceExit"
   },
   "repository": {
     "type": "git",
@@ -55,6 +55,13 @@
     "eslint-plugin-react": "^7.18.3",
     "eslint-plugin-react-hooks": "^1.7.0",
     "jest": "^24.9.0",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "supertest": "^4.0.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   }
 }
