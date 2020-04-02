@@ -54,6 +54,7 @@ userSchema.pre('save', function removeDotGmail(next) {
   return next();
 });
 
+userSchema.index({ fullname: 'text', username: 'text', ou: 'text', mail: 'text' });
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
