@@ -16,7 +16,7 @@ const {
   postUploadArchive,
   patchEditArchive,
   deleteArchive
-} = require('../handlers/document');
+} = require('../handlers/archive');
 
 const r = express.Router();
 

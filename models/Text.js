@@ -21,6 +21,6 @@ const documentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Document = mongoose.model('Text', documentSchema);
+const Text = mongoose.model('Text', documentSchema);
 
-module.exports = Document;
+module.exports = Text;

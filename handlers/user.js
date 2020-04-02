@@ -47,6 +47,7 @@ exports.checkSSORedirect = () => {
           const mailNonITB = successAttributes['cas:itbEmailNonITB']['_text'];
           const ou = successAttributes['cas:ou']['_text'];
           const status = successAttributes['cas:itbStatus']['_text'];
+          const role = 2; // Default role is 'Internal ITB'
 
           const userData = {
             username,
@@ -54,7 +55,8 @@ exports.checkSSORedirect = () => {
             mail,
             mailNonITB,
             ou,
-            status
+            status,
+            role
           };
           const newUser = new User(userData);
           await newUser.save();
@@ -92,7 +94,7 @@ exports.postSignout = async (req, res) => {
       }
 
       req.session.user = null;
-      return sendResponse(res, 500, 'Successfully logged out');
+      return sendResponse(res, 200, 'Successfully logged out');
     });
   } catch (e) {
     console.error(`User could not log out: ${e.message}`);
