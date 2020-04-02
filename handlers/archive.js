@@ -103,14 +103,11 @@ const buildArchive = async (file, fields, saveOption) => {
         path: process.env.UPLOAD_DIR + file.filetoupload.name
       }
     ];
-    console.log(dataFile);
 
     const result = await saveModel(File, dataFile);
-    console.info(result);
 
     // eslint-disable-next-line
     dataDocument[0].file = result[0]._id;
-    console.log(dataDocument);
 
     if (saveOption === NEW_ARCHIVE) {
       // Create new document, with attr 'file' referenced to the newly file
@@ -198,7 +195,7 @@ exports.deleteArchive = async (req, res) => {
     const foundDocument = await Document.find({ _id: id });
 
     // eslint-disable-next-line
-    let result = File.deleteOne({ _id: foundDocument[0].file  });
+    let result = File.deleteOne({ _id: foundDocument[0].file });
     // eslint-disable-next-line
     result = Document.deleteOne({ _id: id });
 
