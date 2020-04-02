@@ -1,24 +1,15 @@
 const mongoose = require('mongoose');
 // eslint-disable-next-line no-unused-vars
-const File = require('../models/File');
 
 /**
  * Document Interface
  * @typedef {Object} Document
- * @property {String} kode Kode dari arsip
- * @property {String} judul Judul dari arsip
- * @property {String} keterangan Keterangan dari arsip
- * @property {String} lokasi Lokasi arsip
- * @property {String} file File arsip
+ * @property {String} textual_archive_number Nomor arsip tekstual
+ * @property {String} author penulis/pembuat arsip tekstual
  */
-const Id = mongoose.Types.ObjectId;
 const documentSchema = new mongoose.Schema(
   {
-    archive: {
-      type: Id,
-      ref: 'Archive'
-    },
-    textualArchiveNumber: {
+    textual_archive_number: {
       type: String,
       required: true
     },

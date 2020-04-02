@@ -1,32 +1,33 @@
 const mongoose = require('mongoose');
-// eslint-disable-next-line no-unused-vars
-const File = require('../models/File');
 
 /**
  * Document Interface
  * @typedef {Object} Document
- * @property {String} kode Kode dari arsip
- * @property {String} judul Judul dari arsip
- * @property {String} keterangan Keterangan dari arsip
- * @property {String} lokasi Lokasi arsip
- * @property {String} file File arsip
+ * @property {String} photographer Fotografer dari foto
+ * @property {String} photo_type Jenis foto
+ * @property {String} photo_size Ukuran foto
+ * @property {String} photo_condition Kondisi foto
+ * @property {String} activity_description Deskripsi kegiatan pada foto
  */
-const Id = mongoose.Types.ObjectId;
 const documentSchema = new mongoose.Schema(
   {
-    archive: {
-      type: Id,
-      ref: 'Archive'
-    },
     photographer: {
       type: String,
       required: true
     },
-    photoSize: {
+    photo_type: {
       type: String,
       required: true
     },
-    photoCondition: {
+    photo_size: {
+      type: String,
+      required: true
+    },
+    photo_condition: {
+      type: String,
+      required: true
+    },
+    activity_description: {
       type: String,
       required: true
     }
@@ -34,6 +35,6 @@ const documentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Document = mongoose.model('Photo', documentSchema);
+const Photo = mongoose.model('Photo', documentSchema);
 
-module.exports = Document;
+module.exports = Photo;

@@ -5,19 +5,12 @@ const File = require('../models/File');
 /**
  * Document Interface
  * @typedef {Object} Document
- * @property {String} kode Kode dari arsip
- * @property {String} judul Judul dari arsip
- * @property {String} keterangan Keterangan dari arsip
- * @property {String} lokasi Lokasi arsip
- * @property {String} file File arsip
+ * @property {String} narrator Narrator dari berkas arsip
+ * @property {String} reporter Reporter dari berkas arsip
+ * @property {String} activity_description Deskripsi kegiatan / topik dari berkas audio
  */
-const Id = mongoose.Types.ObjectId;
 const documentSchema = new mongoose.Schema(
   {
-    archive: {
-      type: Id,
-      ref: 'Archive'
-    },
     narrator: {
       type: String,
       required: true
@@ -26,14 +19,13 @@ const documentSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    activityDescription: {
-      type: String,
-      required: true
+    activity_description: {
+      type: String
     }
   },
   { timestamps: true }
 );
 
-const Document = mongoose.model('Audio', documentSchema);
+const Audio = mongoose.model('Audio', documentSchema);
 
-module.exports = Document;
+module.exports = Audio;
