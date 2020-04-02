@@ -41,60 +41,67 @@ const execute = async () => {
   try {
     const data = [
       {
-        username: 'hendry',
-        fullname: 'hendryfull',
-        mail: 'hendry@students.itb.ac.id',
-        mainNonITB: 'hendry@gmail.com',
-        ou: 'undefined',
-        status: 'undefined'
+        username: 'mhendryp',
+        fullname: 'Muhammad Hendry Prasetya',
+        mail: 'mhendryp@students.itb.ac.id',
+        mainNonITB: 'mhendryp@gmail.com',
+        ou: 'STEI - Teknik Informatika',
+        status: 'Mahasiswa',
+        role: 1
       },
       {
         username: 'abda',
-        fullname: 'abdafull',
+        fullname: 'Abda Shaffan Diva',
         mail: 'abda@students.itb.ac.id',
         mainNonITB: 'abda@gmail.com',
-        ou: 'undefined',
-        status: 'undefined'
+        ou: 'STEI - Teknik Informatika',
+        status: 'Mahasiswa',
+        role: 2
       },
       {
         username: 'willsen',
-        fullname: 'willsenfull',
+        fullname: 'Willsen Sentosa',
         mail: 'willsen@students.itb.ac.id',
         mainNonITB: 'willsen@gmail.com',
-        ou: 'undefined',
-        status: 'undefined'
+        ou: 'STEI - Teknik Informatika',
+        status: 'Mahasiswa',
+        role: 2
       },
       {
         username: 'harry',
-        fullname: 'harryfull',
+        fullname: 'Harry Rahmadi Munly',
         mail: 'harry@students.itb.ac.id',
         mainNonITB: 'harry@gmail.com',
-        ou: 'undefined',
-        status: 'undefined'
+        ou: 'STEI - Teknik Informatika',
+        status: 'Mahasiswa',
+        role: 2
       },
       {
-        username: 'ijun',
-        fullname: 'ijunfull',
-        mail: 'ijun@students.itb.ac.id',
-        mainNonITB: 'juniardi@gmail.com',
-        ou: 'undefined',
-        status: 'undefined'
+        username: 'juniardiakbar',
+        fullname: 'Juniardi Akbar',
+        mail: 'juniardiakbar@students.itb.ac.id',
+        mainNonITB: 'juniardiakbar@gmail.com',
+        ou: 'STEI - Teknik Informatika',
+        status: 'Mahasiswa',
+        role: 2
       },
       {
         username: 'alterhendry',
         fullname: 'hendryfull2',
         mail: 'hendry2@students.itb.ac.id',
         mainNonITB: 'hendry2@gmail.com',
-        ou: 'undefined',
-        status: 'undefined'
+        ou: 'STEI - Teknik Informatika',
+        status: 'Mahasiswa',
+        role: 2
       },
       {
         username: 'alternhendry2',
         fullname: 'hendryfull3',
         mail: 'hendry3@students.itb.ac.id',
         mainNonITB: 'hendry3@gmail.com',
-        ou: 'undefined',
-        status: 'undefined'
+        ou: 'STEI - Teknik Informatika',
+        status: 'Mahasiswa',
+        role: 2
       }
     ];
 
