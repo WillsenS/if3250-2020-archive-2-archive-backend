@@ -6,7 +6,8 @@ const {
   getUsers,
   deleteUser,
   patchEditUser,
-  getUserDetail
+  getUserDetail,
+  searchUser
 } = require('../handlers/user');
 const {
   searchDocument,
@@ -273,6 +274,8 @@ r.patch('/edit/:id', patchEditArchive);
 r.delete('/delete/:id', deleteArchive);
 
 r.get('/users', getUsers);
+
+r.get('/user-search', searchUser);
 
 r.get('/users/:id', getUserDetail);
 
