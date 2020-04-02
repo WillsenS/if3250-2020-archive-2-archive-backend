@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema(
     },
     status: {
       type: String
+    },
+    role: {
+      type: Number,
+      required: true
     }
   },
   { timestamps: true }

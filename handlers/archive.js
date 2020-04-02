@@ -97,7 +97,6 @@ const buildArchive = async (file, fields, saveOption) => {
     const dataFile = [
       {
         originalname: file.filetoupload.name,
-        encoding: 'undefined-encoding',
         filename: file.filetoupload.name,
         mimetype: file.filetoupload.type,
         size: file.filetoupload.size,

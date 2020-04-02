@@ -27,6 +27,6 @@ const documentSchema = new mongoose.Schema(
 );
 
 documentSchema.index({ judul: 'text', keterangan: 'text' });
-const Archive = mongoose.model('Archive', documentSchema);
+const Role = mongoose.model('Role', documentSchema);
 
-module.exports = Archive;
+module.exports = Role;
