@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Normalize user emal
+// Normalize user email
 userSchema.pre('save', function removeDotGmail(next) {
   const user = this;
   if (!user.mail || !user.mailNonITB) {

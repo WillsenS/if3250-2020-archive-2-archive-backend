@@ -1,54 +1,62 @@
 const mongoose = require('mongoose');
-// eslint-disable-next-line no-unused-vars
+/* eslint-disable */
+const Audio = require('../models/Audio');
+const Video = require('../models/Video');
+const Text = require('../models/Text');
+const Photo = require('../models/Photo');
+const Role = require('../models/Role');
 const File = require('../models/File');
-
+/* eslint-enable */
 /**
  * Document Interface
  * @typedef {Object} Document
- * @property {String} kode Kode dari arsip
- * @property {String} judul Judul dari arsip
- * @property {String} keterangan Keterangan dari arsip
- * @property {String} lokasi Lokasi arsip
- * @property {String} file File arsip
+ * @property {String} judul Judul arsip
+ * @property {String} nomor Nomor arsip
+ * @property {String} pola Pola klasifikasi arsip
+ * @property {String} lokasi_kegiatan Lokasi kegiatan atau lokasi pembuatan arsip
+ * @property {String} keterangan Keterangan arsip
+ * @property {Date} waktu_kegiatan Waktu kegiatan atau waktu pembuatan arsip
+ * @property {Boolean} keamanan_terbuka Terbuka atau tidaknya keamanan arisp
+ * @property {String} lokasi_simpan_arsip Lokasi di mana arsip disimpan
+ * @property {String} mime Tipe mime berkas arsip
+ * @property {String} audio Berkas audio arsip
+ * @property {String} video Berkas video arsip
+ * @property {String} photo Berkas foto arsip
+ * @property {String} text Berkas text arsip
+
  */
-const Id = mongoose.Types.ObjectId;
+const Id = mongoose.Schema.Types.ObjectId;
 const documentSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      unique: false
-    },
-    type: {
-      type: String,
-      required: true,
-      unique: false
-    },
     judul: {
       type: String,
       required: true
     },
-    code: {
+    nomor: {
       type: String,
       required: true
     },
-    location: {
+    pola: {
       type: String,
       required: true
     },
-    description: {
+    lokasi_kegiatan: {
       type: String,
       required: true
     },
-    date: {
+    keterangan: {
+      type: String,
+      required: true
+    },
+    waktu_kegiatan: {
       type: Date,
       required: true
     },
-    dateUploaded: {
-      type: Date,
+    keamanan_terbuka: {
+      type: Boolean,
       required: true
     },
-    archiveLocation: {
+    lokasi_simpan_arsip: {
       type: String,
       required: true
     },
@@ -56,27 +64,32 @@ const documentSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    hak_akses: {
-      type: [String],
-      required: true
-    },
-    unit_kerja_terkait: {
-      type: [String],
-      required: true
-    },
-    metadata: {
+    audio: {
       type: Id,
-      required: true
+      ref: 'Audio'
+    },
+    video: {
+      type: Id,
+      ref: 'Video'
+    },
+    photo: {
+      type: Id,
+      ref: 'Photo'
+    },
+    text: {
+      type: Id,
+      ref: 'Text'
     },
     file: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'File'
+      type: Id,
+      ref: 'File',
+      required: true
     }
   },
   { timestamps: true }
 );
 
 documentSchema.index({ judul: 'text', keterangan: 'text' });
-const Document = mongoose.model('Archive', documentSchema);
+const Archive = mongoose.model('Archive', documentSchema);
 
-module.exports = Document;
+module.exports = Archive;

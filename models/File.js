@@ -5,7 +5,6 @@ const fs = require('fs');
  * File Interface
  * @typedef {Object} File
  * @property {String} originalname Original name from uploader's device
- * @property {String} encoding Type of encoding used in this file
  * @property {String} filename Name of file in server
  * @property {String} mimetype type of mime in this file
  * @property {String} url Location to file's resource
@@ -14,16 +13,30 @@ const fs = require('fs');
  */
 const fileSchema = new mongoose.Schema(
   {
-    originalname: String,
-    encoding: String,
+    originalname: {
+      type: String,
+      required: true
+    },
     filename: {
       type: String,
       unique: true
     },
-    mimetype: String,
-    url: String,
-    size: String,
-    path: String
+    mimetype: {
+      type: String,
+      required: true
+    },
+    url: {
+      type: String,
+      required: true
+    },
+    size: {
+      type: String,
+      required: true
+    },
+    path: {
+      type: String,
+      required: true
+    }
   },
   {
     timestamps: true
