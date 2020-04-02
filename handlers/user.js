@@ -1,6 +1,9 @@
 /* eslint-disable dot-notation */
+const secret = 'mysecretsshhh';
+
 const axios = require('axios');
 const convert = require('xml-js');
+const jwt = require('jsonwebtoken');
 const formidable = require('formidable');
 const User = require('../models/User');
 const { defaultURL } = require('../config');
@@ -28,17 +31,15 @@ exports.checkSSORedirect = () => {
         );
         const serviceResponse = result['cas:serviceResponse'];
 
-        if (
-          serviceResponse['cas:authenticationFailure'] &&
-          serviceResponse['cas:authenticationFailure']['_attributes'] &&
-          serviceResponse['cas:authenticationFailure']['_attributes']['code'] === 'INVALID_TICKET'
-        ) {
+        if (serviceResponse['cas:authenticationFailure']) {
           return res.redirect(`https://login.itb.ac.id/cas/login?service=${defaultURL}`);
         }
 
         const successResponse = serviceResponse['cas:authenticationSuccess'];
         const username = successResponse['cas:user']['_text'];
         const foundUser = await User.findOne({ username });
+
+        let payload;
 
         if (!foundUser) {
           const successAttributes = successResponse['cas:attributes'];
@@ -60,12 +61,19 @@ exports.checkSSORedirect = () => {
           };
           const newUser = new User(userData);
           await newUser.save();
+
+          payload = { user: newUser };
           req.session.user = newUser;
         } else {
+          payload = { user: foundUser };
           req.session.user = foundUser;
         }
 
-        return sendResponse(res, 200, 'OK', { username });
+        const token = await jwt.sign(payload, secret, {
+          expiresIn: '1h'
+        });
+
+        return sendResponse(res, 200, 'OK', { username, token });
       } catch (err) {
         return sendResponse(res, 500, 'Error occured during sign in process');
       }
