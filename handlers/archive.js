@@ -201,30 +201,16 @@ const buildArchive = async (file, fields) => {
 exports.getArchiveDetail = async (req, res) => {
   try {
     const { id } = req.params;
-    const foundArchive = await Archive.find({ _id: id });
-    const { file } = foundArchive[0];
-    let metadata;
-    switch (foundArchive[0].tipe) {
-      case 'Audio':
-        metadata = foundArchive[0].audio;
-        break;
-      case 'Photo':
-        metadata = foundArchive[0].video;
-        break;
-      case 'Text':
-        metadata = foundArchive[0].text;
-        break;
-      case 'Video':
-        metadata = foundArchive[0].video;
-        break;
-      default:
-        throw new Error('Invalid archive type');
-    }
+    const foundArchive = await Archive.find({ _id: id })
+      .populate('file')
+      .populate('audio')
+      .populate('photo')
+      .populate('video')
+      .populate('text');
+
     return sendResponse(res, 200, 'Successfully retrieved archive', {
       data: {
-        foundArchive,
-        file,
-        metadata
+        foundArchive
       }
     });
   } catch (err) {
