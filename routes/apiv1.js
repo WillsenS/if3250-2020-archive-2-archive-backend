@@ -12,10 +12,13 @@ const {
 const {
   searchArchive,
   getArchiveDetail,
-  uploadArchive,
   postUploadArchive,
   patchEditArchive,
-  deleteArchive
+  deleteArchive,
+  uploadAudio,
+  uploadPhoto,
+  uploadText,
+  uploadVideo
 } = require('../handlers/archive');
 
 const r = express.Router();
@@ -287,6 +290,9 @@ r.delete('/users/:id', deleteUser);
 /*
  * Routes for testing pages
  */
-r.get('/upload', uploadArchive);
+r.get('/upload/audio', uploadAudio);
+r.get('/upload/photo', uploadPhoto);
+r.get('/upload/text', uploadText);
+r.get('/upload/video', uploadVideo);
 
 module.exports = r;

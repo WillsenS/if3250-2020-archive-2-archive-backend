@@ -294,7 +294,7 @@ exports.patchEditArchive = async (req, res) => {
           throw new Error('Invalid archive type');
       }
 
-      Archive.findOneAndUpdate({ _id: id }, dataArchive, {
+      await Archive.findOneAndUpdate({ _id: id }, dataArchive, {
         upsert: false,
         useFindAndModify: false
       });
@@ -310,27 +310,30 @@ exports.patchEditArchive = async (req, res) => {
 const deleteArchiveById = async id => {
   const foundArchive = await Archive.find({ _id: id });
 
-  // eslint-disable-next-line
-  let result = File.deleteOne({ _id: foundArchive[0].file });
+  console.log(foundArchive[0]);
+  console.log(foundArchive[0].file);
 
-  switch (Archive.tipe) {
+  // eslint-disable-next-line
+  let result = await File.deleteOne({ _id: foundArchive[0].file });
+
+  switch (foundArchive[0].tipe) {
     case 'Audio':
-      result = result && Audio.deleteOne({ _id: Archive.audio });
+      result = await Audio.deleteOne({ _id: foundArchive[0].audio });
       break;
     case 'Photo':
-      result = result && Photo.deleteOne({ _id: Archive.photo });
+      result = await Photo.deleteOne({ _id: foundArchive[0].photo });
       break;
     case 'Text':
-      result = result && Text.deleteOne({ _id: Archive.text });
+      result = await Text.deleteOne({ _id: foundArchive[0].text });
       break;
     case 'Video':
-      result = result && Video.deleteOne({ _id: Archive.video });
+      result = await Video.deleteOne({ _id: foundArchive[0].video });
       break;
     default:
       throw new Error('Invalid archive type');
   }
   // eslint-disable-next-line
-  result = result && Archive.deleteOne({ _id: id });
+  result = Archive.deleteOne({ _id: id });
 
   return result;
 };
@@ -362,13 +365,21 @@ exports.deleteArchive = async (req, res) => {
 
 // Pages for testing
 
-exports.uploadArchive = (req, res) => {
-  // Upload Photo Archive
-
+const uploadUpperLayout = (res, type) => {
   res.writeHead(200, { 'Content-Type': 'text/html' });
-  res.write('<form action="upload" method="post" enctype="multipart/form-data">');
+  res.write('<meta charset="UTF-8">');
+  res.write('<!DOCTYPE html>');
+  res.write('<html>');
+  res.write('<head>');
+  res.write(
+    '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">'
+  );
+  res.write('</head>');
+  res.write('<body>');
+  res.write('<div class="container">');
+  res.write(`<form action="upload" method="post" enctype="multipart/form-data">`);
   res.write('<div>Judul: <input type="text" name="judul"></div><br>');
-  res.write('<div>Tipe: <input type="text" name="tipe"></div><br>');
+  res.write(`<div>Tipe: <input type="text" name="tipe" value=${type}></div><br>`);
   res.write('<div>Nomor: <input type="text" name="nomor"></div><br>');
   res.write('<div>Pola: <input type="text" name="pola"></div><br>');
   res.write('<div>Lokasi Kegiatan: <input type="text" name="lokasi_kegiatan"></div><br>');
@@ -377,13 +388,66 @@ exports.uploadArchive = (req, res) => {
   res.write('<div>Keamanan terbuka?: <input type="number" name="keamanan_terbuka"></div><br>');
   res.write('<div>Lokasi simpan arsip: <input type="text" name="lokasi_simpan_arsip"></div><br>');
   res.write('<div>Mime: <input type="text" name="mime"></div><br>');
+  res.write('<div>File: <input type="file" name="filetoupload"></div><br>');
+};
+
+const uploadLowerLayout = res => {
+  res.write('</form>');
+  res.write('</div>');
+  res.write('</body>');
+  res.write('</html>');
+};
+
+exports.uploadAudio = (req, res) => {
+  // Upload Photo Archive
+  uploadUpperLayout(res, 'Audio');
+
+  res.write('<div>Narrator: <input type="text" name="narrator"></div><br>');
+  res.write('<div>Reporter: <input type="text" name="reporter"></div><br>');
+  res.write('<div>Activity Description: <input type="text" name="activity_description"></div><br>');
+  res.write('<input type="submit">');
+
+  uploadLowerLayout(res);
+  return res.end();
+};
+
+exports.uploadPhoto = (req, res) => {
+  // Upload Photo Archive
+  uploadUpperLayout(res, 'Photo');
+
   res.write('<div>Fotografer: <input type="text" name="photographer"></div><br>');
   res.write('<div>Photo Type: <input type="text" name="photo_type"></div><br>');
   res.write('<div>Photo Size: <input type="text" name="photo_size"></div><br>');
   res.write('<div>Photo Condition: <input type="text" name="photo_condition"></div><br>');
   res.write('<div>Activity Description: <input type="text" name="activity_description"></div><br>');
-  res.write('<div>File: <input type="file" name="filetoupload"></div><br>');
   res.write('<input type="submit">');
-  res.write('</form>');
+
+  uploadLowerLayout(res);
+  return res.end();
+};
+
+exports.uploadText = (req, res) => {
+  // Upload Photo Archive
+  uploadUpperLayout(res, 'Text');
+
+  res.write(
+    '<div>Textual Archive Number: <input type="text" name="textual_archive_number"></div><br>'
+  );
+  res.write('<div>Author: <input type="text" name="author"></div><br>');
+
+  uploadLowerLayout(res);
+  return res.end();
+};
+
+exports.uploadVideo = (req, res) => {
+  // Upload Photo Archive
+  uploadUpperLayout(res, 'Video');
+
+  res.write('<div>Narrator: <input type="text" name="narrator"></div><br>');
+  res.write('<div>Reporter: <input type="text" name="reporter"></div><br>');
+  res.write('<div>Activity Description: <input type="text" name="activity_description"></div><br>');
+  res.write('<input type="submit">');
+
+  uploadLowerLayout(res);
   return res.end();
 };
