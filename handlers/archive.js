@@ -333,7 +333,7 @@ const deleteArchiveById = async id => {
       throw new Error('Invalid archive type');
   }
   // eslint-disable-next-line
-  result = Archive.deleteOne({ _id: id });
+  result = await Archive.deleteOne({ _id: id });
 
   return result;
 };
