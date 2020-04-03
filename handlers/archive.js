@@ -148,7 +148,7 @@ const buildArchive = async (file, fields) => {
       lokasi_kegiatan: fields.lokasi_kegiatan,
       keterangan: fields.keterangan,
       waktu_kegiatan: fields.waktu_kegiatan,
-      keamanan_terbuka: (fields.keamanan_terbuka != 0),
+      keamanan_terbuka: fields.keamanan_terbuka !== 0,
       lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
       mime: fields.mime
     }
@@ -284,7 +284,7 @@ exports.patchEditArchive = async (req, res) => {
           lokasi_kegiatan: fields.lokasi_kegiatan,
           keterangan: fields.description,
           waktu_kegiatan: fields.waktu_kegiatan,
-          keamanan_terbuka: (fields.keamanan_terbuka != 0),
+          keamanan_terbuka: fields.keamanan_terbuka !== 0,
           lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
           mime: fields.mime,
           file: foundArchive[0].file
