@@ -277,27 +277,67 @@ exports.patchEditArchive = async (req, res) => {
         }
       ];
 
+      const options = {
+        upsert: false,
+        useFindAndModify: false
+      };
+
+      let data;
       switch (dataArchive[0].tipe) {
         case 'Audio':
+          data = [
+            {
+              narrator: fields.narrator,
+              reporter: fields.reporter,
+              activity_description: fields.activity_description
+            }
+          ];
+          await Audio.findOneAndUpdate({ _id: foundArchive[0].audio }, data, options);
+
           dataArchive[0].audio = foundArchive[0].audio;
           break;
         case 'Photo':
+          data = [
+            {
+              photographer: fields.photographer,
+              photo_type: fields.photo_type,
+              photo_size: fields.photo_size,
+              photo_condition: fields.photo_condition,
+              activity_description: fields.activity_description
+            }
+          ];
+          await Photo.findOneAndUpdate({ _id: foundArchive[0].photo }, data, options);
+
           dataArchive[0].photo = foundArchive[0].photo;
           break;
         case 'Text':
+          data = [
+            {
+              textual_archive_number: fields.textual_archive_number,
+              author: fields.author
+            }
+          ];
+          await Text.findOneAndUpdate({ _id: foundArchive[0].text }, data, options);
+
           dataArchive[0].text = foundArchive[0].text;
           break;
         case 'Video':
+          data = [
+            {
+              narrator: fields.narrator,
+              reporter: fields.reporter,
+              activity_description: fields.activity_description
+            }
+          ];
+          await Video.findOneAndUpdate({ _id: foundArchive[0].video }, data, options);
+
           dataArchive[0].video = foundArchive[0].video;
           break;
         default:
           throw new Error('Invalid archive type');
       }
 
-      await Archive.findOneAndUpdate({ _id: id }, dataArchive, {
-        upsert: false,
-        useFindAndModify: false
-      });
+      await Archive.findOneAndUpdate({ _id: id }, dataArchive, options);
 
       return sendResponse(res, 200, 'Successfully edited archive');
     } catch (e) {
