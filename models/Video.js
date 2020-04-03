@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
  * @typedef {Object} Document
  * @property {String} narrator Narrator dari berkas arsip
  * @property {String} reporter Reporter dari berkas arsip
- * @property {String} activity_description Deskripsi kegiatan pada foto
+ * @property {String} activity_description Deskripsi kegiatan pada video
  */
 const documentSchema = new mongoose.Schema(
   {

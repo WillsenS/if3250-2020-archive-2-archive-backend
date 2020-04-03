@@ -10,7 +10,7 @@ const {
   searchUser
 } = require('../handlers/user');
 const {
-  searchDocument,
+  searchArchive,
   getArchiveDetail,
   uploadArchive,
   postUploadArchive,
@@ -52,7 +52,7 @@ r.get('/auth/signin', isNonAuthenticated, signInSSO);
  *
  * /api/v1/auth/signout:
  *   post:
- *     summary: "Make user out from application"
+ *     summary: "Sign out user from application"
  *     description: "Removing user session from database"
  *     tags:
  *     - "auth"
@@ -97,10 +97,10 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  *
  * /api/v1/search:
  *   get:
- *     summary: "Search document by query"
+ *     summary: "Search archive by query"
  *     tags:
- *     - "document"
- *     description: "Retrieve document that it's data relevant with the query"
+ *     - "archive"
+ *     description: "Retrieve archive that it's data relevant with the query"
  *     produces:
  *     - application/json
  *     parameters:
@@ -119,7 +119,7 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/search', searchDocument);
+r.get('/search', searchArchive);
 
 /**
  * @swagger
@@ -128,8 +128,8 @@ r.get('/search', searchDocument);
  *   get:
  *     summary: "Get archive detail by id"
  *     tags:
- *     - "document"
- *     description: "Retrieve data with id provided in url parameter"
+ *     - "archive"
+ *     description: "Retrieve archive data with id provided in url parameter"
  *     produces:
  *     - application/json
  *     parameters:
@@ -155,10 +155,10 @@ r.get('/detail/:id', getArchiveDetail);
  *
  * /api/v1/upload:
  *   post:
- *     summary: "Search document by query"
+ *     summary: "Search archive by query"
  *     tags:
- *     - "document"
- *     description: "Retrieve document that it's data relevant with the query"
+ *     - "archive"
+ *     description: "Retrieve archive that it's data relevant with the query"
  *     produces:
  *     - application/json
  *     requestBody:
@@ -199,10 +199,10 @@ r.post('/upload', postUploadArchive);
  *
  * /api/v1/edit:
  *   patch:
- *     summary: "Search document by query"
+ *     summary: "Search archive by query"
  *     tags:
- *     - "document"
- *     description: "Retrieve document that it's data relevant with the query"
+ *     - "archive"
+ *     description: "Retrieve archive that it's data relevant with the query"
  *     produces:
  *     - application/json
  *     parameters:
@@ -248,9 +248,9 @@ r.patch('/edit/:id', patchEditArchive);
  *
  * /api/v1/delete:
  *   delete:
- *     summary: "Delete document by id"
+ *     summary: "Delete archive by id"
  *     tags:
- *     - "document"
+ *     - "archive"
  *     description: "Delete archive with id prodived in request parameter"
  *     produces:
  *     - application/json

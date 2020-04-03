@@ -1,11 +1,15 @@
 /* eslint-disable no-await-in-loop */
 const formidable = require('formidable');
 const mv = require('mv');
-const Document = require('../models/Document');
+const Archive = require('../models/Archive');
 const { translateFiltersMongoose, saveModel, sendResponse } = require('../helpers');
 const File = require('../models/File');
+const Audio = require('../models/Audio');
+const Video = require('../models/Video');
+const Text = require('../models/Text');
+const Photo = require('../models/Photo');
 
-exports.searchDocument = async (req, res) => {
+exports.searchArchive = async (req, res) => {
   try {
     let { q, page } = req.query;
     const { filters } = req.query;
@@ -31,8 +35,8 @@ exports.searchDocument = async (req, res) => {
       where = { $and: [where, options] };
     }
 
-    const countDocument = await Document.countDocuments(where);
-    const findDocument = await Document.find(where)
+    const countArchive = await Archive.countDocuments(where);
+    const findArchive = await Archive.find(where)
       .populate('file')
       .limit(limit)
       .skip((page - 1) * limit);
@@ -46,7 +50,7 @@ exports.searchDocument = async (req, res) => {
       } else if (val) qs += `&${qsNameList[index]}=${val}`;
     });
 
-    const totalPages = Math.ceil(countDocument / limit);
+    const totalPages = Math.ceil(countArchive / limit);
     const baseLink = `${process.env.BASE_URL}/api/v1/search`;
     const nextLink = totalPages > page ? `${baseLink}${qs}&page=${page + 1}` : '#';
     const prevLink = page > 1 ? `${baseLink}${qs}&page=${page - 1}` : '#';
@@ -56,13 +60,13 @@ exports.searchDocument = async (req, res) => {
 
     for (let i = 0; i < filterAttr.length; i += 1) {
       const val = filterAttr[i];
-      const findDistictAttribute = await Document.find(where).distinct(val);
+      const findDistictAttribute = await Archive.find(where).distinct(val);
       filtersCandidate[val] = findDistictAttribute.sort();
     }
 
     return sendResponse(res, 200, 'OK', {
-      data: findDocument,
-      count: countDocument,
+      data: findArchive,
+      count: countArchive,
       currentPage: page,
       totalPages,
       filtersCandidate,
@@ -75,67 +79,162 @@ exports.searchDocument = async (req, res) => {
   }
 };
 
-const NEW_ARCHIVE = 'new';
-const EDIT_ARCHIVE_NEW_FILE = 'edit-upload';
+const saveMetadata = async fields => {
+  let result;
+  let data;
+  switch (fields.tipe) {
+    case 'Audio':
+      data = [
+        {
+          narrator: fields.narrator,
+          reporter: fields.reporter,
+          activity_description: fields.activity_description
+        }
+      ];
+      result = await saveModel(Audio, data);
+      break;
+    case 'Photo':
+      data = [
+        {
+          photographer: fields.photographer,
+          photo_type: fields.photo_type,
+          photo_size: fields.photo_size,
+          photo_condition: fields.photo_condition,
+          activity_description: fields.activity_description
+        }
+      ];
+      result = await saveModel(Photo, data);
+      break;
+    case 'Text':
+      data = [
+        {
+          textual_archive_number: fields.textual_archive_number,
+          author: fields.author
+        }
+      ];
+      result = await saveModel(Text, data);
+      break;
+    case 'Video':
+      data = [
+        {
+          narrator: fields.narrator,
+          reporter: fields.reporter,
+          activity_description: fields.activity_description
+        }
+      ];
+      result = await saveModel(Video, data);
+      break;
+    default:
+      throw new Error('Invalid archive type');
+  }
+  return result;
+};
 
-const buildArchive = async (file, fields, saveOption) => {
+const buildArchive = async (file, fields) => {
   if (!file.filetoupload) {
     throw new Error('Uploaded file not found');
   }
 
-  const dataDocument = [
+  const dataArchive = [
     {
-      kode: fields.code,
-      judul: fields.title,
+      judul: fields.judul,
+      tipe: fields.tipe,
+      nomor: fields.nomor,
+      pola: fields.pola,
+      lokasi_kegiatan: fields.lokasi_kegiatan,
       keterangan: fields.description,
-      lokasi: fields.location
+      waktu_kegiatan: fields.waktu_kegiatan,
+      keamanan_terbuka: fields.keamanan_terbuka,
+      lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
+      mime: fields.mime
     }
   ];
 
-  if (saveOption === NEW_ARCHIVE || saveOption === EDIT_ARCHIVE_NEW_FILE) {
-    // Create new file object
-    const dataFile = [
-      {
-        originalname: file.filetoupload.name,
-        filename: file.filetoupload.name,
-        mimetype: file.filetoupload.type,
-        size: file.filetoupload.size,
-        path: process.env.UPLOAD_DIR + file.filetoupload.name
-      }
-    ];
-
-    const result = await saveModel(File, dataFile);
-
-    // eslint-disable-next-line
-    dataDocument[0].file = result[0]._id;
-
-    if (saveOption === NEW_ARCHIVE) {
-      // Create new document, with attr 'file' referenced to the newly file
-      const resultDocument = await saveModel(Document, dataDocument);
-      console.info(resultDocument);
-    } else if (saveOption === EDIT_ARCHIVE_NEW_FILE) {
-      // Update existing document, with attr 'file' referenced to the newly upload file
+  // Create new file object
+  const dataFile = [
+    {
+      originalname: file.filetoupload.name,
+      filename: file.filetoupload.name,
+      mimetype: file.filetoupload.type,
+      size: file.filetoupload.size,
+      path: process.env.UPLOAD_DIR + file.filetoupload.name
     }
+  ];
+
+  const result = await saveModel(File, dataFile);
+
+  // eslint-disable-next-line
+  dataArchive[0].file = result[0]._id;
+
+  const metadata = await saveMetadata(fields);
+
+  /* eslint-disable */
+  switch (fields.tipe) {
+    case 'Audio':
+      dataArchive[0].audio = metadata[0]._id;
+      break;
+    case 'Photo':
+      dataArchive[0].photo = metadata[0]._id;
+      break;
+    case 'Text':
+      dataArchive[0].text = metadata[0]._id;
+      break;
+    case 'Video':
+      dataArchive[0].video = metadata[0]._id;
+      break;
+    default:
+      throw new Error('Invalid archive type');
   }
+  /* eslint-enable */
+
+  // Create new archive
+  // Attr 'file' referenced to the newly uploaded file
+  // Metadata attr referenced to object with metadata of file
+  const resultArchive = await saveModel(Archive, dataArchive);
+  console.info(resultArchive);
 };
 
 exports.getArchiveDetail = async (req, res) => {
   try {
     const { id } = req.params;
-    const findDocument = await Document.find({ _id: id });
-    return sendResponse(res, 200, 'Successfully retrieved archive', { data: findDocument });
+    const foundArchive = await Archive.find({ _id: id });
+    const { file } = foundArchive[0];
+    let metadata;
+    switch (foundArchive[0].tipe) {
+      case 'Audio':
+        metadata = foundArchive[0].audio;
+        break;
+      case 'Photo':
+        metadata = foundArchive[0].video;
+        break;
+      case 'Text':
+        metadata = foundArchive[0].text;
+        break;
+      case 'Video':
+        metadata = foundArchive[0].video;
+        break;
+      default:
+        throw new Error('Invalid archive type');
+    }
+    return sendResponse(res, 200, 'Successfully retrieved archive', {
+      data: {
+        foundArchive,
+        file,
+        metadata
+      }
+    });
   } catch (err) {
     console.error(err);
     return sendResponse(res, 400, 'Error. Bad request');
   }
 };
 
-exports.postUploadArchive = async (req, res) => {
+const buildArchiveFromForm = async (req, res) => {
   const form = new formidable.IncomingForm();
 
   form.parse(req, async function(err, fields, file) {
     try {
-      await buildArchive(file, fields, NEW_ARCHIVE);
+      await buildArchive(file, fields);
 
       if (!file.filetoupload) {
         throw new Error('Uploaded file not found');
@@ -160,23 +259,52 @@ exports.postUploadArchive = async (req, res) => {
   });
 };
 
+exports.postUploadArchive = async (req, res) => {
+  await buildArchiveFromForm(req, res);
+};
+
 exports.patchEditArchive = async (req, res) => {
   const { id } = req.params;
   const form = new formidable.IncomingForm();
 
   form.parse(req, async function(err, fields) {
     try {
-      const foundDocument = await Document.find({ _id: id });
+      const foundArchive = await Archive.find({ _id: id });
 
-      const dataDocument = {
-        kode: fields.code,
-        judul: fields.title,
-        keterangan: fields.description,
-        lokasi: fields.location,
-        file: foundDocument[0].file
-      };
+      const dataArchive = [
+        {
+          judul: fields.judul,
+          tipe: fields.tipe,
+          nomor: fields.nomor,
+          pola: fields.pola,
+          lokasi_kegiatan: fields.lokasi_kegiatan,
+          keterangan: fields.description,
+          waktu_kegiatan: fields.waktu_kegiatan,
+          keamanan_terbuka: fields.keamanan_terbuka,
+          lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
+          mime: fields.mime,
+          file: foundArchive[0].file
+        }
+      ];
 
-      Document.findOneAndUpdate({ _id: id }, dataDocument, {
+      switch (dataArchive[0].tipe) {
+        case 'Audio':
+          dataArchive[0].audio = foundArchive[0].audio;
+          break;
+        case 'Photo':
+          dataArchive[0].photo = foundArchive[0].photo;
+          break;
+        case 'Text':
+          dataArchive[0].text = foundArchive[0].text;
+          break;
+        case 'Video':
+          dataArchive[0].video = foundArchive[0].video;
+          break;
+        default:
+          throw new Error('Invalid archive type');
+      }
+
+      Archive.findOneAndUpdate({ _id: id }, dataArchive, {
         upsert: false,
         useFindAndModify: false
       });
@@ -189,15 +317,51 @@ exports.patchEditArchive = async (req, res) => {
   });
 };
 
+const deleteArchiveById = async id => {
+  const foundArchive = await Archive.find({ _id: id });
+
+  // eslint-disable-next-line
+  let result = File.deleteOne({ _id: foundArchive[0].file });
+
+  switch (Archive.tipe) {
+    case 'Audio':
+      result = result && Audio.deleteOne({ _id: Archive.audio });
+      break;
+    case 'Photo':
+      result = result && Photo.deleteOne({ _id: Archive.photo });
+      break;
+    case 'Text':
+      result = result && Text.deleteOne({ _id: Archive.text });
+      break;
+    case 'Video':
+      result = result && Video.deleteOne({ _id: Archive.video });
+      break;
+    default:
+      throw new Error('Invalid archive type');
+  }
+  // eslint-disable-next-line
+  result = result && Archive.deleteOne({ _id: id });
+
+  return result;
+};
+
+exports.putEditArchive = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await deleteArchiveById(id);
+    await buildArchiveFromForm(req, res);
+
+    return sendResponse(res, 200, 'Successfully replace archive');
+  } catch (e) {
+    console.error(e);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+};
+
 exports.deleteArchive = async (req, res) => {
   try {
     const { id } = req.params;
-    const foundDocument = await Document.find({ _id: id });
-
-    // eslint-disable-next-line
-    let result = File.deleteOne({ _id: foundDocument[0].file });
-    // eslint-disable-next-line
-    result = Document.deleteOne({ _id: id });
+    await deleteArchiveById(id);
 
     return sendResponse(res, 200, 'Successfully deleted archive data. Archive file still exist');
   } catch (err) {
