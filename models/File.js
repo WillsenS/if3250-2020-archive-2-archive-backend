@@ -26,8 +26,7 @@ const fileSchema = new mongoose.Schema(
       required: true
     },
     url: {
-      type: String,
-      required: true
+      type: String
     },
     size: {
       type: String,

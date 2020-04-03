@@ -4,7 +4,6 @@ const Audio = require('../models/Audio');
 const Video = require('../models/Video');
 const Text = require('../models/Text');
 const Photo = require('../models/Photo');
-const Role = require('../models/Role');
 const File = require('../models/File');
 /* eslint-enable */
 /**
@@ -20,11 +19,11 @@ const File = require('../models/File');
  * @property {Boolean} keamanan_terbuka Terbuka atau tidaknya keamanan arisp
  * @property {String} lokasi_simpan_arsip Lokasi di mana arsip disimpan
  * @property {String} mime Tipe mime berkas arsip
- * @property {String} audio Berkas audio arsip
- * @property {String} video Berkas video arsip
- * @property {String} photo Berkas foto arsip
- * @property {String} text Berkas text arsip
-
+ * @property {String} audio Metadata berkas audio arsip
+ * @property {String} video Metadata berkas video arsip
+ * @property {String} photo Metadata berkas foto arsip
+ * @property {String} text Metadata berkas text arsip
+ * @property {String} file Informasi file secara general
  */
 const Id = mongoose.Schema.Types.ObjectId;
 const documentSchema = new mongoose.Schema(
