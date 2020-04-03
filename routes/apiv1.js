@@ -5,7 +5,8 @@ const {
   postSignout,
   getUsers,
   deleteUser,
-  patchEditUser,
+  removeAdminAccessFromUser,
+  updateUserRole,
   getUserDetail,
   searchUser
 } = require('../handlers/user');
@@ -332,7 +333,9 @@ r.get('/user-search', searchUser);
 
 r.get('/users/:id', getUserDetail);
 
-r.patch('/users/:id', patchEditUser);
+r.patch('/users/:id', updateUserRole);
+
+r.patch('/remove-admin/:id', removeAdminAccessFromUser);
 
 // eslint-disable-next-line
 r.delete('/users/:id', deleteUser);

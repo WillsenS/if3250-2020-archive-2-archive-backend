@@ -2,7 +2,7 @@
 const formidable = require('formidable');
 const mv = require('mv');
 const Archive = require('../models/Archive');
-const { translateFiltersMongoose, saveModel, sendResponse } = require('../helpers');
+const { translateFiltersMongoose, sendResponse } = require('../helpers');
 const File = require('../models/File');
 const Audio = require('../models/Audio');
 const Video = require('../models/Video');
@@ -84,54 +84,46 @@ exports.searchArchive = async (req, res) => {
 };
 
 const saveMetadata = async fields => {
-  let result;
+  let metadataDoc;
   let data;
   switch (fields.tipe) {
     case 'Audio':
-      data = [
-        {
-          narrator: fields.narrator,
-          reporter: fields.reporter,
-          activity_description: fields.activity_description
-        }
-      ];
-      result = await saveModel(Audio, data);
+      data = {
+        narrator: fields.narrator,
+        reporter: fields.reporter,
+        activity_description: fields.activity_description
+      };
+      metadataDoc = await Audio.create(data);
       break;
     case 'Photo':
-      data = [
-        {
-          photographer: fields.photographer,
-          photo_type: fields.photo_type,
-          photo_size: fields.photo_size,
-          photo_condition: fields.photo_condition,
-          activity_description: fields.activity_description
-        }
-      ];
-      result = await saveModel(Photo, data);
+      data = {
+        photographer: fields.photographer,
+        photo_type: fields.photo_type,
+        photo_size: fields.photo_size,
+        photo_condition: fields.photo_condition,
+        activity_description: fields.activity_description
+      };
+      metadataDoc = await Photo.create(data);
       break;
     case 'Text':
-      data = [
-        {
-          textual_archive_number: fields.textual_archive_number,
-          author: fields.author
-        }
-      ];
-      result = await saveModel(Text, data);
+      data = {
+        textual_archive_number: fields.textual_archive_number,
+        author: fields.author
+      };
+      metadataDoc = await Text.create(data);
       break;
     case 'Video':
-      data = [
-        {
-          narrator: fields.narrator,
-          reporter: fields.reporter,
-          activity_description: fields.activity_description
-        }
-      ];
-      result = await saveModel(Video, data);
+      data = {
+        narrator: fields.narrator,
+        reporter: fields.reporter,
+        activity_description: fields.activity_description
+      };
+      metadataDoc = await Video.create(data);
       break;
     default:
       throw new Error('Invalid archive type');
   }
-  return result;
+  return metadataDoc;
 };
 
 const buildArchive = async (file, fields) => {
@@ -139,52 +131,48 @@ const buildArchive = async (file, fields) => {
     throw new Error('Uploaded file not found');
   }
 
-  const dataArchive = [
-    {
-      judul: fields.judul,
-      tipe: fields.tipe,
-      nomor: fields.nomor,
-      pola: fields.pola,
-      lokasi_kegiatan: fields.lokasi_kegiatan,
-      keterangan: fields.keterangan,
-      waktu_kegiatan: fields.waktu_kegiatan,
-      keamanan_terbuka: fields.keamanan_terbuka > 0,
-      lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
-      mime: fields.mime
-    }
-  ];
+  const dataArchive = {
+    judul: fields.judul,
+    tipe: fields.tipe,
+    nomor: fields.nomor,
+    pola: fields.pola,
+    lokasi_kegiatan: fields.lokasi_kegiatan,
+    keterangan: fields.keterangan,
+    waktu_kegiatan: fields.waktu_kegiatan,
+    keamanan_terbuka: fields.keamanan_terbuka > 0,
+    lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
+    mime: fields.mime
+  };
 
   // Create new file object
-  const dataFile = [
-    {
-      originalname: file.filetoupload.name,
-      filename: file.filetoupload.name,
-      mimetype: file.filetoupload.type,
-      size: file.filetoupload.size,
-      path: process.env.UPLOAD_DIR + file.filetoupload.name
-    }
-  ];
+  const dataFile = {
+    originalname: file.filetoupload.name,
+    filename: file.filetoupload.name,
+    mimetype: file.filetoupload.type,
+    size: file.filetoupload.size,
+    path: process.env.UPLOAD_DIR + file.filetoupload.name
+  };
 
-  const result = await saveModel(File, dataFile);
+  const fileDoc = await File.create(dataFile);
 
   // eslint-disable-next-line
-  dataArchive[0].file = result[0]._id;
+  dataArchive.file = fileDoc._id;
 
-  const metadata = await saveMetadata(fields);
+  const metadataDoc = await saveMetadata(fields);
 
   /* eslint-disable */
   switch (fields.tipe) {
     case 'Audio':
-      dataArchive[0].audio = metadata[0]._id;
+      dataArchive.audio = metadataDoc._id;
       break;
     case 'Photo':
-      dataArchive[0].photo = metadata[0]._id;
+      dataArchive.photo = metadataDoc._id;
       break;
     case 'Text':
-      dataArchive[0].text = metadata[0]._id;
+      dataArchive.text = metadataDoc._id;
       break;
     case 'Video':
-      dataArchive[0].video = metadata[0]._id;
+      dataArchive.video = metadataDoc._id;
       break;
     default:
       throw new Error('Invalid archive type');
@@ -194,8 +182,8 @@ const buildArchive = async (file, fields) => {
   // Create new archive
   // Attr 'file' referenced to the newly uploaded file
   // Metadata attr referenced to object with metadata of file
-  const resultArchive = await saveModel(Archive, dataArchive);
-  console.info(resultArchive);
+  const archiveDoc = await Archive.create(dataArchive);
+  console.info(archiveDoc);
 };
 
 exports.getArchiveDetail = async (req, res) => {
@@ -261,23 +249,19 @@ exports.patchEditArchive = async (req, res) => {
     try {
       const foundArchive = await Archive.findById(id);
 
-      const dataArchive = [
-        {
-          judul: fields.judul,
-          tipe: fields.tipe,
-          nomor: fields.nomor,
-          pola: fields.pola,
-          lokasi_kegiatan: fields.lokasi_kegiatan,
-          keterangan: fields.description,
-          waktu_kegiatan: fields.waktu_kegiatan,
-          keamanan_terbuka: fields.keamanan_terbuka > 0,
-          lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
-          mime: fields.mime,
-          file: foundArchive.file
-        }
-      ];
-
-      console.log(fields.keamanan_terbuka);
+      const dataArchive = {
+        judul: fields.judul,
+        tipe: fields.tipe,
+        nomor: fields.nomor,
+        pola: fields.pola,
+        lokasi_kegiatan: fields.lokasi_kegiatan,
+        keterangan: fields.description,
+        waktu_kegiatan: fields.waktu_kegiatan,
+        keamanan_terbuka: fields.keamanan_terbuka > 0,
+        lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
+        mime: fields.mime,
+        file: foundArchive.file
+      };
 
       const options = {
         upsert: false,
@@ -285,55 +269,47 @@ exports.patchEditArchive = async (req, res) => {
       };
 
       let data;
-      switch (dataArchive[0].tipe) {
+      switch (dataArchive.tipe) {
         case 'Audio':
-          data = [
-            {
-              narrator: fields.narrator,
-              reporter: fields.reporter,
-              activity_description: fields.activity_description
-            }
-          ];
+          data = {
+            narrator: fields.narrator,
+            reporter: fields.reporter,
+            activity_description: fields.activity_description
+          };
           await Audio.findByIdAndUpdate(foundArchive.audio, data, options);
 
-          dataArchive[0].audio = foundArchive.audio;
+          dataArchive.audio = foundArchive.audio;
           break;
         case 'Photo':
-          data = [
-            {
-              photographer: fields.photographer,
-              photo_type: fields.photo_type,
-              photo_size: fields.photo_size,
-              photo_condition: fields.photo_condition,
-              activity_description: fields.activity_description
-            }
-          ];
+          data = {
+            photographer: fields.photographer,
+            photo_type: fields.photo_type,
+            photo_size: fields.photo_size,
+            photo_condition: fields.photo_condition,
+            activity_description: fields.activity_description
+          };
           await Photo.findByIdAndUpdate(foundArchive.photo, data, options);
 
-          dataArchive[0].photo = foundArchive.photo;
+          dataArchive.photo = foundArchive.photo;
           break;
         case 'Text':
-          data = [
-            {
-              textual_archive_number: fields.textual_archive_number,
-              author: fields.author
-            }
-          ];
+          data = {
+            textual_archive_number: fields.textual_archive_number,
+            author: fields.author
+          };
           await Text.findByIdAndUpdate(foundArchive.text, data, options);
 
-          dataArchive[0].text = foundArchive.text;
+          dataArchive.text = foundArchive.text;
           break;
         case 'Video':
-          data = [
-            {
-              narrator: fields.narrator,
-              reporter: fields.reporter,
-              activity_description: fields.activity_description
-            }
-          ];
+          data = {
+            narrator: fields.narrator,
+            reporter: fields.reporter,
+            activity_description: fields.activity_description
+          };
           await Video.findByIdAndUpdate(foundArchive.video, data, options);
 
-          dataArchive[0].video = foundArchive.video;
+          dataArchive.video = foundArchive.video;
           break;
         default:
           throw new Error('Invalid archive type');
