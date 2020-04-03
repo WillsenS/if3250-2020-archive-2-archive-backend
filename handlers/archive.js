@@ -377,7 +377,7 @@ const uploadUpperLayout = (res, type) => {
   res.write('</head>');
   res.write('<body>');
   res.write('<div class="container">');
-  res.write(`<form action="upload" method="post" enctype="multipart/form-data">`);
+  res.write(`<form action="/api/v1/upload" method="post" enctype="multipart/form-data">`);
   res.write('<div>Judul: <input type="text" name="judul"></div><br>');
   res.write(`<div>Tipe: <input type="text" name="tipe" value=${type}></div><br>`);
   res.write('<div>Nomor: <input type="text" name="nomor"></div><br>');
@@ -392,6 +392,7 @@ const uploadUpperLayout = (res, type) => {
 };
 
 const uploadLowerLayout = res => {
+  res.write('<input type="submit">');
   res.write('</form>');
   res.write('</div>');
   res.write('</body>');
@@ -405,7 +406,6 @@ exports.uploadAudio = (req, res) => {
   res.write('<div>Narrator: <input type="text" name="narrator"></div><br>');
   res.write('<div>Reporter: <input type="text" name="reporter"></div><br>');
   res.write('<div>Activity Description: <input type="text" name="activity_description"></div><br>');
-  res.write('<input type="submit">');
 
   uploadLowerLayout(res);
   return res.end();
@@ -420,7 +420,6 @@ exports.uploadPhoto = (req, res) => {
   res.write('<div>Photo Size: <input type="text" name="photo_size"></div><br>');
   res.write('<div>Photo Condition: <input type="text" name="photo_condition"></div><br>');
   res.write('<div>Activity Description: <input type="text" name="activity_description"></div><br>');
-  res.write('<input type="submit">');
 
   uploadLowerLayout(res);
   return res.end();
@@ -446,7 +445,6 @@ exports.uploadVideo = (req, res) => {
   res.write('<div>Narrator: <input type="text" name="narrator"></div><br>');
   res.write('<div>Reporter: <input type="text" name="reporter"></div><br>');
   res.write('<div>Activity Description: <input type="text" name="activity_description"></div><br>');
-  res.write('<input type="submit">');
 
   uploadLowerLayout(res);
   return res.end();
