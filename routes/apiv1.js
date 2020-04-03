@@ -14,6 +14,7 @@ const {
   getArchiveDetail,
   postUploadArchive,
   patchEditArchive,
+  putEditArchive,
   deleteArchive,
   uploadAudio,
   uploadPhoto,
@@ -158,10 +159,10 @@ r.get('/detail/:id', getArchiveDetail);
  *
  * /api/v1/upload:
  *   post:
- *     summary: "Search archive by query"
+ *     summary: "Upload new archive"
  *     tags:
  *     - "archive"
- *     description: "Retrieve archive that it's data relevant with the query"
+ *     description: "Upload new archive based on form fields"
  *     produces:
  *     - application/json
  *     requestBody:
@@ -202,10 +203,10 @@ r.post('/upload', postUploadArchive);
  *
  * /api/v1/edit:
  *   patch:
- *     summary: "Search archive by query"
+ *     summary: "Update archive by id"
  *     tags:
  *     - "archive"
- *     description: "Retrieve archive that it's data relevant with the query"
+ *     description: "Update archive with provided id"
  *     produces:
  *     - application/json
  *     parameters:
@@ -245,6 +246,55 @@ r.post('/upload', postUploadArchive);
  *         description: "Caught exception on server"
  */
 r.patch('/edit/:id', patchEditArchive);
+
+/**
+ * @swagger
+ *
+ * /api/v1/edit:
+ *   patch:
+ *     summary: "Replace archive by id"
+ *     tags:
+ *     - "archive"
+ *     description: "Replace archive with new provided data"
+ *     produces:
+ *     - application/json
+ *     parameters:
+ *       - name: "id"
+ *         in: "path"
+ *         required: "true"
+ *         description: "archive id"
+ *         type: "string"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *           type: object
+ *           properties:
+ *             code:
+ *               type: string
+ *             title:
+ *               type: string
+ *             description:
+ *               type: string
+ *             location:
+ *               type: string
+ *           required:
+ *             -  code
+ *             -  title
+ *             -  description
+ *             -  location
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       401:
+ *         description: "Not authenticated"
+ *       500:
+ *         description: "Caught exception on server"
+ */
+r.put('/edit/:id', putEditArchive);
 
 /**
  * @swagger
