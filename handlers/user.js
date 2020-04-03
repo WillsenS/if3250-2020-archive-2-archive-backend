@@ -6,6 +6,7 @@ const convert = require('xml-js');
 const jwt = require('jsonwebtoken');
 const formidable = require('formidable');
 const User = require('../models/User');
+// const Role = require('../models/Role');
 const { defaultURL } = require('../config');
 const { sendResponse } = require('../helpers');
 
@@ -173,10 +174,10 @@ exports.searchUser = async (req, res) => {
 exports.getUserDetail = async (req, res) => {
   const { id } = req.params;
   try {
-    const foundUser = await User.find({ _id: id });
+    const foundUser = await User.findById(id);
 
     return sendResponse(res, 200, 'Sucessfully retrieved user detail', {
-      data: foundUser[0]
+      data: foundUser
     });
   } catch (err) {
     console.error(err.message);
@@ -184,27 +185,20 @@ exports.getUserDetail = async (req, res) => {
   }
 };
 
-exports.patchEditUser = async (req, res) => {
+// const HIGHEST_ADMIN_ROLE = 1; // Admin Terpusat
+const DEFAULT_ROLE = 2; // Internal ITB Non-Admin
+
+exports.updateUserRole = async (req, res) => {
   const { id } = req.params;
   const form = new formidable.IncomingForm();
 
   form.parse(req, async function(err, fields) {
     try {
-      const dataUser = [
-        {
-          username: fields.username,
-          fullname: fields.fullname,
-          mail: fields.mail,
-          mailNonITB: fields.mailNonITB,
-          ou: fields.ou,
-          status: fields.status
-        }
-      ];
+      const dataUser = {
+        role: fields.kode_role
+      };
 
-      await User.findOneAndUpdate({ _id: id }, dataUser, {
-        upsert: false,
-        useFindAndModify: false
-      });
+      await User.findByIdAndUpdate(id, dataUser);
 
       return sendResponse(res, 200, 'Successfully edited user');
     } catch (e) {
@@ -214,12 +208,27 @@ exports.patchEditUser = async (req, res) => {
   });
 };
 
+exports.removeAdminAccessFromUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const dataUser = {
+      role: DEFAULT_ROLE
+    };
+
+    await User.findByIdAndUpdate(id, dataUser);
+
+    return sendResponse(res, 200, 'Successfully removed admin access from user');
+  } catch (e) {
+    console.error(e);
+    return sendResponse(res, 400, 'Error. User not found');
+  }
+};
+
 exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // eslint-disable-next-line
-    result = await User.deleteOne({ _id: id });
+    await User.findByIdAndDelete(id);
     return sendResponse(res, 200, 'Successfully deleted user');
   } catch (err) {
     console.error(err.message);
