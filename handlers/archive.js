@@ -36,7 +36,7 @@ exports.searchArchive = async (req, res) => {
     }
 
     const countArchive = await Archive.countDocuments(where);
-    const findArchive = await Archive.find(where)
+    const foundArchive = await Archive.find(where)
       .populate('file')
       .populate('audio')
       .populate('photo')
@@ -64,12 +64,12 @@ exports.searchArchive = async (req, res) => {
 
     for (let i = 0; i < filterAttr.length; i += 1) {
       const val = filterAttr[i];
-      const findDistictAttribute = await Archive.find(where).distinct(val);
-      filtersCandidate[val] = findDistictAttribute.sort();
+      const findDistinctAttribute = await Archive.find(where).distinct(val);
+      filtersCandidate[val] = findDistinctAttribute.sort();
     }
 
     return sendResponse(res, 200, 'OK', {
-      data: findArchive,
+      data: foundArchive,
       count: countArchive,
       currentPage: page,
       totalPages,
@@ -201,7 +201,7 @@ const buildArchive = async (file, fields) => {
 exports.getArchiveDetail = async (req, res) => {
   try {
     const { id } = req.params;
-    const foundArchive = await Archive.find({ _id: id })
+    const foundArchive = await Archive.findById(id)
       .populate('file')
       .populate('audio')
       .populate('photo')
@@ -259,7 +259,7 @@ exports.patchEditArchive = async (req, res) => {
 
   form.parse(req, async function(err, fields) {
     try {
-      const foundArchive = await Archive.find({ _id: id });
+      const foundArchive = await Archive.findById(id);
 
       const dataArchive = [
         {
@@ -273,7 +273,7 @@ exports.patchEditArchive = async (req, res) => {
           keamanan_terbuka: fields.keamanan_terbuka > 0,
           lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
           mime: fields.mime,
-          file: foundArchive[0].file
+          file: foundArchive.file
         }
       ];
 
@@ -294,9 +294,9 @@ exports.patchEditArchive = async (req, res) => {
               activity_description: fields.activity_description
             }
           ];
-          await Audio.findOneAndUpdate({ _id: foundArchive[0].audio }, data, options);
+          await Audio.findByIdAndUpdate(foundArchive.audio, data, options);
 
-          dataArchive[0].audio = foundArchive[0].audio;
+          dataArchive[0].audio = foundArchive.audio;
           break;
         case 'Photo':
           data = [
@@ -308,9 +308,9 @@ exports.patchEditArchive = async (req, res) => {
               activity_description: fields.activity_description
             }
           ];
-          await Photo.findOneAndUpdate({ _id: foundArchive[0].photo }, data, options);
+          await Photo.findByIdAndUpdate(foundArchive.photo, data, options);
 
-          dataArchive[0].photo = foundArchive[0].photo;
+          dataArchive[0].photo = foundArchive.photo;
           break;
         case 'Text':
           data = [
@@ -319,9 +319,9 @@ exports.patchEditArchive = async (req, res) => {
               author: fields.author
             }
           ];
-          await Text.findOneAndUpdate({ _id: foundArchive[0].text }, data, options);
+          await Text.findByIdAndUpdate(foundArchive.text, data, options);
 
-          dataArchive[0].text = foundArchive[0].text;
+          dataArchive[0].text = foundArchive.text;
           break;
         case 'Video':
           data = [
@@ -331,15 +331,15 @@ exports.patchEditArchive = async (req, res) => {
               activity_description: fields.activity_description
             }
           ];
-          await Video.findOneAndUpdate({ _id: foundArchive[0].video }, data, options);
+          await Video.findByIdAndUpdate(foundArchive.video, data, options);
 
-          dataArchive[0].video = foundArchive[0].video;
+          dataArchive[0].video = foundArchive.video;
           break;
         default:
           throw new Error('Invalid archive type');
       }
 
-      await Archive.findOneAndUpdate({ _id: id }, dataArchive, options);
+      await Archive.findByIdAndUpdate(id, dataArchive, options);
 
       return sendResponse(res, 200, 'Successfully edited archive');
     } catch (e) {
@@ -350,32 +350,28 @@ exports.patchEditArchive = async (req, res) => {
 };
 
 const deleteArchiveById = async id => {
-  const foundArchive = await Archive.find({ _id: id });
+  const foundArchive = await Archive.findById(id);
 
-  console.log(foundArchive[0]);
-  console.log(foundArchive[0].file);
+  let result = await File.findByIdAndDelete(foundArchive.file);
 
-  // eslint-disable-next-line
-  let result = await File.deleteOne({ _id: foundArchive[0].file });
-
-  switch (foundArchive[0].tipe) {
+  switch (foundArchive.tipe) {
     case 'Audio':
-      result = await Audio.deleteOne({ _id: foundArchive[0].audio });
+      result = await Audio.findByIdAndDelete(foundArchive.audio);
       break;
     case 'Photo':
-      result = await Photo.deleteOne({ _id: foundArchive[0].photo });
+      result = await Photo.findByIdAndDelete(foundArchive.photo);
       break;
     case 'Text':
-      result = await Text.deleteOne({ _id: foundArchive[0].text });
+      result = await Text.findByIdAndDelete(foundArchive.text);
       break;
     case 'Video':
-      result = await Video.deleteOne({ _id: foundArchive[0].video });
+      result = await Video.findByIdAndDelete(foundArchive.video);
       break;
     default:
       throw new Error('Invalid archive type');
   }
-  // eslint-disable-next-line
-  result = await Archive.deleteOne({ _id: id });
+
+  result = await Archive.findByIdAndDelete(id);
 
   return result;
 };
@@ -386,7 +382,7 @@ exports.putEditArchive = async (req, res) => {
     await deleteArchiveById(id);
     await buildArchiveFromForm(req, res);
 
-    return sendResponse(res, 200, 'Successfully replace archive');
+    return sendResponse(res, 200, 'Successfully replaced archive');
   } catch (e) {
     console.error(e);
     return sendResponse(res, 400, 'Error. Bad request');

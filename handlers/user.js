@@ -173,10 +173,10 @@ exports.searchUser = async (req, res) => {
 exports.getUserDetail = async (req, res) => {
   const { id } = req.params;
   try {
-    const foundUser = await User.find({ _id: id });
+    const foundUser = await User.findById(id);
 
     return sendResponse(res, 200, 'Sucessfully retrieved user detail', {
-      data: foundUser[0]
+      data: foundUser
     });
   } catch (err) {
     console.error(err.message);
@@ -201,7 +201,7 @@ exports.patchEditUser = async (req, res) => {
         }
       ];
 
-      await User.findOneAndUpdate({ _id: id }, dataUser, {
+      await User.findByIdAndUpdate(id, dataUser, {
         upsert: false,
         useFindAndModify: false
       });
