@@ -38,6 +38,10 @@ exports.searchArchive = async (req, res) => {
     const countArchive = await Archive.countDocuments(where);
     const findArchive = await Archive.find(where)
       .populate('file')
+      .populate('audio')
+      .populate('photo')
+      .populate('video')
+      .populate('text')
       .limit(limit)
       .skip((page - 1) * limit);
 
@@ -142,9 +146,9 @@ const buildArchive = async (file, fields) => {
       nomor: fields.nomor,
       pola: fields.pola,
       lokasi_kegiatan: fields.lokasi_kegiatan,
-      keterangan: fields.description,
+      keterangan: fields.keterangan,
       waktu_kegiatan: fields.waktu_kegiatan,
-      keamanan_terbuka: fields.keamanan_terbuka,
+      keamanan_terbuka: (fields.keamanan_terbuka != 0),
       lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
       mime: fields.mime
     }
@@ -280,7 +284,7 @@ exports.patchEditArchive = async (req, res) => {
           lokasi_kegiatan: fields.lokasi_kegiatan,
           keterangan: fields.description,
           waktu_kegiatan: fields.waktu_kegiatan,
-          keamanan_terbuka: fields.keamanan_terbuka,
+          keamanan_terbuka: (fields.keamanan_terbuka != 0),
           lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
           mime: fields.mime,
           file: foundArchive[0].file
@@ -373,13 +377,26 @@ exports.deleteArchive = async (req, res) => {
 // Pages for testing
 
 exports.uploadArchive = (req, res) => {
+  // Upload Photo Archive
+
   res.writeHead(200, { 'Content-Type': 'text/html' });
   res.write('<form action="upload" method="post" enctype="multipart/form-data">');
-  res.write('<div>Judul: <input type="text" name="title"></div><br>');
+  res.write('<div>Judul: <input type="text" name="judul"></div><br>');
+  res.write('<div>Tipe: <input type="text" name="tipe"></div><br>');
+  res.write('<div>Nomor: <input type="text" name="nomor"></div><br>');
+  res.write('<div>Pola: <input type="text" name="pola"></div><br>');
+  res.write('<div>Lokasi Kegiatan: <input type="text" name="lokasi_kegiatan"></div><br>');
+  res.write('<div>Keterangan: <input type="text" name="keterangan"></div><br>');
+  res.write('<div>Waktu Kegiatan: <input type="text" name="waktu_kegiatan"></div><br>');
+  res.write('<div>Keamanan terbuka?: <input type="number" name="keamanan_terbuka"></div><br>');
+  res.write('<div>Lokasi simpan arsip: <input type="text" name="lokasi_simpan_arsip"></div><br>');
+  res.write('<div>Mime: <input type="text" name="mime"></div><br>');
+  res.write('<div>Fotografer: <input type="text" name="photographer"></div><br>');
+  res.write('<div>Photo Type: <input type="text" name="photo_type"></div><br>');
+  res.write('<div>Photo Size: <input type="text" name="photo_size"></div><br>');
+  res.write('<div>Photo Condition: <input type="text" name="photo_condition"></div><br>');
+  res.write('<div>Activity Description: <input type="text" name="activity_description"></div><br>');
   res.write('<div>File: <input type="file" name="filetoupload"></div><br>');
-  res.write('<div>Kode: <input type="text" name="code"></div><br>');
-  res.write('<div>Description: <input type="text" name="description"></div><br>');
-  res.write('<div>Location: <input type="text" name="location"></div><br>');
   res.write('<input type="submit">');
   res.write('</form>');
   return res.end();
