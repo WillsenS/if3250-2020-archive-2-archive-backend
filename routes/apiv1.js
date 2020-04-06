@@ -20,7 +20,8 @@ const {
   uploadAudio,
   uploadPhoto,
   uploadText,
-  uploadVideo
+  uploadVideo,
+  postNewBorrowRequest
 } = require('../handlers/archive');
 
 const r = express.Router();
@@ -347,5 +348,21 @@ r.get('/upload/audio', uploadAudio);
 r.get('/upload/photo', uploadPhoto);
 r.get('/upload/text', uploadText);
 r.get('/upload/video', uploadVideo);
+
+const forceAuth = (req, res, next) => {
+  req.session.user = {
+    _id: '5e85ea81b2b5d2785eff4bff',
+    username: 'juniardiakbar',
+    fullname: 'Juniardi Akbar',
+    mail: 'juniardiakbar@students.itb.ac.id',
+    ou: 'STEI - Teknik Informatika',
+    status: 'Mahasiswa',
+    role: 2
+  };
+
+  next();
+};
+
+r.post('/archive/borrow', forceAuth, postNewBorrowRequest);
 
 module.exports = r;
