@@ -9,14 +9,12 @@ const {
   getUserDetail,
   searchUser
 } = require('../handlers/user');
-const {
-  searchDocument,
-  getArchiveDetail,
-  uploadArchive,
-  postUploadArchive,
-  patchEditArchive,
-  deleteArchive
-} = require('../handlers/archive');
+const { searchArchive } = require('../handlers/archive');
+// getArchiveDetail,
+// uploadArchive,
+// postUploadArchive,
+// patchEditArchive,
+// deleteArchive
 
 const r = express.Router();
 
@@ -89,7 +87,7 @@ r.post('/auth/signout', isAuthenticated, postSignout);
  */
 r.get('/auth/check', isAuthenticated, (req, res) => {
   const { user } = req.session;
-  res.json(user);
+  res.json({ data: user });
 });
 
 /**
@@ -119,7 +117,7 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/search', searchDocument);
+r.get('/search', searchArchive);
 
 /**
  * @swagger
@@ -148,7 +146,7 @@ r.get('/search', searchDocument);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/detail/:id', getArchiveDetail);
+// r.get('/detail/:id', getArchiveDetail);
 
 /**
  * @swagger
@@ -192,7 +190,7 @@ r.get('/detail/:id', getArchiveDetail);
  *       500:
  *         description: "Caught exception on server"
  */
-r.post('/upload', postUploadArchive);
+// r.post('/upload', postUploadArchive);
 
 /**
  * @swagger
@@ -241,7 +239,7 @@ r.post('/upload', postUploadArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.patch('/edit/:id', patchEditArchive);
+// r.patch('/edit/:id', patchEditArchive);
 
 /**
  * @swagger
@@ -271,7 +269,7 @@ r.patch('/edit/:id', patchEditArchive);
  *         description: "Caught exception on server"
  */
 // eslint-disable-next-line
-r.delete('/delete/:id', deleteArchive);
+// r.delete('/delete/:id', deleteArchive);
 
 r.get('/users', getUsers);
 
@@ -287,6 +285,6 @@ r.delete('/users/:id', deleteUser);
 /*
  * Routes for testing pages
  */
-r.get('/upload', uploadArchive);
+// r.get('/upload', uploadArchive);
 
 module.exports = r;

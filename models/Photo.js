@@ -26,10 +26,6 @@ const documentSchema = new mongoose.Schema(
     photo_condition: {
       type: String,
       required: true
-    },
-    activity_description: {
-      type: String,
-      required: true
     }
   },
   { timestamps: true }
