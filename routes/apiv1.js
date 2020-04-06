@@ -5,16 +5,19 @@ const {
   postSignout,
   getUsers,
   deleteUser,
-  patchEditUser,
+  removeAdminAccessFromUser,
+  updateUserRole,
   getUserDetail,
   searchUser
 } = require('../handlers/user');
-const { searchArchive } = require('../handlers/archive');
-// getArchiveDetail,
-// uploadArchive,
-// postUploadArchive,
-// patchEditArchive,
-// deleteArchive
+const {
+  searchArchive,
+  putEditArchive,
+  uploadAudio,
+  uploadPhoto,
+  uploadText,
+  uploadVideo
+} = require('../handlers/archive');
 
 const r = express.Router();
 
@@ -50,7 +53,7 @@ r.get('/auth/signin', isNonAuthenticated, signInSSO);
  *
  * /api/v1/auth/signout:
  *   post:
- *     summary: "Make user out from application"
+ *     summary: "Sign out user from application"
  *     description: "Removing user session from database"
  *     tags:
  *     - "auth"
@@ -95,10 +98,10 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  *
  * /api/v1/search:
  *   get:
- *     summary: "Search document by query"
+ *     summary: "Search archive by query"
  *     tags:
- *     - "document"
- *     description: "Retrieve document that it's data relevant with the query"
+ *     - "archive"
+ *     description: "Retrieve archive that it's data relevant with the query"
  *     produces:
  *     - application/json
  *     parameters:
@@ -126,8 +129,8 @@ r.get('/search', searchArchive);
  *   get:
  *     summary: "Get archive detail by id"
  *     tags:
- *     - "document"
- *     description: "Retrieve data with id provided in url parameter"
+ *     - "archive"
+ *     description: "Retrieve archive data with id provided in url parameter"
  *     produces:
  *     - application/json
  *     parameters:
@@ -153,10 +156,10 @@ r.get('/search', searchArchive);
  *
  * /api/v1/upload:
  *   post:
- *     summary: "Search document by query"
+ *     summary: "Upload new archive"
  *     tags:
- *     - "document"
- *     description: "Retrieve document that it's data relevant with the query"
+ *     - "archive"
+ *     description: "Upload new archive based on form fields"
  *     produces:
  *     - application/json
  *     requestBody:
@@ -197,10 +200,10 @@ r.get('/search', searchArchive);
  *
  * /api/v1/edit:
  *   patch:
- *     summary: "Search document by query"
+ *     summary: "Update archive by id"
  *     tags:
- *     - "document"
- *     description: "Retrieve document that it's data relevant with the query"
+ *     - "archive"
+ *     description: "Update archive with provided id"
  *     produces:
  *     - application/json
  *     parameters:
@@ -244,11 +247,60 @@ r.get('/search', searchArchive);
 /**
  * @swagger
  *
+ * /api/v1/edit:
+ *   patch:
+ *     summary: "Replace archive by id"
+ *     tags:
+ *     - "archive"
+ *     description: "Replace archive with new provided data"
+ *     produces:
+ *     - application/json
+ *     parameters:
+ *       - name: "id"
+ *         in: "path"
+ *         required: "true"
+ *         description: "archive id"
+ *         type: "string"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *           type: object
+ *           properties:
+ *             code:
+ *               type: string
+ *             title:
+ *               type: string
+ *             description:
+ *               type: string
+ *             location:
+ *               type: string
+ *           required:
+ *             -  code
+ *             -  title
+ *             -  description
+ *             -  location
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       401:
+ *         description: "Not authenticated"
+ *       500:
+ *         description: "Caught exception on server"
+ */
+r.put('/edit/:id', putEditArchive);
+
+/**
+ * @swagger
+ *
  * /api/v1/delete:
  *   delete:
- *     summary: "Delete document by id"
+ *     summary: "Delete archive by id"
  *     tags:
- *     - "document"
+ *     - "archive"
  *     description: "Delete archive with id prodived in request parameter"
  *     produces:
  *     - application/json
@@ -277,7 +329,9 @@ r.get('/user-search', searchUser);
 
 r.get('/users/:id', getUserDetail);
 
-r.patch('/users/:id', patchEditUser);
+r.patch('/users/:id', updateUserRole);
+
+r.patch('/remove-admin/:id', removeAdminAccessFromUser);
 
 // eslint-disable-next-line
 r.delete('/users/:id', deleteUser);
@@ -285,6 +339,9 @@ r.delete('/users/:id', deleteUser);
 /*
  * Routes for testing pages
  */
-// r.get('/upload', uploadArchive);
+r.get('/upload/audio', uploadAudio);
+r.get('/upload/photo', uploadPhoto);
+r.get('/upload/text', uploadText);
+r.get('/upload/video', uploadVideo);
 
 module.exports = r;

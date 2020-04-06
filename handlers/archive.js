@@ -1,10 +1,13 @@
 /* eslint-disable no-await-in-loop */
-// const formidable = require('formidable');
-// const mv = require('mv');
+const formidable = require('formidable');
+const mv = require('mv');
 const Archive = require('../models/Archive');
-// const { translateFiltersMongoose, saveModel, sendResponse } = require('../helpers');
 const { translateFiltersMongoose, sendResponse } = require('../helpers');
-// const File = require('../models/File');
+const File = require('../models/File');
+const Audio = require('../models/Audio');
+const Video = require('../models/Video');
+const Text = require('../models/Text');
+const Photo = require('../models/Photo');
 
 exports.searchArchive = async (req, res) => {
   try {
@@ -35,6 +38,10 @@ exports.searchArchive = async (req, res) => {
     const countArchive = await Archive.countDocuments(where);
     const findArchive = await Archive.find(where)
       .populate('file')
+      .populate('audio')
+      .populate('photo')
+      .populate('video')
+      .populate('text')
       .limit(limit)
       .skip((page - 1) * limit);
 
@@ -76,151 +83,383 @@ exports.searchArchive = async (req, res) => {
   }
 };
 
-// const NEW_ARCHIVE = 'new';
-// const EDIT_ARCHIVE_NEW_FILE = 'edit-upload';
+const saveMetadata = async fields => {
+  let metadataDoc;
+  let data;
+  switch (fields.tipe) {
+    case 'Audio':
+      data = {
+        narrator: fields.narrator,
+        reporter: fields.reporter,
+        activity_description: fields.activity_description
+      };
+      metadataDoc = await Audio.create(data);
+      break;
+    case 'Photo':
+      data = {
+        photographer: fields.photographer,
+        photo_type: fields.photo_type,
+        photo_size: fields.photo_size,
+        photo_condition: fields.photo_condition,
+        activity_description: fields.activity_description
+      };
+      metadataDoc = await Photo.create(data);
+      break;
+    case 'Text':
+      data = {
+        textual_archive_number: fields.textual_archive_number,
+        author: fields.author
+      };
+      metadataDoc = await Text.create(data);
+      break;
+    case 'Video':
+      data = {
+        narrator: fields.narrator,
+        reporter: fields.reporter,
+        activity_description: fields.activity_description
+      };
+      metadataDoc = await Video.create(data);
+      break;
+    default:
+      throw new Error('Invalid archive type');
+  }
+  return metadataDoc;
+};
 
-// const buildArchive = async (file, fields, saveOption) => {
-//   if (!file.filetoupload) {
-//     throw new Error('Uploaded file not found');
-//   }
+const buildArchive = async (file, fields) => {
+  if (!file.filetoupload) {
+    throw new Error('Uploaded file not found');
+  }
 
-//   const dataDocument = [
-//     {
-//       kode: fields.code,
-//       judul: fields.title,
-//       keterangan: fields.description,
-//       lokasi: fields.location
-//     }
-//   ];
+  const dataArchive = {
+    judul: fields.judul,
+    tipe: fields.tipe,
+    nomor: fields.nomor,
+    pola: fields.pola,
+    lokasi_kegiatan: fields.lokasi_kegiatan,
+    keterangan: fields.keterangan,
+    waktu_kegiatan: fields.waktu_kegiatan,
+    keamanan_terbuka: fields.keamanan_terbuka > 0,
+    lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
+    mime: fields.mime
+  };
 
-//   if (saveOption === NEW_ARCHIVE || saveOption === EDIT_ARCHIVE_NEW_FILE) {
-//     // Create new file object
-//     const dataFile = [
-//       {
-//         originalname: file.filetoupload.name,
-//         filename: file.filetoupload.name,
-//         mimetype: file.filetoupload.type,
-//         size: file.filetoupload.size,
-//         path: process.env.UPLOAD_DIR + file.filetoupload.name
-//       }
-//     ];
-//     console.log(dataFile);
+  // Create new file object
+  const dataFile = {
+    originalname: file.filetoupload.name,
+    filename: file.filetoupload.name,
+    mimetype: file.filetoupload.type,
+    size: file.filetoupload.size,
+    path: process.env.UPLOAD_DIR + file.filetoupload.name
+  };
 
-//     const result = await saveModel(File, dataFile);
-//     console.info(result);
+  const fileDoc = await File.create(dataFile);
 
-//     // eslint-disable-next-line
-//     dataDocument[0].file = result[0]._id;
-//     console.log(dataDocument);
+  // eslint-disable-next-line
+  dataArchive.file = fileDoc._id;
 
-//     if (saveOption === NEW_ARCHIVE) {
-//       // Create new document, with attr 'file' referenced to the newly file
-//       const resultDocument = await saveModel(Document, dataDocument);
-//       console.info(resultDocument);
-//     } else if (saveOption === EDIT_ARCHIVE_NEW_FILE) {
-//       // Update existing document, with attr 'file' referenced to the newly upload file
-//     }
-//   }
-// };
+  const metadataDoc = await saveMetadata(fields);
 
-// exports.getArchiveDetail = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const findDocument = await Document.find({ _id: id });
-//     return sendResponse(res, 200, 'Successfully retrieved archive', { data: findDocument });
-//   } catch (err) {
-//     console.error(err);
-//     return sendResponse(res, 400, 'Error. Bad request');
-//   }
-// };
+  /* eslint-disable */
+  switch (fields.tipe) {
+    case 'Audio':
+      dataArchive.audio = metadataDoc._id;
+      break;
+    case 'Photo':
+      dataArchive.photo = metadataDoc._id;
+      break;
+    case 'Text':
+      dataArchive.text = metadataDoc._id;
+      break;
+    case 'Video':
+      dataArchive.video = metadataDoc._id;
+      break;
+    default:
+      throw new Error('Invalid archive type');
+  }
+  /* eslint-enable */
 
-// exports.postUploadArchive = async (req, res) => {
-//   const form = new formidable.IncomingForm();
+  // Create new archive
+  // Attr 'file' referenced to the newly uploaded file
+  // Metadata attr referenced to object with metadata of file
+  const archiveDoc = await Archive.create(dataArchive);
+  console.info(archiveDoc);
+};
 
-//   form.parse(req, async function(err, fields, file) {
-//     try {
-//       await buildArchive(file, fields, NEW_ARCHIVE);
+exports.getArchiveDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const foundArchive = await Archive.findById(id)
+      .populate('file')
+      .populate('audio')
+      .populate('photo')
+      .populate('video')
+      .populate('text');
 
-//       if (!file.filetoupload) {
-//         throw new Error('Uploaded file not found');
-//       }
-//       const oldpath = file.filetoupload.path;
-//       const newpath =
-//         process.env.NODE_PATH +
-//         process.env.PUBLIC_DIR +
-//         process.env.UPLOAD_DIR +
-//         file.filetoupload.name;
+    return sendResponse(res, 200, 'Successfully retrieved archive', {
+      data: {
+        foundArchive
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+};
 
-//       console.log(newpath);
-//       mv(oldpath, newpath, function() {
-//         return 1;
-//       });
+const buildArchiveFromForm = async (req, res) => {
+  const form = new formidable.IncomingForm();
 
-//       return sendResponse(res, 200, 'Successfully added and uploaded archive');
-//     } catch (e) {
-//       console.error(e);
-//       return sendResponse(res, 400, 'Error. Bad request');
-//     }
-//   });
-// };
+  form.parse(req, async function(err, fields, file) {
+    try {
+      await buildArchive(file, fields);
 
-// exports.patchEditArchive = async (req, res) => {
-//   const { id } = req.params;
-//   const form = new formidable.IncomingForm();
+      if (!file.filetoupload) {
+        throw new Error('Uploaded file not found');
+      }
+      const oldpath = file.filetoupload.path;
+      const newpath =
+        process.env.NODE_PATH +
+        process.env.PUBLIC_DIR +
+        process.env.UPLOAD_DIR +
+        file.filetoupload.name;
 
-//   form.parse(req, async function(err, fields) {
-//     try {
-//       const foundDocument = await Document.find({ _id: id });
+      console.log(newpath);
+      mv(oldpath, newpath, function() {
+        return 1;
+      });
 
-//       const dataDocument = {
-//         kode: fields.code,
-//         judul: fields.title,
-//         keterangan: fields.description,
-//         lokasi: fields.location,
-//         file: foundDocument[0].file
-//       };
+      return sendResponse(res, 200, 'Successfully added and uploaded archive');
+    } catch (e) {
+      console.error(e);
+      return sendResponse(res, 400, 'Error. Bad request');
+    }
+  });
+};
 
-//       Document.findOneAndUpdate({ _id: id }, dataDocument, {
-//         upsert: false,
-//         useFindAndModify: false
-//       });
+exports.postUploadArchive = async (req, res) => {
+  await buildArchiveFromForm(req, res);
+};
 
-//       return sendResponse(res, 200, 'Successfully edited archive');
-//     } catch (e) {
-//       console.error(e);
-//       return sendResponse(res, 400, 'Error. Bad request');
-//     }
-//   });
-// };
+exports.patchEditArchive = async (req, res) => {
+  const { id } = req.params;
+  const form = new formidable.IncomingForm();
 
-// exports.deleteArchive = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const foundDocument = await Document.find({ _id: id });
+  form.parse(req, async function(err, fields) {
+    try {
+      const foundArchive = await Archive.findById(id);
 
-//     // eslint-disable-next-line
-//     let result = File.deleteOne({ _id: foundDocument[0].file });
-//     // eslint-disable-next-line
-//     result = Document.deleteOne({ _id: id });
+      const dataArchive = {
+        judul: fields.judul,
+        tipe: fields.tipe,
+        nomor: fields.nomor,
+        pola: fields.pola,
+        lokasi_kegiatan: fields.lokasi_kegiatan,
+        keterangan: fields.description,
+        waktu_kegiatan: fields.waktu_kegiatan,
+        keamanan_terbuka: fields.keamanan_terbuka > 0,
+        lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
+        mime: fields.mime,
+        file: foundArchive.file
+      };
 
-//     return sendResponse(res, 200, 'Successfully deleted archive data. Archive file still exist');
-//   } catch (err) {
-//     console.error(err);
-//     return sendResponse(res, 400, 'Error. Bad request');
-//   }
-// };
+      const options = {
+        upsert: false,
+        useFindAndModify: false
+      };
+
+      let data;
+      switch (dataArchive.tipe) {
+        case 'Audio':
+          data = {
+            narrator: fields.narrator,
+            reporter: fields.reporter,
+            activity_description: fields.activity_description
+          };
+          await Audio.findByIdAndUpdate(foundArchive.audio, data, options);
+
+          dataArchive.audio = foundArchive.audio;
+          break;
+        case 'Photo':
+          data = {
+            photographer: fields.photographer,
+            photo_type: fields.photo_type,
+            photo_size: fields.photo_size,
+            photo_condition: fields.photo_condition,
+            activity_description: fields.activity_description
+          };
+          await Photo.findByIdAndUpdate(foundArchive.photo, data, options);
+
+          dataArchive.photo = foundArchive.photo;
+          break;
+        case 'Text':
+          data = {
+            textual_archive_number: fields.textual_archive_number,
+            author: fields.author
+          };
+          await Text.findByIdAndUpdate(foundArchive.text, data, options);
+
+          dataArchive.text = foundArchive.text;
+          break;
+        case 'Video':
+          data = {
+            narrator: fields.narrator,
+            reporter: fields.reporter,
+            activity_description: fields.activity_description
+          };
+          await Video.findByIdAndUpdate(foundArchive.video, data, options);
+
+          dataArchive.video = foundArchive.video;
+          break;
+        default:
+          throw new Error('Invalid archive type');
+      }
+
+      await Archive.findByIdAndUpdate(id, dataArchive, options);
+
+      return sendResponse(res, 200, 'Successfully edited archive');
+    } catch (e) {
+      console.error(e);
+      return sendResponse(res, 400, 'Error. Bad request');
+    }
+  });
+};
+
+const deleteArchiveById = async id => {
+  const foundArchive = await Archive.findById(id);
+
+  let result = await File.findByIdAndDelete(foundArchive.file);
+
+  switch (foundArchive.tipe) {
+    case 'Audio':
+      result = await Audio.findByIdAndDelete(foundArchive.audio);
+      break;
+    case 'Photo':
+      result = await Photo.findByIdAndDelete(foundArchive.photo);
+      break;
+    case 'Text':
+      result = await Text.findByIdAndDelete(foundArchive.text);
+      break;
+    case 'Video':
+      result = await Video.findByIdAndDelete(foundArchive.video);
+      break;
+    default:
+      throw new Error('Invalid archive type');
+  }
+
+  result = await Archive.findByIdAndDelete(id);
+
+  return result;
+};
+
+exports.putEditArchive = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await deleteArchiveById(id);
+    await buildArchiveFromForm(req, res);
+
+    return sendResponse(res, 200, 'Successfully replaced archive');
+  } catch (e) {
+    console.error(e);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+};
+
+exports.deleteArchive = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await deleteArchiveById(id);
+
+    return sendResponse(res, 200, 'Successfully deleted archive data. Archive file still exist');
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+};
 
 // Pages for testing
 
-// exports.uploadArchive = (req, res) => {
-//   res.writeHead(200, { 'Content-Type': 'text/html' });
-//   res.write('<form action="upload" method="post" enctype="multipart/form-data">');
-//   res.write('<div>Judul: <input type="text" name="title"></div><br>');
-//   res.write('<div>File: <input type="file" name="filetoupload"></div><br>');
-//   res.write('<div>Kode: <input type="text" name="code"></div><br>');
-//   res.write('<div>Description: <input type="text" name="description"></div><br>');
-//   res.write('<div>Location: <input type="text" name="location"></div><br>');
-//   res.write('<input type="submit">');
-//   res.write('</form>');
-//   return res.end();
-// };
+const uploadUpperLayout = (res, type) => {
+  res.writeHead(200, { 'Content-Type': 'text/html' });
+  res.write('<meta charset="UTF-8">');
+  res.write('<!DOCTYPE html>');
+  res.write('<html>');
+  res.write('<head>');
+  res.write(
+    '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">'
+  );
+  res.write('</head>');
+  res.write('<body>');
+  res.write('<div class="container">');
+  res.write(`<form action="/api/v1/upload" method="post" enctype="multipart/form-data">`);
+  res.write('<div>Judul: <input type="text" name="judul"></div><br>');
+  res.write(`<div>Tipe: <input type="text" name="tipe" value=${type}></div><br>`);
+  res.write('<div>Nomor: <input type="text" name="nomor"></div><br>');
+  res.write('<div>Pola: <input type="text" name="pola"></div><br>');
+  res.write('<div>Lokasi Kegiatan: <input type="text" name="lokasi_kegiatan"></div><br>');
+  res.write('<div>Keterangan: <input type="text" name="keterangan"></div><br>');
+  res.write('<div>Waktu Kegiatan: <input type="text" name="waktu_kegiatan"></div><br>');
+  res.write('<div>Keamanan terbuka?: <input type="number" name="keamanan_terbuka"></div><br>');
+  res.write('<div>Lokasi simpan arsip: <input type="text" name="lokasi_simpan_arsip"></div><br>');
+  res.write('<div>Mime: <input type="text" name="mime"></div><br>');
+  res.write('<div>File: <input type="file" name="filetoupload"></div><br>');
+};
+
+const uploadLowerLayout = res => {
+  res.write('<input type="submit">');
+  res.write('</form>');
+  res.write('</div>');
+  res.write('</body>');
+  res.write('</html>');
+};
+
+exports.uploadAudio = (req, res) => {
+  // Upload Photo Archive
+  uploadUpperLayout(res, 'Audio');
+
+  res.write('<div>Narrator: <input type="text" name="narrator"></div><br>');
+  res.write('<div>Reporter: <input type="text" name="reporter"></div><br>');
+  res.write('<div>Activity Description: <input type="text" name="activity_description"></div><br>');
+
+  uploadLowerLayout(res);
+  return res.end();
+};
+
+exports.uploadPhoto = (req, res) => {
+  // Upload Photo Archive
+  uploadUpperLayout(res, 'Photo');
+
+  res.write('<div>Fotografer: <input type="text" name="photographer"></div><br>');
+  res.write('<div>Photo Type: <input type="text" name="photo_type"></div><br>');
+  res.write('<div>Photo Size: <input type="text" name="photo_size"></div><br>');
+  res.write('<div>Photo Condition: <input type="text" name="photo_condition"></div><br>');
+  res.write('<div>Activity Description: <input type="text" name="activity_description"></div><br>');
+
+  uploadLowerLayout(res);
+  return res.end();
+};
+
+exports.uploadText = (req, res) => {
+  // Upload Photo Archive
+  uploadUpperLayout(res, 'Text');
+
+  res.write(
+    '<div>Textual Archive Number: <input type="text" name="textual_archive_number"></div><br>'
+  );
+  res.write('<div>Author: <input type="text" name="author"></div><br>');
+
+  uploadLowerLayout(res);
+  return res.end();
+};
+
+exports.uploadVideo = (req, res) => {
+  // Upload Photo Archive
+  uploadUpperLayout(res, 'Video');
+
+  res.write('<div>Narrator: <input type="text" name="narrator"></div><br>');
+  res.write('<div>Reporter: <input type="text" name="reporter"></div><br>');
+  res.write('<div>Activity Description: <input type="text" name="activity_description"></div><br>');
+
+  uploadLowerLayout(res);
+  return res.end();
+};
