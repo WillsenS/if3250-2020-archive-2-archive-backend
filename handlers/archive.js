@@ -59,7 +59,12 @@ exports.searchArchive = async (req, res) => {
     const nextLink = totalPages > page ? `${baseLink}${qs}&page=${page + 1}` : '#';
     const prevLink = page > 1 ? `${baseLink}${qs}&page=${page - 1}` : '#';
 
-    const filterAttr = ['tipe', 'pola', 'lokasi_kegiatan', 'lokasi_simpan_arsip', 'mime'];
+    // NEW Filter
+    // const filterAttr = ['tipe', 'pola', 'lokasi_kegiatan', 'lokasi_simpan_arsip', 'mime'];
+
+    // OLD Filter
+    const filterAttr = ['lokasi', 'kode'];
+
     const filtersCandidate = {};
 
     for (let i = 0; i < filterAttr.length; i += 1) {

@@ -51,7 +51,7 @@ describe('Search Endpoints with Query', () => {
 
 describe('Search Endpoints with Query and Filter', () => {
   it('should create search archive with query and filter', async () => {
-    const res = await request(app).get('/api/v1/search?q=1tb&filters=lokasi==Bandung');
+    const res = await request(app).get('/api/v1/search?q=1tb&filters=pola==PB.03');
     const { data, count, currentPage, totalPages, filtersCandidate } = res.body;
     countWithFilter = count;
 
