@@ -62,10 +62,8 @@ exports.checkSSORedirect = () => {
           await newUser.save();
 
           payload = { user: newUser };
-          req.session.user = newUser;
         } else {
           payload = { user: foundUser };
-          req.session.user = foundUser;
         }
 
         const token = await jwt.sign(payload, secret, {

@@ -198,9 +198,7 @@ exports.getArchiveDetail = async (req, res) => {
       .populate('text');
 
     return sendResponse(res, 200, 'Successfully retrieved archive', {
-      data: {
-        foundArchive
-      }
+      data: foundArchive
     });
   } catch (err) {
     console.error(err);
