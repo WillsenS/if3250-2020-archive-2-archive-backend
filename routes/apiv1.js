@@ -12,11 +12,7 @@ const {
 } = require('../handlers/user');
 const {
   searchArchive,
-  getArchiveDetail,
-  postUploadArchive,
-  patchEditArchive,
   putEditArchive,
-  deleteArchive,
   uploadAudio,
   uploadPhoto,
   uploadText,
@@ -94,7 +90,7 @@ r.post('/auth/signout', isAuthenticated, postSignout);
  */
 r.get('/auth/check', isAuthenticated, (req, res) => {
   const { user } = req.session;
-  res.json(user);
+  res.json({ data: user });
 });
 
 /**
@@ -153,7 +149,7 @@ r.get('/search', searchArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/detail/:id', getArchiveDetail);
+// r.get('/detail/:id', getArchiveDetail);
 
 /**
  * @swagger
@@ -197,7 +193,7 @@ r.get('/detail/:id', getArchiveDetail);
  *       500:
  *         description: "Caught exception on server"
  */
-r.post('/upload', postUploadArchive);
+// r.post('/upload', postUploadArchive);
 
 /**
  * @swagger
@@ -246,7 +242,7 @@ r.post('/upload', postUploadArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.patch('/edit/:id', patchEditArchive);
+// r.patch('/edit/:id', patchEditArchive);
 
 /**
  * @swagger
@@ -325,7 +321,7 @@ r.put('/edit/:id', putEditArchive);
  *         description: "Caught exception on server"
  */
 // eslint-disable-next-line
-r.delete('/delete/:id', deleteArchive);
+// r.delete('/delete/:id', deleteArchive);
 
 r.get('/users', getUsers);
 

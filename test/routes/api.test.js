@@ -51,7 +51,7 @@ describe('Search Endpoints with Query', () => {
 
 describe('Search Endpoints with Query and Filter', () => {
   it('should create search archive with query and filter', async () => {
-    const res = await request(app).get('/api/v1/search?q=1tb&filters=lokasi==Bandung');
+    const res = await request(app).get('/api/v1/search?q=1tb&filters=pola==PB.03');
     const { data, count, currentPage, totalPages, filtersCandidate } = res.body;
     countWithFilter = count;
 
@@ -73,25 +73,25 @@ describe('Search Endpoints with Query and Filter', () => {
  */
 
 describe('Upload archive without data', () => {
-  it('should return error response with status 400', async () => {
+  it('should return error response with status 404', async () => {
     const res = await request(app).post('/api/v1/upload');
 
-    expect(res.statusCode).toEqual(400);
+    expect(res.statusCode).toEqual(404);
   });
 });
 
 describe('Edit archive with invalid id', () => {
-  it('should return error response with status 400', async () => {
+  it('should return error response with status 404', async () => {
     const res = await request(app).patch('/api/v1/edit/abcd');
 
-    expect(res.statusCode).toEqual(400);
+    expect(res.statusCode).toEqual(404);
   });
 });
 
 describe('Delete archive with invalid id', () => {
-  it('should return error response with status 400', async () => {
+  it('should return error response with status 404', async () => {
     const res = await request(app)['delete']('/api/v1/delete/abcd');
 
-    expect(res.statusCode).toEqual(400);
+    expect(res.statusCode).toEqual(404);
   });
 });
