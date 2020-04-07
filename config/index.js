@@ -1,6 +1,6 @@
 const config = {
-  // defaultURL: 'https://024eff95.ngrok.io'
-  defaultURL: 'https://demoapp.my.id'
+  defaultURL: 'https://39a99c7c.ngrok.io'
+  // defaultURL: 'https://demoapp.my.id'
 };
 
 module.exports = config;
