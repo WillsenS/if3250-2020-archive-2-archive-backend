@@ -382,6 +382,20 @@ exports.deleteArchive = async (req, res) => {
   }
 };
 
+exports.downloadArchive = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const foundArchive = await Archive.findById(id);
+    const result = await File.findById(foundArchive.file);
+    const file = `.${process.env.PUBLIC_DIR}${result.path}`;
+
+    return res.download(file);
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+};
+
 // Pages for testing
 
 const uploadUpperLayout = (res, type) => {
