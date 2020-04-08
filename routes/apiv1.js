@@ -13,7 +13,6 @@ const {
 const {
   searchArchive,
   getArchiveDetail,
-  downloadArchive,
   postUploadArchive,
   patchEditArchive,
   putEditArchive,
