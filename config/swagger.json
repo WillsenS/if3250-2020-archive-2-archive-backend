@@ -46,6 +46,33 @@
         "properties": {
           "judul": {
             "type": "string"
+          },
+          "tipe": {
+            "type": "string"
+          },
+          "nomor": {
+            "type": "string"
+          },
+          "pola": {
+            "type": "string"
+          },
+          "lokasi_kegiatan": {
+            "type": "string"
+          },
+          "keterangan": {
+            "type": "string"
+          },
+          "waktu_kegiatan": {
+            "type": "string"
+          },
+          "keamanan_terbuka": {
+            "type": "string"
+          },
+          "lokasi_simpan_arsip": {
+            "type": "string"
+          },
+          "mime": {
+            "type": "string"
           }
         }
       },
