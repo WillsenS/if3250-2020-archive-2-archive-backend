@@ -12,11 +12,16 @@ const {
 } = require('../handlers/user');
 const {
   searchArchive,
+  getArchiveDetail,
+  postUploadArchive,
+  patchEditArchive,
   putEditArchive,
+  deleteArchive,
   uploadAudio,
   uploadPhoto,
   uploadText,
-  uploadVideo
+  uploadVideo,
+  downloadArchive
 } = require('../handlers/archive');
 
 const r = express.Router();
@@ -149,7 +154,7 @@ r.get('/search', searchArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-// r.get('/detail/:id', getArchiveDetail);
+r.get('/detail/:id', getArchiveDetail);
 
 /**
  * @swagger
@@ -193,7 +198,7 @@ r.get('/search', searchArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-// r.post('/upload', postUploadArchive);
+r.post('/upload', postUploadArchive);
 
 /**
  * @swagger
@@ -242,7 +247,7 @@ r.get('/search', searchArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-// r.patch('/edit/:id', patchEditArchive);
+r.patch('/edit/:id', patchEditArchive);
 
 /**
  * @swagger
@@ -321,7 +326,7 @@ r.put('/edit/:id', putEditArchive);
  *         description: "Caught exception on server"
  */
 // eslint-disable-next-line
-// r.delete('/delete/:id', deleteArchive);
+r.delete('/delete/:id', deleteArchive);
 
 r.get('/users', getUsers);
 
@@ -332,6 +337,8 @@ r.get('/users/:id', getUserDetail);
 r.patch('/users/:id', updateUserRole);
 
 r.patch('/remove-admin/:id', removeAdminAccessFromUser);
+
+r.get('/download/:id', downloadArchive);
 
 // eslint-disable-next-line
 r.delete('/users/:id', deleteUser);
