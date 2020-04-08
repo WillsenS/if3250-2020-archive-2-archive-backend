@@ -207,6 +207,30 @@ exports.getArchiveDetail = async (req, res) => {
   }
 };
 
+exports.downloadArchive = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const foundArchive = await Archive.findById(id);
+    const result = await File.findById(foundArchive.file);
+    const file = process.env.NODE_PATH +
+    process.env.PUBLIC_DIR +
+    process.env.UPLOAD_DIR +
+    result.filename;
+    res.download(file, function (err) {
+      if (err) {
+        console.error(err);
+        return sendResponse(res, 400, 'Error. Bad request');
+      } else {
+        return sendResponse(res, 200, 'Successfully downloaded');
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+  
+}
+
 const buildArchiveFromForm = async (req, res) => {
   const form = new formidable.IncomingForm();
 

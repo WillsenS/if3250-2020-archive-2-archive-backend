@@ -13,6 +13,7 @@ const {
 const {
   searchArchive,
   getArchiveDetail,
+  downloadArchive,
   postUploadArchive,
   patchEditArchive,
   putEditArchive,
@@ -326,6 +327,8 @@ r.put('/edit/:id', putEditArchive);
  */
 // eslint-disable-next-line
 r.delete('/delete/:id', deleteArchive);
+
+r.get('/download/:id', downloadArchive);
 
 r.get('/users', getUsers);
 
