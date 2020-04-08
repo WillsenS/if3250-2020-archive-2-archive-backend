@@ -22,28 +22,39 @@ const isValid = async user => {
  * @param {object} req.session.user User object that was created by passport
  */
 exports.isAuthenticated = async (req, res, next) => {
-  const bearerHeader = req.headers.authorization;
+  try {
+    const bearerHeader = req.headers.authorization;
 
-  if (bearerHeader) {
-    const bearer = bearerHeader.split(' ');
-    const bearerToken = bearer[1];
+    if (bearerHeader) {
+      const bearer = bearerHeader.split(' ');
+      const bearerToken = bearer[1];
 
-    const decode = jwt.verify(bearerToken, secret);
-    const valid = await isValid(decode.user);
+      const decode = jwt.verify(bearerToken, secret);
+      const valid = await isValid(decode.user);
 
-    if (decode.user && valid) {
-      req.session.user = decode.user;
-      return next();
+      if (decode.user && valid) {
+        req.session.user = decode.user;
+        return next();
+      }
     }
+
+    return res.json({
+      apiVersion: res.locals.apiVersion,
+      error: {
+        code: 401,
+        message: 'You are not allowed.'
+      }
+    });
+  } catch (e) {
+    console.error(e);
+    return res.json({
+      apiVersion: res.locals.apiVersion,
+      error: {
+        code: 500,
+        message: `Error: ${e}`
+      }
+    });
   }
-
-  return res.json({
-    apiVersion: res.locals.apiVersion,
-    error: {
-      code: 401,
-      message: 'You are not allowed.'
-    }
-  });
 };
 
 /**

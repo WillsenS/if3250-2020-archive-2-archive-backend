@@ -35,6 +35,126 @@
           },
           "status": {
             "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "Archive": {
+        "type": "object",
+        "properties": {
+          "judul": {
+            "type": "string"
+          },
+          "tipe": {
+            "type": "string"
+          },
+          "nomor": {
+            "type": "string"
+          },
+          "pola": {
+            "type": "string"
+          },
+          "lokasi_kegiatan": {
+            "type": "string"
+          },
+          "keterangan": {
+            "type": "string"
+          },
+          "waktu_kegiatan": {
+            "type": "string"
+          },
+          "keamanan_terbuka": {
+            "type": "boolean"
+          },
+          "lokasi_simpan_arsip": {
+            "type": "string"
+          },
+          "mime": {
+            "type": "string"
+          }
+        }
+      },
+      "File": {
+        "type": "object",
+        "properties": {
+          "originalname": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "mimetype": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        }
+      },
+      "Audio": {
+        "type": "object",
+        "properties": {
+          "narrator": {
+            "type": "string"
+          },
+          "reporter": {
+            "type": "string"
+          },
+          "activity_description": {
+            "type": "string"
+          }
+        }
+      },
+      "Photo": {
+        "type": "object",
+        "properties": {
+          "photographer": {
+            "type": "string"
+          },
+          "photo_type": {
+            "type": "string"
+          },
+          "photo_size": {
+            "type": "string"
+          },
+          "photo_condition": {
+            "type": "string"
+          },
+          "activity_description": {
+            "type": "string"
+          }
+        }
+      },
+      "Text": {
+        "type": "object",
+        "properties": {
+          "author": {
+            "type": "string"
+          },
+          "textual_archive_number" : {
+            "type": "string"
+          }
+        }
+      },
+      "Video": {
+        "type": "object",
+        "properties": {
+          "narrator": {
+            "type": "string"
+          },
+          "reporter": {
+            "type": "string"
+          },
+          "activity_description": {
+            "type": "string"
           }
         }
       }

@@ -186,8 +186,7 @@ exports.getUserDetail = async (req, res) => {
 };
 
 // const HIGHEST_ADMIN_ROLE = 1; // Admin Terpusat
-// const ADMIN = 2 // Dibawah admin terpusat
-const DEFAULT_ROLE = 3; // Internal ITB Non-Admin
+const DEFAULT_ROLE = 2; // Internal ITB Non-Admin
 
 exports.updateUserRole = async (req, res) => {
   const { id } = req.params;

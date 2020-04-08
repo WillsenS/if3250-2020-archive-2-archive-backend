@@ -36,7 +36,8 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: Number,
-      required: true
+      required: true,
+      default: 2 // Internal ITB Non-Admin
     }
   },
   { timestamps: true }

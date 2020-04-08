@@ -21,7 +21,8 @@ const {
   uploadAudio,
   uploadPhoto,
   uploadText,
-  uploadVideo
+  uploadVideo,
+  downloadArchive
 } = require('../handlers/archive');
 
 const r = express.Router();
@@ -46,8 +47,12 @@ r.get('/', isAuthenticated, (req, res) => {
  *     responses:
  *       200:
  *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
  *       401:
  *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
  *       500:
  *         description: "Caught exception on server"
  */
@@ -66,11 +71,15 @@ r.get('/auth/signin', isNonAuthenticated, signInSSO);
  *       - application/json
  *     responses:
  *       200:
- *         description: "Successfully logged out"
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
  *       401:
  *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
  *       500:
- *         description: "Error happened during logging out"
+ *         description: "Caught exception on server"
  */
 r.post('/auth/signout', isAuthenticated, postSignout);
 
@@ -88,14 +97,18 @@ r.post('/auth/signout', isAuthenticated, postSignout);
  *     responses:
  *       200:
  *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
  *       401:
  *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
  *       500:
  *         description: "Caught exception on server"
  */
 r.get('/auth/check', isAuthenticated, (req, res) => {
   const { user } = req.session;
-  res.json(user);
+  res.json({ data: user });
 });
 
 /**
@@ -112,9 +125,13 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  *     parameters:
  *       - name: "q"
  *         in: "query"
- *         required: "true"
+ *         required: true
  *         description: "query"
  *         type: "string"
+ *       - name: "page"
+ *         in: "query"
+ *         required: false
+ *         description: "page number"
  *     responses:
  *       200:
  *         description: "Success operation"
@@ -122,6 +139,8 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  *         description: "Bad request"
  *       401:
  *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
  *       500:
  *         description: "Caught exception on server"
  */
@@ -151,6 +170,8 @@ r.get('/search', searchArchive);
  *         description: "Bad request"
  *       401:
  *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
  *       500:
  *         description: "Caught exception on server"
  */
@@ -167,27 +188,39 @@ r.get('/detail/:id', getArchiveDetail);
  *     description: "Upload new archive based on form fields"
  *     produces:
  *     - application/json
- *     requestBody:
- *       required: true
- *       content:
- *         application/x-www-form-urlencoded:
- *           schema:
+ *     parameters:
+ *       - in: body
+ *         name: archive
+ *         required: true
+ *         schema:
  *           type: object
  *           properties:
- *             code:
- *               type: string
- *             title:
- *               type: string
- *             description:
- *               type: string
- *             location:
- *               type: string
- *           required:
- *             -  code
- *             -  title
- *             -  description
- *             -  location
- *
+ *              judul:
+ *                description: test
+ *                type: string
+ *              tipe:
+ *                type: string
+ *              nomor:
+ *                type: string
+ *              pola:
+ *                type: string
+ *              lokasi_kegiatan:
+ *                type: string
+ *              keterangan:
+ *                type: string
+ *              waktu_kegiatan:
+ *                type: string
+ *              keamanan_terbuka:
+ *                type: boolean
+ *              lokasi_simpan_arsip:
+ *                type: string
+ *              mime:
+ *                type: string
+ *       - in: formData
+ *         name: filetoupload
+ *         type: file
+ *         description: The file to upload
+ *         required: true
  *     responses:
  *       200:
  *         description: "Success operation"
@@ -195,6 +228,8 @@ r.get('/detail/:id', getArchiveDetail);
  *         description: "Bad request"
  *       401:
  *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
  *       500:
  *         description: "Caught exception on server"
  */
@@ -217,26 +252,33 @@ r.post('/upload', postUploadArchive);
  *         required: "true"
  *         description: "archive id"
  *         type: "string"
- *     requestBody:
- *       required: true
- *       content:
- *         application/x-www-form-urlencoded:
- *           schema:
+ *       - in: body
+ *         name: archive
+ *         required: true
+ *         schema:
  *           type: object
  *           properties:
- *             code:
- *               type: string
- *             title:
- *               type: string
- *             description:
- *               type: string
- *             location:
- *               type: string
- *           required:
- *             -  code
- *             -  title
- *             -  description
- *             -  location
+ *              judul:
+ *                description: test
+ *                type: string
+ *              tipe:
+ *                type: string
+ *              nomor:
+ *                type: string
+ *              pola:
+ *                type: string
+ *              lokasi_kegiatan:
+ *                type: string
+ *              keterangan:
+ *                type: string
+ *              waktu_kegiatan:
+ *                type: string
+ *              keamanan_terbuka:
+ *                type: boolean
+ *              lokasi_simpan_arsip:
+ *                type: string
+ *              mime:
+ *                type: string
  *     responses:
  *       200:
  *         description: "Success operation"
@@ -244,6 +286,8 @@ r.post('/upload', postUploadArchive);
  *         description: "Bad request"
  *       401:
  *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
  *       500:
  *         description: "Caught exception on server"
  */
@@ -253,7 +297,7 @@ r.patch('/edit/:id', patchEditArchive);
  * @swagger
  *
  * /api/v1/edit:
- *   patch:
+ *   put:
  *     summary: "Replace archive by id"
  *     tags:
  *     - "archive"
@@ -263,29 +307,41 @@ r.patch('/edit/:id', patchEditArchive);
  *     parameters:
  *       - name: "id"
  *         in: "path"
- *         required: "true"
+ *         required: true
  *         description: "archive id"
  *         type: "string"
- *     requestBody:
- *       required: true
- *       content:
- *         application/x-www-form-urlencoded:
- *           schema:
+ *       - in: body
+ *         name: archive
+ *         required: true
+ *         schema:
  *           type: object
  *           properties:
- *             code:
- *               type: string
- *             title:
- *               type: string
- *             description:
- *               type: string
- *             location:
- *               type: string
- *           required:
- *             -  code
- *             -  title
- *             -  description
- *             -  location
+ *              judul:
+ *                description: test
+ *                type: string
+ *              tipe:
+ *                type: string
+ *              nomor:
+ *                type: string
+ *              pola:
+ *                type: string
+ *              lokasi_kegiatan:
+ *                type: string
+ *              keterangan:
+ *                type: string
+ *              waktu_kegiatan:
+ *                type: string
+ *              keamanan_terbuka:
+ *                type: boolean
+ *              lokasi_simpan_arsip:
+ *                type: string
+ *              mime:
+ *                type: string
+ *       - in: formData
+ *         name: filetoupload
+ *         type: file
+ *         description: The file to upload
+ *         required: true
  *     responses:
  *       200:
  *         description: "Success operation"
@@ -293,6 +349,8 @@ r.patch('/edit/:id', patchEditArchive);
  *         description: "Bad request"
  *       401:
  *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
  *       500:
  *         description: "Caught exception on server"
  */
@@ -322,22 +380,204 @@ r.put('/edit/:id', putEditArchive);
  *         description: "Bad request"
  *       401:
  *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
  *       500:
  *         description: "Caught exception on server"
  */
 // eslint-disable-next-line
 r.delete('/delete/:id', deleteArchive);
 
+/**
+ * @swagger
+ *
+ * /api/v1/download:
+ *   get:
+ *     summary: "Download archive by id"
+ *     tags:
+ *     - "archive"
+ *     description: "Download file of an archive by id"
+ *     produces:
+ *     - application/json
+ *     parameters:
+ *       - name: "id"
+ *         in: "path"
+ *         required: "true"
+ *         description: "archive id"
+ *         type: "string"
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       401:
+ *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
+ *       500:
+ *         description: "Caught exception on server"
+ */
 r.get('/download/:id', downloadArchive);
 
+/**
+ * @swagger
+ *
+ * /api/v1/users:
+ *   get:
+ *     summary: "Get all users"
+ *     tags:
+ *     - "archive"
+ *     description: "Get all users data available in database"
+ *     produces:
+ *     - application/json
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       401:
+ *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
+ *       500:
+ *         description: "Caught exception on server"
+ */
 r.get('/users', getUsers);
 
+/**
+ * @swagger
+ *
+ * /api/v1/user-search:
+ *   get:
+ *     summary: "Search users"
+ *     tags:
+ *     - "user"
+ *     description: "Search users by name/mail with query and page number"
+ *     produces:
+ *     - application/json
+ *     parameters:
+ *       - name: "q"
+ *         in: "query"
+ *         required: "true"
+ *         description: "query"
+ *         type: "string"
+ *       - name: "page"
+ *         in: "query"
+ *         required: "false"
+ *         description: "page number"
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       401:
+ *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
+ *       500:
+ *         description: "Caught exception on server"
+ */
 r.get('/user-search', searchUser);
 
+/**
+ * @swagger
+ *
+ * /api/v1/users:
+ *   get:
+ *     summary: "Get user detail by id"
+ *     tags:
+ *     - "user"
+ *     description: "Retrieve user data with id provided in url parameter"
+ *     produces:
+ *     - application/json
+ *     parameters:
+ *       - name: "id"
+ *         in: "path"
+ *         required: "true"
+ *         description: "user id"
+ *         type: "string"
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       401:
+ *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
+ *       500:
+ *         description: "Caught exception on server"
+ */
 r.get('/users/:id', getUserDetail);
 
+/**
+ * @swagger
+ *
+ * /api/v1/users:
+ *   patch:
+ *     summary: "Update user by id"
+ *     tags:
+ *     - "user"
+ *     description: "Update user with provided id"
+ *     produces:
+ *     - application/json
+ *     parameters:
+ *       - name: "id"
+ *         in: "path"
+ *         required: "true"
+ *         description: "user id"
+ *         type: "string"
+ *       - in: body
+ *         name: role
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *              role:
+ *                type: integer
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       401:
+ *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
+ *       500:
+ *         description: "Caught exception on server"
+ */
 r.patch('/users/:id', updateUserRole);
 
+/**
+ * @swagger
+ *
+ * /api/v1/remove-admin:
+ *   patch:
+ *     summary: "Remove admin priviledges by user id"
+ *     tags:
+ *     - "user"
+ *     description: "Remove admin priviledges by user id"
+ *     produces:
+ *     - application/json
+ *     parameters:
+ *       - name: "id"
+ *         in: "path"
+ *         required: "true"
+ *         description: "user id"
+ *         type: "string"
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       401:
+ *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
+ *       500:
+ *         description: "Caught exception on server"
+ */
 r.patch('/remove-admin/:id', removeAdminAccessFromUser);
 
 // eslint-disable-next-line
