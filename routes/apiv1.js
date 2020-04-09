@@ -21,7 +21,8 @@ const {
   uploadPhoto,
   uploadText,
   uploadVideo,
-  downloadArchive
+  downloadArchive,
+  getStatistic
 } = require('../handlers/archive');
 
 const r = express.Router();
@@ -581,6 +582,27 @@ r.patch('/remove-admin/:id', removeAdminAccessFromUser);
 
 // eslint-disable-next-line
 r.delete('/users/:id', deleteUser);
+
+/**
+ * @swagger
+ *
+ * /api/v1/statistic:
+ *   get:
+ *     summary: "Get number of archives and users on the database"
+ *     tags:
+ *     - "user"
+ *     description: "Get number of archives and users on the database"
+ *     produces:
+ *     - application/json
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       401:
+ *         Unauthorized request
+ */
+r.get('/statistic', isAuthenticated, getStatistic);
 
 /*
  * Routes for testing pages
