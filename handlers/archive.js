@@ -8,6 +8,7 @@ const Audio = require('../models/Audio');
 const Video = require('../models/Video');
 const Text = require('../models/Text');
 const Photo = require('../models/Photo');
+const User = require('../models/User');
 
 exports.searchArchive = async (req, res) => {
   try {
@@ -392,6 +393,36 @@ exports.downloadArchive = async (req, res) => {
     return res.download(file);
   } catch (err) {
     console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+};
+
+exports.getStatistic = async (req, res) => {
+  try {
+    const totalArchive = await Archive.countDocuments({});
+    const audio = await Archive.countDocuments({ tipe: { $eq: 'Audio' } });
+    const video = await Archive.countDocuments({ tipe: { $eq: 'Video' } });
+    const text = await Archive.countDocuments({ tipe: { $eq: 'Text' } });
+    const photo = await Archive.countDocuments({ tipe: { $eq: 'Photo' } });
+    const totalUsers = await User.countDocuments({});
+    const admin = await User.countDocuments({ role: { $eq: 1 } });
+    const user = totalUsers - admin;
+    return sendResponse(res, 200, 'OK', {
+      archives: {
+        total: totalArchive,
+        audio,
+        video,
+        text,
+        photo
+      },
+      users: {
+        total: totalUsers,
+        admin,
+        user
+      }
+    });
+  } catch (e) {
+    console.error(e);
     return sendResponse(res, 400, 'Error. Bad request');
   }
 };

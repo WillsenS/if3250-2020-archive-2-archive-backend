@@ -125,7 +125,7 @@ if (process.env.NODE_ENV === 'development') {
  */
 app.listen(app.get('port'), () => {
   console.log(
-    '%s App is running at http://%s in %s mode',
+    '%s App is running at %s in %s mode',
     chalk.green('✓'),
     process.env.BASE_URL,
     app.get('env')
