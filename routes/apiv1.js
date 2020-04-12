@@ -11,9 +11,10 @@ const {
   searchUser
 } = require('../handlers/user');
 const {
-  checkAuthArchive,
+  isAuthArchive,
   searchArchive,
   getArchiveDetail,
+  getArchiveTitle,
   postUploadArchive,
   patchEditArchive,
   putEditArchive,
@@ -113,8 +114,6 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
   res.json({ data: user });
 });
 
-r.get('/auth/archive/:idArchive', isAuthenticated, checkAuthArchive);
-
 /**
  * @swagger
  *
@@ -179,7 +178,9 @@ r.get('/search', searchArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/detail/:id', getArchiveDetail);
+r.get('/detail/:id', isAuthArchive, getArchiveDetail);
+
+r.get('/archive/title/:id', getArchiveTitle);
 
 /**
  * @swagger
@@ -616,20 +617,6 @@ r.get('/upload/photo', uploadPhoto);
 r.get('/upload/text', uploadText);
 r.get('/upload/video', uploadVideo);
 
-const forceAuth = (req, res, next) => {
-  req.session.user = {
-    _id: '5e85ea81b2b5d2785eff4bff',
-    username: 'juniardiakbar',
-    fullname: 'Juniardi Akbar',
-    mail: 'juniardiakbar@students.itb.ac.id',
-    ou: 'STEI - Teknik Informatika',
-    status: 'Mahasiswa',
-    role: 2
-  };
-
-  next();
-};
-
-r.post('/archive/borrow', forceAuth, postNewBorrowRequest);
+r.post('/archive/borrow', isAuthenticated, postNewBorrowRequest);
 
 module.exports = r;

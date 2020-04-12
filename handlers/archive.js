@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop */
 const formidable = require('formidable');
 const mv = require('mv');
+const moment = require('moment');
 const Archive = require('../models/Archive');
 const { translateFiltersMongoose, sendResponse } = require('../helpers');
 const File = require('../models/File');
@@ -10,16 +11,62 @@ const Text = require('../models/Text');
 const Photo = require('../models/Photo');
 const User = require('../models/User');
 const Borrow = require('../models/Borrow');
+const secret = 'mysecretsshhh';
+const jwt = require('jsonwebtoken');
 
-exports.checkAuthArchive = async (req, res) => {
+const isValid = async user => {
+  const { _id } = user;
+  const foundUser = await User.findById(_id);
+
+  return (
+    user.username === foundUser.username &&
+    user.fullname === foundUser.fullname &&
+    user.mail === foundUser.mail &&
+    user.mailNonITB === foundUser.mailNonITB &&
+    user.ou === foundUser.ou &&
+    user.status === foundUser.status
+  );
+};
+
+exports.isAuthArchive = async (req, res, next) => {
   try {
-    const { idArchive } = req.params;
-    const foundArchive = File.findById(idArchive);
+    const { id } = req.params;
+    const foundArchive = File.findById(id);
 
     if (!foundArchive.keamanan_terbuka) {
-      const foundBorrow = Borrower;
+      const bearerHeader = req.headers.authorization;
+
+      if (bearerHeader) {
+        const bearer = bearerHeader.split(' ');
+        const bearerToken = bearer[1];
+
+        const decode = jwt.verify(bearerToken, secret);
+        const valid = await isValid(decode.user);
+
+        if (decode.user && valid) {
+          req.session.user = decode.user;
+        }
+      }
+
+      const foundBorrow = await Borrow.find({
+        borrower: req.session.user._id,
+        archive: id,
+        createdAt: { $gte: moment().subtract(7, 'days') },
+        status: 2
+      });
+
+      if (foundBorrow.length > 0) {
+        return next();
+      }
+
+      return sendResponse(res, 401, "You're not allowed to acces this archive");
     }
-  } catch (e) {}
+
+    next();
+  } catch (e) {
+    console.error(e);
+    return sendResponse(res, 500, 'Error: Bad Request');
+  }
 };
 
 exports.searchArchive = async (req, res) => {
@@ -202,6 +249,20 @@ const buildArchive = async (file, fields) => {
   // Metadata attr referenced to object with metadata of file
   const archiveDoc = await Archive.create(dataArchive);
   console.info(archiveDoc);
+};
+
+exports.getArchiveTitle = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const foundArchive = await Archive.findById(id);
+
+    return sendResponse(res, 200, 'Successfully retrieved archive', {
+      data: foundArchive.judul
+    });
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
 };
 
 exports.getArchiveDetail = async (req, res) => {
@@ -531,14 +592,12 @@ exports.postNewBorrowRequest = async (req, res) => {
 
     const data = {
       archive: idArchive,
-      borrower: user['_id'],
+      borrower: user._id,
       phone,
       email,
       reason,
       status: 0
     };
-
-    console.log(data);
 
     const createBorrow = await Borrow.create(data);
     return sendResponse(res, 200, 'OK', createBorrow);
