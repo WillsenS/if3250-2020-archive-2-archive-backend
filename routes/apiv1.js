@@ -23,7 +23,7 @@ const {
   uploadText,
   uploadVideo,
   downloadArchive,
-  getStatistic
+  getStatistic,
   postNewBorrowRequest
 } = require('../handlers/archive');
 
