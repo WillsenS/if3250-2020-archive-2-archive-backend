@@ -9,6 +9,18 @@ const Video = require('../models/Video');
 const Text = require('../models/Text');
 const Photo = require('../models/Photo');
 const User = require('../models/User');
+const Borrow = require('../models/Borrow');
+
+exports.checkAuthArchive = async (req, res) => {
+  try {
+    const { idArchive } = req.params;
+    const foundArchive = File.findById(idArchive);
+
+    if (!foundArchive.keamanan_terbuka) {
+      const foundBorrow = Borrower;
+    }
+  } catch (e) {}
+};
 
 exports.searchArchive = async (req, res) => {
   try {
