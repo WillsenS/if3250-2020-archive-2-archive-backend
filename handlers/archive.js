@@ -523,3 +523,27 @@ exports.uploadVideo = (req, res) => {
   uploadLowerLayout(res);
   return res.end();
 };
+
+exports.postNewBorrowRequest = async (req, res) => {
+  try {
+    const { user } = req.session;
+    const { idArchive, phone, email, reason } = req.body;
+
+    const data = {
+      archive: idArchive,
+      borrower: user['_id'],
+      phone,
+      email,
+      reason,
+      status: 0
+    };
+
+    console.log(data);
+
+    const createBorrow = await Borrow.create(data);
+    return sendResponse(res, 200, 'OK', createBorrow);
+  } catch (e) {
+    console.error(e);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+};
