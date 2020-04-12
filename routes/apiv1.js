@@ -11,6 +11,7 @@ const {
   searchUser
 } = require('../handlers/user');
 const {
+  checkAuthArchive,
   searchArchive,
   getArchiveDetail,
   postUploadArchive,
@@ -110,6 +111,8 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
   const { user } = req.session;
   res.json({ data: user });
 });
+
+r.get('/auth/archive/:idArchive', isAuthenticated, checkAuthArchive);
 
 /**
  * @swagger

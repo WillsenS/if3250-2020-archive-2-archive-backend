@@ -61,10 +61,10 @@ exports.searchArchive = async (req, res) => {
     const prevLink = page > 1 ? `${baseLink}${qs}&page=${page - 1}` : '#';
 
     // NEW Filter
-    // const filterAttr = ['tipe', 'pola', 'lokasi_kegiatan', 'lokasi_simpan_arsip', 'mime'];
+    const filterAttr = ['tipe', 'pola', 'lokasi_kegiatan', 'lokasi_simpan_arsip', 'mime'];
 
     // OLD Filter
-    const filterAttr = ['lokasi', 'kode'];
+    // const filterAttr = ['lokasi', 'kode'];
 
     const filtersCandidate = {};
 
@@ -203,9 +203,7 @@ exports.getArchiveDetail = async (req, res) => {
       .populate('text');
 
     return sendResponse(res, 200, 'Successfully retrieved archive', {
-      data: {
-        foundArchive
-      }
+      data: foundArchive
     });
   } catch (err) {
     console.error(err);
