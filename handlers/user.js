@@ -62,10 +62,8 @@ exports.checkSSORedirect = () => {
           await newUser.save();
 
           payload = { user: newUser };
-          req.session.user = newUser;
         } else {
           payload = { user: foundUser };
-          req.session.user = foundUser;
         }
 
         const token = await jwt.sign(payload, secret, {
@@ -192,7 +190,7 @@ exports.updateUserRole = async (req, res) => {
   const { id } = req.params;
   const form = new formidable.IncomingForm();
 
-  form.parse(req, async function(err, fields) {
+  form.parse(req, async (err, fields) => {
     try {
       const dataUser = {
         role: fields.kode_role
