@@ -13,6 +13,7 @@ const {
 const {
   isAuthArchive,
   searchArchive,
+  latestArchive,
   getArchiveDetail,
   getArchiveTitle,
   postUploadArchive,
@@ -148,6 +149,8 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  *         description: "Caught exception on server"
  */
 r.get('/search', searchArchive);
+
+r.get('/archive/latest', latestArchive);
 
 /**
  * @swagger

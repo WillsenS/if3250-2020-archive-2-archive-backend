@@ -150,6 +150,24 @@ exports.searchArchive = async (req, res) => {
   }
 };
 
+exports.latestArchive = async (req, res) => {
+  try {
+    const limit = 5;
+    const findArchive = await Archive.find({
+      keamanan_terbuka: true
+    })
+      .sort({ createdAt: -1 })
+      .limit(limit);
+
+    return sendResponse(res, 200, 'OK', {
+      data: findArchive
+    });
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+};
+
 const saveMetadata = async fields => {
   let metadataDoc;
   let data;
