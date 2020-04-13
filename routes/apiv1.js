@@ -11,9 +11,11 @@ const {
   searchUser
 } = require('../handlers/user');
 const {
+  isAuthArchive,
   searchArchive,
   latestArchive,
   getArchiveDetail,
+  getArchiveTitle,
   postUploadArchive,
   patchEditArchive,
   putEditArchive,
@@ -23,7 +25,8 @@ const {
   uploadText,
   uploadVideo,
   downloadArchive,
-  getStatistic
+  getStatistic,
+  postNewBorrowRequest
 } = require('../handlers/archive');
 
 const r = express.Router();
@@ -178,7 +181,9 @@ r.get('/archive/latest', latestArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/detail/:id', getArchiveDetail);
+r.get('/detail/:id', isAuthArchive, getArchiveDetail);
+
+r.get('/archive/title/:id', getArchiveTitle);
 
 /**
  * @swagger
@@ -614,5 +619,7 @@ r.get('/upload/audio', uploadAudio);
 r.get('/upload/photo', uploadPhoto);
 r.get('/upload/text', uploadText);
 r.get('/upload/video', uploadVideo);
+
+r.post('/archive/borrow', isAuthenticated, postNewBorrowRequest);
 
 module.exports = r;
