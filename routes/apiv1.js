@@ -11,8 +11,11 @@ const {
   searchUser
 } = require('../handlers/user');
 const {
+  isAuthArchive,
   searchArchive,
+  latestArchive,
   getArchiveDetail,
+  getArchiveTitle,
   postUploadArchive,
   patchEditArchive,
   putEditArchive,
@@ -21,7 +24,9 @@ const {
   uploadPhoto,
   uploadText,
   uploadVideo,
-  downloadArchive
+  downloadArchive,
+  getStatistic,
+  postNewBorrowRequest
 } = require('../handlers/archive');
 
 const r = express.Router();
@@ -145,6 +150,8 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  */
 r.get('/search', searchArchive);
 
+r.get('/archive/latest', latestArchive);
+
 /**
  * @swagger
  *
@@ -174,7 +181,9 @@ r.get('/search', searchArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/detail/:id', getArchiveDetail);
+r.get('/detail/:id', isAuthArchive, getArchiveDetail);
+
+r.get('/archive/title/:id', getArchiveTitle);
 
 /**
  * @swagger
@@ -582,6 +591,27 @@ r.patch('/remove-admin/:id', removeAdminAccessFromUser);
 // eslint-disable-next-line
 r.delete('/users/:id', deleteUser);
 
+/**
+ * @swagger
+ *
+ * /api/v1/statistic:
+ *   get:
+ *     summary: "Get number of archives and users on the database"
+ *     tags:
+ *     - "user"
+ *     description: "Get number of archives and users on the database"
+ *     produces:
+ *     - application/json
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       401:
+ *         Unauthorized request
+ */
+r.get('/statistic', isAuthenticated, getStatistic);
+
 /*
  * Routes for testing pages
  */
@@ -589,5 +619,7 @@ r.get('/upload/audio', uploadAudio);
 r.get('/upload/photo', uploadPhoto);
 r.get('/upload/text', uploadText);
 r.get('/upload/video', uploadVideo);
+
+r.post('/archive/borrow', isAuthenticated, postNewBorrowRequest);
 
 module.exports = r;

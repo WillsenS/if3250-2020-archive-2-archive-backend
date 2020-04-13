@@ -1,13 +1,73 @@
-/* eslint-disable no-await-in-loop */
 const formidable = require('formidable');
 const mv = require('mv');
+const moment = require('moment');
+const jwt = require('jsonwebtoken');
 const Archive = require('../models/Archive');
-const { translateFiltersMongoose, sendResponse } = require('../helpers');
 const File = require('../models/File');
 const Audio = require('../models/Audio');
 const Video = require('../models/Video');
 const Text = require('../models/Text');
 const Photo = require('../models/Photo');
+const User = require('../models/User');
+const Borrow = require('../models/Borrow');
+const { translateFiltersMongoose, sendResponse } = require('../helpers');
+
+const secret = 'mysecretsshhh';
+
+const isValid = async user => {
+  const { _id } = user;
+  const foundUser = await User.findById(_id);
+
+  return (
+    user.username === foundUser.username &&
+    user.fullname === foundUser.fullname &&
+    user.mail === foundUser.mail &&
+    user.mailNonITB === foundUser.mailNonITB &&
+    user.ou === foundUser.ou &&
+    user.status === foundUser.status
+  );
+};
+
+exports.isAuthArchive = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const foundArchive = File.findById(id);
+
+    if (!foundArchive.keamanan_terbuka) {
+      const bearerHeader = req.headers.authorization;
+
+      if (bearerHeader) {
+        const bearer = bearerHeader.split(' ');
+        const bearerToken = bearer[1];
+
+        const decode = jwt.verify(bearerToken, secret);
+        const valid = await isValid(decode.user);
+
+        if (decode.user && valid) {
+          req.session.user = decode.user;
+        }
+      }
+
+      const foundBorrow = await Borrow.find({
+        borrower: req.session.user._id,
+        archive: id,
+        createdAt: { $gte: moment().subtract(7, 'days') },
+        status: 2
+      });
+
+      if (foundBorrow.length > 0) {
+        return next();
+      }
+
+      return sendResponse(res, 401, "You're not allowed to acces this archive");
+    }
+
+    return next();
+  } catch (e) {
+    console.error(e);
+    return sendResponse(res, 500, 'Error: Bad Request');
+  }
+};
 
 exports.searchArchive = async (req, res) => {
   try {
@@ -29,6 +89,8 @@ exports.searchArchive = async (req, res) => {
     };
 
     let where = searchQuery;
+
+    console.log(where);
 
     if (filters) {
       options = translateFiltersMongoose(filters);
@@ -60,10 +122,10 @@ exports.searchArchive = async (req, res) => {
     const prevLink = page > 1 ? `${baseLink}${qs}&page=${page - 1}` : '#';
 
     // NEW Filter
-    // const filterAttr = ['tipe', 'pola', 'lokasi_kegiatan', 'lokasi_simpan_arsip', 'mime'];
+    const filterAttr = ['tipe', 'pola', 'lokasi_kegiatan', 'lokasi_simpan_arsip', 'mime'];
 
     // OLD Filter
-    const filterAttr = ['lokasi', 'kode'];
+    // const filterAttr = ['lokasi', 'kode'];
 
     const filtersCandidate = {};
 
@@ -81,6 +143,24 @@ exports.searchArchive = async (req, res) => {
       filtersCandidate,
       nextLink,
       prevLink
+    });
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+};
+
+exports.latestArchive = async (req, res) => {
+  try {
+    const limit = 5;
+    const findArchive = await Archive.find({
+      keamanan_terbuka: true
+    })
+      .sort({ createdAt: -1 })
+      .limit(limit);
+
+    return sendResponse(res, 200, 'OK', {
+      data: findArchive
     });
   } catch (err) {
     console.error(err);
@@ -191,6 +271,20 @@ const buildArchive = async (file, fields) => {
   console.info(archiveDoc);
 };
 
+exports.getArchiveTitle = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const foundArchive = await Archive.findById(id);
+
+    return sendResponse(res, 200, 'Successfully retrieved archive', {
+      data: foundArchive.judul
+    });
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+};
+
 exports.getArchiveDetail = async (req, res) => {
   try {
     const { id } = req.params;
@@ -202,9 +296,7 @@ exports.getArchiveDetail = async (req, res) => {
       .populate('text');
 
     return sendResponse(res, 200, 'Successfully retrieved archive', {
-      data: {
-        foundArchive
-      }
+      data: foundArchive
     });
   } catch (err) {
     console.error(err);
@@ -239,7 +331,7 @@ exports.downloadArchive = async (req, res) => {
 const buildArchiveFromForm = async (req, res) => {
   const form = new formidable.IncomingForm();
 
-  form.parse(req, async function(err, fields, file) {
+  form.parse(req, async (err, fields, file) => {
     try {
       await buildArchive(file, fields);
 
@@ -254,7 +346,7 @@ const buildArchiveFromForm = async (req, res) => {
         file.filetoupload.name;
 
       console.log(newpath);
-      mv(oldpath, newpath, function() {
+      mv(oldpath, newpath, () => {
         return 1;
       });
 
@@ -274,7 +366,7 @@ exports.patchEditArchive = async (req, res) => {
   const { id } = req.params;
   const form = new formidable.IncomingForm();
 
-  form.parse(req, async function(err, fields) {
+  form.parse(req, async (err, fields) => {
     try {
       const foundArchive = await Archive.findById(id);
 
@@ -420,6 +512,36 @@ exports.downloadArchive = async (req, res) => {
   }
 };
 
+exports.getStatistic = async (req, res) => {
+  try {
+    const totalArchive = await Archive.countDocuments({});
+    const audio = await Archive.countDocuments({ tipe: { $eq: 'Audio' } });
+    const video = await Archive.countDocuments({ tipe: { $eq: 'Video' } });
+    const text = await Archive.countDocuments({ tipe: { $eq: 'Text' } });
+    const photo = await Archive.countDocuments({ tipe: { $eq: 'Photo' } });
+    const totalUsers = await User.countDocuments({});
+    const admin = await User.countDocuments({ role: { $eq: 1 } });
+    const user = totalUsers - admin;
+    return sendResponse(res, 200, 'OK', {
+      archives: {
+        total: totalArchive,
+        audio,
+        video,
+        text,
+        photo
+      },
+      users: {
+        total: totalUsers,
+        admin,
+        user
+      }
+    });
+  } catch (e) {
+    console.error(e);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+};
+
 // Pages for testing
 
 const uploadUpperLayout = (res, type) => {
@@ -505,4 +627,26 @@ exports.uploadVideo = (req, res) => {
 
   uploadLowerLayout(res);
   return res.end();
+};
+
+exports.postNewBorrowRequest = async (req, res) => {
+  try {
+    const { user } = req.session;
+    const { idArchive, phone, email, reason } = req.body;
+
+    const data = {
+      archive: idArchive,
+      borrower: user._id,
+      phone,
+      email,
+      reason,
+      status: 0
+    };
+
+    const createBorrow = await Borrow.create(data);
+    return sendResponse(res, 200, 'OK', createBorrow);
+  } catch (e) {
+    console.error(e);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
 };

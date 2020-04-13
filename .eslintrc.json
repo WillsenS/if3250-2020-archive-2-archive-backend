@@ -6,6 +6,9 @@
     "jest": true
   },
   "rules": {
+    "no-await-in-loop": 0,
+    "no-console": "off",
+    "no-underscore-dangle": ["error", { "allow": ["_id"] }],
     "prettier/prettier": ["error"],
     "dot-notation": [2, { "allowKeywords": false }]
   }
