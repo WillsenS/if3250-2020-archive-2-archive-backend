@@ -12,6 +12,7 @@ const {
 } = require('../handlers/user');
 const {
   searchArchive,
+  latestArchive,
   getArchiveDetail,
   postUploadArchive,
   patchEditArchive,
@@ -145,6 +146,8 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  *         description: "Caught exception on server"
  */
 r.get('/search', searchArchive);
+
+r.get('/archive/latest', latestArchive);
 
 /**
  * @swagger

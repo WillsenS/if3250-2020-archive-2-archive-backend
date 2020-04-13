@@ -1,5 +1,5 @@
 const config = {
-  defaultURL: 'https://39a99c7c.ngrok.io'
+  defaultURL: 'https://b0d5732f.ngrok.io'
   // defaultURL: 'https://demoapp.my.id'
 };
 
