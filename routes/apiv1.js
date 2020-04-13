@@ -425,7 +425,7 @@ r.delete('/delete/:id', deleteArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/download/:id', downloadArchive);
+r.get('/archive/download/:id', isAuthArchive, downloadArchive);
 
 /**
  * @swagger

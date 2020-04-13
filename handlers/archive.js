@@ -31,7 +31,7 @@ const isValid = async user => {
 exports.isAuthArchive = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const foundArchive = File.findById(id);
+    const foundArchive = await Archive.findById(id);
 
     if (!foundArchive.keamanan_terbuka) {
       const bearerHeader = req.headers.authorization;
@@ -297,6 +297,30 @@ exports.getArchiveDetail = async (req, res) => {
 
     return sendResponse(res, 200, 'Successfully retrieved archive', {
       data: foundArchive
+    });
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+};
+
+exports.downloadArchive = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const foundArchive = await Archive.findById(id).populated('file');
+
+    const file =
+      process.env.NODE_PATH +
+      process.env.PUBLIC_DIR +
+      process.env.UPLOAD_DIR +
+      foundArchive.file.filename;
+
+    return res.download(file, err => {
+      if (err) {
+        console.error(err);
+        return sendResponse(res, 400, 'Error. Bad request');
+      }
+      return sendResponse(res, 200, 'Successfully downloaded');
     });
   } catch (err) {
     console.error(err);
