@@ -101,17 +101,17 @@ exports.searchArchive = async (req, res) => {
       where=undefined;
     }
 
+    const populateCondition = { keamanan_terbuka: true};
+
     const countArchive = await Archive.countDocuments(where);
     const findArchive = await Archive.find(where)
-      .populate('file')
-      .populate('audio')
-      .populate('photo')
-      .populate('video')
-      .populate('text')
+      .populate({path: 'file', match: populateCondition})
+      .populate({path: 'audio', match: populateCondition})
+      .populate({path: 'photo', match: populateCondition})
+      .populate({path: 'video', match: populateCondition})
+      .populate({path: 'text', match: populateCondition})
       .limit(limit)
       .skip((page - 1) * limit);
-    
-    console.log(findArchive);
 
     let qs = '?';
     const qsNameList = ['q', 'filters'];
