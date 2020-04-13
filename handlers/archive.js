@@ -1,9 +1,8 @@
-/* eslint-disable no-await-in-loop */
 const formidable = require('formidable');
 const mv = require('mv');
 const moment = require('moment');
+const jwt = require('jsonwebtoken');
 const Archive = require('../models/Archive');
-const { translateFiltersMongoose, sendResponse } = require('../helpers');
 const File = require('../models/File');
 const Audio = require('../models/Audio');
 const Video = require('../models/Video');
@@ -11,8 +10,9 @@ const Text = require('../models/Text');
 const Photo = require('../models/Photo');
 const User = require('../models/User');
 const Borrow = require('../models/Borrow');
+const { translateFiltersMongoose, sendResponse } = require('../helpers');
+
 const secret = 'mysecretsshhh';
-const jwt = require('jsonwebtoken');
 
 const isValid = async user => {
   const { _id } = user;
@@ -62,7 +62,7 @@ exports.isAuthArchive = async (req, res, next) => {
       return sendResponse(res, 401, "You're not allowed to acces this archive");
     }
 
-    next();
+    return next();
   } catch (e) {
     console.error(e);
     return sendResponse(res, 500, 'Error: Bad Request');
@@ -89,6 +89,8 @@ exports.searchArchive = async (req, res) => {
     };
 
     let where = searchQuery;
+
+    console.log(where);
 
     if (filters) {
       options = translateFiltersMongoose(filters);
@@ -287,7 +289,7 @@ exports.getArchiveDetail = async (req, res) => {
 const buildArchiveFromForm = async (req, res) => {
   const form = new formidable.IncomingForm();
 
-  form.parse(req, async function(err, fields, file) {
+  form.parse(req, async (err, fields, file) => {
     try {
       await buildArchive(file, fields);
 
@@ -302,7 +304,7 @@ const buildArchiveFromForm = async (req, res) => {
         file.filetoupload.name;
 
       console.log(newpath);
-      mv(oldpath, newpath, function() {
+      mv(oldpath, newpath, () => {
         return 1;
       });
 
@@ -322,7 +324,7 @@ exports.patchEditArchive = async (req, res) => {
   const { id } = req.params;
   const form = new formidable.IncomingForm();
 
-  form.parse(req, async function(err, fields) {
+  form.parse(req, async (err, fields) => {
     try {
       const foundArchive = await Archive.findById(id);
 

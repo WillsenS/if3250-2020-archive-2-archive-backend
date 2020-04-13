@@ -190,7 +190,7 @@ exports.updateUserRole = async (req, res) => {
   const { id } = req.params;
   const form = new formidable.IncomingForm();
 
-  form.parse(req, async function(err, fields) {
+  form.parse(req, async (err, fields) => {
     try {
       const dataUser = {
         role: fields.kode_role

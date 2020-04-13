@@ -7,7 +7,7 @@ jest.setTimeout(10000);
  * SEARCH TEST
  */
 
-const filterCandidate = ['lokasi', 'kode'];
+const filterCandidate = ['tipe', 'pola', 'lokasi_kegiatan', 'lokasi_simpan_arsip', 'mime'];
 
 describe('Search Endpoints without Query', () => {
   it('should create search archive without query', async () => {

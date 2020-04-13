@@ -42,7 +42,7 @@ const fileSchema = new mongoose.Schema(
   }
 );
 
-fileSchema.pre('remove', function(next) {
+fileSchema.pre('remove', next => {
   const file = this;
   fs.unlink(file.path, err => {
     if (err) {
