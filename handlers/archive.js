@@ -97,19 +97,19 @@ exports.searchArchive = async (req, res) => {
       where = { $and: [where, options] };
     }
 
-    if(q=='*') {
-      where=undefined;
+    if (q === '*') {
+      where = undefined;
     }
 
-    const populateCondition = { keamanan_terbuka: true};
+    const populateCondition = { keamanan_terbuka: true };
 
     const countArchive = await Archive.countDocuments(where);
     const findArchive = await Archive.find(where)
-      .populate({path: 'file', match: populateCondition})
-      .populate({path: 'audio', match: populateCondition})
-      .populate({path: 'photo', match: populateCondition})
-      .populate({path: 'video', match: populateCondition})
-      .populate({path: 'text', match: populateCondition})
+      .populate({ path: 'file', match: populateCondition })
+      .populate({ path: 'audio', match: populateCondition })
+      .populate({ path: 'photo', match: populateCondition })
+      .populate({ path: 'video', match: populateCondition })
+      .populate({ path: 'text', match: populateCondition })
       .limit(limit)
       .skip((page - 1) * limit);
 
