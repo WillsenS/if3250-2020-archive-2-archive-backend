@@ -97,6 +97,10 @@ exports.searchArchive = async (req, res) => {
       where = { $and: [where, options] };
     }
 
+    if(q=='*') {
+      where=undefined;
+    }
+
     const countArchive = await Archive.countDocuments(where);
     const findArchive = await Archive.find(where)
       .populate('file')
@@ -106,6 +110,8 @@ exports.searchArchive = async (req, res) => {
       .populate('text')
       .limit(limit)
       .skip((page - 1) * limit);
+    
+    console.log(findArchive);
 
     let qs = '?';
     const qsNameList = ['q', 'filters'];
