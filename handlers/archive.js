@@ -386,7 +386,7 @@ exports.patchEditArchive = async (req, res) => {
         nomor: fields.nomor,
         pola: fields.pola,
         lokasi_kegiatan: fields.lokasi_kegiatan,
-        keterangan: fields.description,
+        keterangan: fields.keterangan,
         waktu_kegiatan: fields.waktu_kegiatan,
         keamanan_terbuka: fields.keamanan_terbuka > 0,
         lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
