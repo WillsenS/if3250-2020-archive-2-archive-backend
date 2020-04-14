@@ -12,8 +12,8 @@ sudo touch ~/.ssh/config
 sudo bash -c 'echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config'
 
 # Deploy to staging server
-echo "Deploying to ${STAGING_SERVER}"
-ssh ubuntu@${STAGING_SERVER} 'bash' < ./deploy/clone-staging.sh
+echo "Deploying to ${STAGING_SERVER}, with git pull"
+ssh ubuntu@${STAGING_SERVER} 'bash' < ./deploy/pull-staging.sh
 
 # Create .env variables
 echo NODE_ENV=staging >> .env
