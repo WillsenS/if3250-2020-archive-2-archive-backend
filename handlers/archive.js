@@ -510,26 +510,34 @@ exports.deleteArchive = async (req, res) => {
 
 exports.getStatistic = async (req, res) => {
   try {
-    const totalArchive = await Archive.countDocuments({});
-    const audio = await Archive.countDocuments({ tipe: { $eq: 'Audio' } });
-    const video = await Archive.countDocuments({ tipe: { $eq: 'Video' } });
-    const text = await Archive.countDocuments({ tipe: { $eq: 'Text' } });
-    const photo = await Archive.countDocuments({ tipe: { $eq: 'Photo' } });
-    const totalUsers = await User.countDocuments({});
-    const admin = await User.countDocuments({ role: { $eq: 1 } });
+    const [totalArchive, audio, video, text, photo, totalUsers, admin] = await Promise.all([
+      Archive.countDocuments({}),
+      Archive.countDocuments({ tipe: { $eq: 'Audio' } }),
+      Archive.countDocuments({ tipe: { $eq: 'Video' } }),
+      Archive.countDocuments({ tipe: { $eq: 'Text' } }),
+      Archive.countDocuments({ tipe: { $eq: 'Photo' } }),
+      User.countDocuments({}),
+      User.countDocuments({ role: { $eq: 1 } })
+    ]);
     const user = totalUsers - admin;
     return sendResponse(res, 200, 'OK', {
-      archives: {
-        total: totalArchive,
-        audio,
-        video,
-        text,
-        photo
-      },
-      users: {
-        total: totalUsers,
-        admin,
-        user
+      payload: {
+        archives: {
+          total: totalArchive,
+          items: [
+            { label: 'Audio', number: audio },
+            { label: 'Video', number: video },
+            { label: 'Tekstual', number: text },
+            { label: 'Foto', number: photo }
+          ]
+        },
+        users: {
+          total: totalUsers,
+          items: [
+            { label: 'Admin', number: admin },
+            { label: 'User', number: user }
+          ]
+        }
       }
     });
   } catch (e) {
