@@ -170,6 +170,7 @@ const execute = async () => {
         lokasi_kegiatan: 'Institut Teknologi Bandung',
         keterangan:
           'Barisan mahasiswa siap-siap menyambut kedatangan Presiden Soekarno. Mahasiswa berdiri di jalan utama kampus (depan lorong menuju LFM).',
+        waktu_hapus: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
         waktu_kegiatan: new Date(1959, 7, 17),
         keamanan_terbuka: true,
         lokasi_simpan_arsip: '-',
@@ -183,6 +184,7 @@ const execute = async () => {
         lokasi_kegiatan: 'Institut Teknologi Bandung',
         keterangan:
           'Presiden Soekarno datang dengan mobil sedan. Bung Karno memakai payung sendiri dan duduk agak tinggi.',
+        waktu_hapus: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
         waktu_kegiatan: new Date(1959, 7, 17),
         keamanan_terbuka: true,
         lokasi_simpan_arsip: '-',
@@ -196,6 +198,7 @@ const execute = async () => {
         lokasi_kegiatan: 'Institut Teknologi Bandung',
         keterangan:
           'Presiden Soekarno dan Rektor ITB saat itu berjalan dari pintu gerbang menuju lapangan bola.',
+        waktu_hapus: new Date(),
         waktu_kegiatan: new Date(1959, 7, 17),
         keamanan_terbuka: true,
         lokasi_simpan_arsip: '-',
@@ -209,6 +212,7 @@ const execute = async () => {
         lokasi_kegiatan: 'Institut Teknologi Bandung',
         keterangan:
           'Mahasiswa berbagai Departemen dan Fakultas berbaris rapih di pinggir lapangan bola. Di tengah-tengah tampak prasasti yang akan ditandatangani Soerkarno masih ditutup kain putih.',
+        waktu_hapus: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
         waktu_kegiatan: new Date(1959, 7, 17),
         keamanan_terbuka: true,
         lokasi_simpan_arsip: '-',
@@ -221,6 +225,7 @@ const execute = async () => {
         pola: 'PB.03',
         lokasi_kegiatan: 'Institut Teknologi Bandung',
         keterangan: 'Para dosen dan istri dosen duduk rapih di pinggir lapangan.',
+        waktu_hapus: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
         waktu_kegiatan: new Date(1959, 7, 17),
         keamanan_terbuka: true,
         lokasi_simpan_arsip: '-',
@@ -233,6 +238,7 @@ const execute = async () => {
         pola: 'PB.03',
         lokasi_kegiatan: 'Institut Teknologi Bandung',
         keterangan: 'Tampak juga para guru besar duduk dengan takzim.',
+        waktu_hapus: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
         waktu_kegiatan: new Date(1959, 7, 17),
         keamanan_terbuka: true,
         lokasi_simpan_arsip: '-',
@@ -245,6 +251,7 @@ const execute = async () => {
         pola: 'PB.03',
         lokasi_kegiatan: 'Institut Teknologi Bandung',
         keterangan: 'Rektor dan Bung Karno membuka prasasti.',
+        waktu_hapus: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
         waktu_kegiatan: new Date(1959, 7, 17),
         keamanan_terbuka: true,
         lokasi_simpan_arsip: '-',

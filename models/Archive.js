@@ -60,6 +60,10 @@ const documentSchema = new mongoose.Schema(
       type: Boolean,
       required: true
     },
+    waktu_hapus: {
+      type: Date,
+      required: true
+    },
     lokasi_simpan_arsip: {
       type: String,
       required: true

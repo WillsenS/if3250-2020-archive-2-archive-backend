@@ -13,6 +13,7 @@ const {
 const {
   isAuthArchive,
   searchArchive,
+  expiredArchive,
   latestArchive,
   getArchiveDetail,
   getArchiveTitle,
@@ -151,6 +152,7 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
 r.get('/search', searchArchive);
 
 r.get('/archive/latest', latestArchive);
+r.get('/archive/expired', expiredArchive);
 
 /**
  * @swagger

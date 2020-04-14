@@ -78,7 +78,7 @@ exports.searchArchive = async (req, res) => {
     q = q || '';
     page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
 
-    const limit = 3;
+    const limit = 10;
     const searchQuery = {
       $text: {
         $search: q
@@ -89,8 +89,6 @@ exports.searchArchive = async (req, res) => {
     };
 
     let where = searchQuery;
-
-    console.log(where);
 
     if (filters) {
       options = translateFiltersMongoose(filters);
@@ -153,6 +151,40 @@ exports.searchArchive = async (req, res) => {
       filtersCandidate,
       nextLink,
       prevLink
+    });
+  } catch (err) {
+    console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+};
+
+exports.expiredArchive = async (req, res) => {
+  try {
+    const { page } = req.query;
+    const limit = 10;
+
+    const countArchive = await Archive.countDocuments();
+
+    const findArchive = await Archive.find({
+      waktu_hapus: {
+        $lte: new Date()
+      }
+    })
+      .populate('audio')
+      .populate('photo')
+      .populate('video')
+      .populate('text')
+      .sort({ waktu_hapus: 1 })
+      .limit(limit)
+      .skip((page - 1) * limit);
+
+    const totalPages = Math.ceil(countArchive / limit);
+
+    return sendResponse(res, 200, 'OK', {
+      data: findArchive,
+      count: countArchive,
+      currentPage: page,
+      totalPages
     });
   } catch (err) {
     console.error(err);
@@ -234,6 +266,7 @@ const buildArchive = async (file, fields) => {
     lokasi_kegiatan: fields.lokasi_kegiatan,
     keterangan: fields.keterangan,
     waktu_kegiatan: fields.waktu_kegiatan,
+    waktu_hapus: fields.waktu_hapus,
     keamanan_terbuka: fields.keamanan_terbuka > 0,
     lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
     mime: fields.mime
