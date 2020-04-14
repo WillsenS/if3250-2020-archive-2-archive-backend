@@ -123,9 +123,9 @@ const bearerChecker = async (req, code) => {
   return false;
 };
 
-exports.isHighestAdmin = async (req, res, next) => {
+const validateAdmin = async (req, res, next, code) => {
   try {
-    const result = await bearerChecker(req, HIGHEST_ADMIN_REQUEST);
+    const result = await bearerChecker(req, code);
 
     if (result) {
       return next();
@@ -136,34 +136,16 @@ exports.isHighestAdmin = async (req, res, next) => {
     console.error(e);
     return sendResponse(res, 500, `Error: ${e}`);
   }
+};
+
+exports.isHighestAdmin = async (req, res, next) => {
+  await validateAdmin(req, res, next, HIGHEST_ADMIN_REQUEST);
 };
 
 exports.isAdminAllLevel = async (req, res, next) => {
-  try {
-    const result = await bearerChecker(req, ADMIN_ALL_LEVEL_REQUEST);
-
-    if (result) {
-      return next();
-    }
-
-    return sendResponse(res, 401, 'Error. You are not allowed');
-  } catch (e) {
-    console.error(e);
-    return sendResponse(res, 500, `Error: ${e}`);
-  }
+  await validateAdmin(req, res, next, ADMIN_ALL_LEVEL_REQUEST);
 };
 
 exports.isAdminOnly = async (req, res, next) => {
-  try {
-    const result = await bearerChecker(req, ADMIN_ONLY_REQUEST);
-
-    if (result) {
-      return next();
-    }
-
-    return sendResponse(res, 401, 'Error. You are not allowed');
-  } catch (e) {
-    console.error(e);
-    return sendResponse(res, 500, `Error: ${e}`);
-  }
+  await validateAdmin(req, res, next, ADMIN_ONLY_REQUEST);
 };
