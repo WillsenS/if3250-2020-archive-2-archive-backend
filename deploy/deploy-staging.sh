@@ -20,6 +20,9 @@ echo NODE_ENV=staging >> .env
 echo MONGODB_URI=$MONGODB_URI >> .env
 echo BASE_URL=$BASE_URL >> .env
 echo SESSION_SECRET=$SESSION_SECRET >> .env
+echo NODE_PATH=$NODE_PATH >> .env
+echo PUBLIC_DIR=$PUBLIC_DIR >> .env
+echo UPLOAD_DIR=$UPLOAD_DIR >> .env
 
 scp ./.env ubuntu@${STAGING_SERVER}:/home/ubuntu/archive-backend/
 
