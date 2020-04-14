@@ -108,43 +108,50 @@ const execute = async () => {
         photographer: '-',
         photo_type: 'cetak (c)',
         photo_size: '3R, HP',
-        photo_condition: 'Baik'
+        photo_condition: 'Baik',
+        activity_description: 'Deskripsi aktivitas foto 1'
       },
       {
         photographer: '-',
         photo_type: 'cetak (c)',
         photo_size: '3R, HP',
-        photo_condition: 'Baik'
+        photo_condition: 'Baik',
+        activity_description: 'Deskripsi aktivitas foto 2'
       },
       {
         photographer: '-',
         photo_type: 'cetak (c)',
         photo_size: '3R, HP',
-        photo_condition: 'Baik'
+        photo_condition: 'Baik',
+        activity_description: 'Deskripsi aktivitas foto 3'
       },
       {
         photographer: '-',
         photo_type: 'cetak (c)',
         photo_size: '3R, HP',
-        photo_condition: 'Baik'
+        photo_condition: 'Baik',
+        activity_description: 'Deskripsi aktivitas foto 4'
       },
       {
         photographer: '-',
         photo_type: 'cetak (c)',
         photo_size: '3R, HP',
-        photo_condition: 'Baik'
+        photo_condition: 'Baik',
+        activity_description: 'Deskripsi aktivitas foto 5'
       },
       {
         photographer: '-',
         photo_type: 'cetak (c)',
         photo_size: '3R, HP',
-        photo_condition: 'Baik'
+        photo_condition: 'Baik',
+        activity_description: 'Deskripsi aktivitas foto 6'
       },
       {
         photographer: '-',
         photo_type: 'cetak (c)',
         photo_size: '3R, HP',
-        photo_condition: 'Baik'
+        photo_condition: 'Baik',
+        activity_description: 'Deskripsi aktivitas foto 7'
       }
     ];
 
