@@ -8,7 +8,8 @@ const {
   removeAdminAccessFromUser,
   updateUserRole,
   getUserDetail,
-  searchUser
+  searchUser,
+  getAdmins
 } = require('../handlers/user');
 const {
   isAuthArchive,
@@ -451,6 +452,41 @@ r.get('/archive/download/:id', isAuthArchive, downloadArchive);
  *         description: "Caught exception on server"
  */
 r.get('/users', getUsers);
+
+/**
+ * @swagger
+ *
+ * /api/v1/admins:
+ *   get:
+ *     summary: "Get all admin or by admin role"
+ *     tags:
+ *     - "archive"
+ *     description: "Get admins data available in database"
+ *     produces:
+ *     - application/json
+ *     parameters:
+ *       - name: "role"
+ *         in: "query"
+ *         required: "false"
+ *         description: "admin role ID (not role name)"
+ *         type: "number"
+ *       - name: "page"
+ *         in: "query"
+ *         required: "false"
+ *         description: "requested page number"
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       401:
+ *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
+ *       500:
+ *         description: "Caught exception on server"
+ */
+r.get('/admins', getAdmins);
 
 /**
  * @swagger

@@ -146,6 +146,41 @@ const findUsers = async (page, q, res) => {
   });
 };
 
+const findAdmins = async (page, role, res) => {
+  let searchQuery;
+  const limit = 5;
+
+  if (role) {
+    searchQuery = {
+      role: {
+        $eq: role
+      }
+    };
+  } else {
+    searchQuery = {
+      role: {
+        $not: {
+          $eq: DEFAULT_ROLE
+        }
+      }
+    };
+  }
+
+  const countAdmin = await User.countDocuments(searchQuery);
+  const foundAdmin = await User.find(searchQuery)
+    .limit(limit)
+    .skip((page - 1) * limit);
+
+  const totalPages = Math.ceil(countAdmin / limit);
+
+  return sendResponse(res, 200, 'Sucessfully retrieved admins', {
+    count: countAdmin,
+    currentPage: page,
+    totalPages,
+    data: foundAdmin
+  });
+};
+
 exports.getUsers = async (req, res) => {
   try {
     let { page } = req.query;
@@ -231,5 +266,16 @@ exports.deleteUser = async (req, res) => {
   } catch (err) {
     console.error(err.message);
     return sendResponse(res, 400, 'Error. User not found');
+  }
+};
+
+exports.getAdmins = async (req, res) => {
+  try {
+    let { page, role } = req.query;
+    page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
+    return await findAdmins(page, role, res);
+  } catch (err) {
+    console.error(err.message);
+    return sendResponse(res, 400, 'Error. Bad request');
   }
 };
