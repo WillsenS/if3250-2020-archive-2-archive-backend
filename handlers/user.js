@@ -165,12 +165,12 @@ const findAdmins = async (page, role, res) => {
       }
     };
   }
-
-  const countAdmin = await User.countDocuments(searchQuery);
-  const foundAdmin = await User.find(searchQuery)
-    .limit(limit)
-    .skip((page - 1) * limit);
-
+  const [countAdmin, foundAdmin] = await Promise.all([
+    User.countDocuments(searchQuery),
+    User.find(searchQuery)
+      .limit(limit)
+      .skip((page - 1) * limit)
+  ]);
   const totalPages = Math.ceil(countAdmin / limit);
 
   return sendResponse(res, 200, 'Sucessfully retrieved admins', {
@@ -178,6 +178,29 @@ const findAdmins = async (page, role, res) => {
     currentPage: page,
     totalPages,
     data: foundAdmin
+  });
+};
+
+const findNonAdmins = async (page, res) => {
+  const limit = 5;
+  const searchQuery = {
+    role: {
+      $eq: DEFAULT_ROLE
+    }
+  };
+  const [countNonAdmin, foundNonAdmin] = await Promise.all([
+    User.countDocuments(searchQuery),
+    User.find(searchQuery)
+      .limit(limit)
+      .skip((page - 1) * limit)
+  ]);
+  const totalPages = Math.ceil(countNonAdmin / limit);
+
+  return sendResponse(res, 200, 'Sucessfully retrieved ordinary users', {
+    count: countNonAdmin,
+    currentPage: page,
+    totalPages,
+    data: foundNonAdmin
   });
 };
 
@@ -274,6 +297,17 @@ exports.getAdmins = async (req, res) => {
     let { page, role } = req.query;
     page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
     return await findAdmins(page, role, res);
+  } catch (err) {
+    console.error(err.message);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+};
+
+exports.getNonAdmins = async (req, res) => {
+  try {
+    let { page } = req.query;
+    page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
+    return await findNonAdmins(page, res);
   } catch (err) {
     console.error(err.message);
     return sendResponse(res, 400, 'Error. Bad request');
