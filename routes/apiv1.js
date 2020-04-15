@@ -501,6 +501,10 @@ r.get('/admins', getAdmins);
  *     produces:
  *     - application/json
  *     parameters:
+ *       - name: "limit"
+ *         in: "query"
+ *         required: "false"
+ *         description: "limit result response"
  *       - name: "page"
  *         in: "query"
  *         required: "false"

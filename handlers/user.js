@@ -181,20 +181,21 @@ const findAdmins = async (page, role, res) => {
   });
 };
 
-const findNonAdmins = async (page, res) => {
-  const limit = 5;
+const findNonAdmins = async (page, limit, res) => {
+  console.log(typeof limit);
   const searchQuery = {
     role: {
       $eq: DEFAULT_ROLE
     }
   };
-  const [countNonAdmin, foundNonAdmin] = await Promise.all([
-    User.countDocuments(searchQuery),
-    User.find(searchQuery)
-      .limit(limit)
-      .skip((page - 1) * limit)
-  ]);
-  const totalPages = Math.ceil(countNonAdmin / limit);
+
+  const countNonAdmin = await User.countDocuments(searchQuery);
+  const foundNonAdmin = limit
+    ? await User.find(searchQuery)
+        .limit(limit)
+        .skip((page - 1) * limit)
+    : await User.find(searchQuery);
+  const totalPages = limit ? Math.ceil(countNonAdmin / limit) : countNonAdmin;
 
   return sendResponse(res, 200, 'Sucessfully retrieved ordinary users', {
     count: countNonAdmin,
@@ -305,9 +306,10 @@ exports.getAdmins = async (req, res) => {
 
 exports.getNonAdmins = async (req, res) => {
   try {
-    let { page } = req.query;
+    let { page, limit } = req.query;
     page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
-    return await findNonAdmins(page, res);
+    const limitFilter = limit ? parseInt(limit) : null;
+    return await findNonAdmins(page, limitFilter, res);
   } catch (err) {
     console.error(err.message);
     return sendResponse(res, 400, 'Error. Bad request');
