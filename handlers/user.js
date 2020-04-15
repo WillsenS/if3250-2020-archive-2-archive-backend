@@ -182,7 +182,6 @@ const findAdmins = async (page, role, res) => {
 };
 
 const findNonAdmins = async (page, limit, res) => {
-  console.log(typeof limit);
   const searchQuery = {
     role: {
       $eq: DEFAULT_ROLE
