@@ -610,7 +610,7 @@ r.delete('/users/:id', deleteUser);
  *       401:
  *         Unauthorized request
  */
-r.get('/statistic', isAuthenticated, getStatistic);
+r.get('/statistic', getStatistic);
 
 /*
  * Routes for testing pages
