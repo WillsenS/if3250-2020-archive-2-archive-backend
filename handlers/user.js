@@ -10,6 +10,9 @@ const User = require('../models/User');
 const { defaultURL } = require('../config');
 const { sendResponse } = require('../helpers');
 
+// const HIGHEST_ADMIN_ROLE = 1; // Admin Terpusat
+const DEFAULT_ROLE = 2; // Internal ITB Non-Admin
+
 /**
  * Router that will check ticket from SSO ITB
  * if the ticket is match, then user is authentication.
@@ -241,9 +244,6 @@ exports.getUserDetail = async (req, res) => {
   }
 };
 
-// const HIGHEST_ADMIN_ROLE = 1; // Admin Terpusat
-const DEFAULT_ROLE = 2; // Internal ITB Non-Admin
-
 exports.updateUserRole = async (req, res) => {
   const { id } = req.params;
   const form = new formidable.IncomingForm();
@@ -294,7 +294,8 @@ exports.deleteUser = async (req, res) => {
 
 exports.getAdmins = async (req, res) => {
   try {
-    let { page, role } = req.query;
+    let { page } = req.query;
+    const { role } = req.query;
     page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
     return await findAdmins(page, role, res);
   } catch (err) {
@@ -305,9 +306,10 @@ exports.getAdmins = async (req, res) => {
 
 exports.getNonAdmins = async (req, res) => {
   try {
-    let { page, limit } = req.query;
+    let { page } = req.query;
+    const { limit } = req.query;
     page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
-    const limitFilter = limit ? parseInt(limit) : null;
+    const limitFilter = limit ? parseInt(limit, 10) : null;
     return await findNonAdmins(page, limitFilter, res);
   } catch (err) {
     console.error(err.message);
