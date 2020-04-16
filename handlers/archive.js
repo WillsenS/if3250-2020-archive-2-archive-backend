@@ -78,7 +78,7 @@ exports.searchArchive = async (req, res) => {
     q = q || '';
     page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
 
-    const limit = 3;
+    const limit = 10;
     const searchQuery = {
       $text: {
         $search: q
@@ -89,8 +89,6 @@ exports.searchArchive = async (req, res) => {
     };
 
     let where = searchQuery;
-
-    console.log(where);
 
     if (filters) {
       options = translateFiltersMongoose(filters);
@@ -133,9 +131,6 @@ exports.searchArchive = async (req, res) => {
 
     // NEW Filter
     const filterAttr = ['tipe', 'pola', 'lokasi_kegiatan', 'lokasi_simpan_arsip', 'mime'];
-
-    // OLD Filter
-    // const filterAttr = ['lokasi', 'kode'];
 
     const filtersCandidate = {};
 

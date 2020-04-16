@@ -113,7 +113,7 @@ exports.postSignout = async (req, res) => {
 const findUsers = async (page, q, res) => {
   let baseLink;
   let searchQuery;
-  const limit = 5;
+  const limit = 10;
 
   if (q) {
     searchQuery = {
@@ -151,7 +151,7 @@ const findUsers = async (page, q, res) => {
 
 const findAdmins = async (page, role, res) => {
   let searchQuery;
-  const limit = 5;
+  const limit = 10;
 
   if (role) {
     searchQuery = {
