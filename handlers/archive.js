@@ -65,6 +65,9 @@ exports.isAuthArchive = async (req, res, next) => {
     return next();
   } catch (e) {
     console.error(e);
+    if (e.name === 'JsonWebTokenError')
+      return sendResponse(res, 401, "You're not allowed to acces this archive");
+
     return sendResponse(res, 500, 'Error: Bad Request');
   }
 };

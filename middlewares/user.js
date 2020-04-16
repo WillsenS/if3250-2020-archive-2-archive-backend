@@ -47,7 +47,16 @@ exports.isAuthenticated = async (req, res, next) => {
       }
     });
   } catch (e) {
-    console.error(e.message);
+    if (e.name === 'JsonWebTokenError') {
+      return res.json({
+        apiVersion: res.locals.apiVersion,
+        error: {
+          code: 401,
+          message: 'You are not allowed.'
+        }
+      });
+    }
+
     return res.json({
       apiVersion: res.locals.apiVersion,
       error: {
