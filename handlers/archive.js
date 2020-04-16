@@ -89,14 +89,13 @@ exports.searchArchive = async (req, res) => {
     };
 
     let where = searchQuery;
+    if (q === '*') {
+      where = {};
+    }
 
     if (filters) {
       options = translateFiltersMongoose(filters);
       where = { $and: [where, options] };
-    }
-
-    if (q === '*') {
-      where = undefined;
     }
 
     const countArchive = await Archive.countDocuments(where);

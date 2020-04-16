@@ -47,12 +47,12 @@ exports.isAuthenticated = async (req, res, next) => {
       }
     });
   } catch (e) {
-    console.error(e);
+    console.error(e.message);
     return res.json({
       apiVersion: res.locals.apiVersion,
       error: {
         code: 500,
-        message: `Error: ${e}`
+        message: `Error: ${e.message}`
       }
     });
   }
