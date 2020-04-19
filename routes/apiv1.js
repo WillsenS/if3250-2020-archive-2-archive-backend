@@ -307,7 +307,7 @@ r.post('/upload', isAdminAllLevel, postUploadArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.patch('/edit/:id', isAdminAllLevel, patchEditArchive);
+r.patch('/edit/:id', isHighestAdmin, patchEditArchive);
 
 /**
  * @swagger
@@ -370,7 +370,7 @@ r.patch('/edit/:id', isAdminAllLevel, patchEditArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.put('/edit/:id', isAdminAllLevel, putEditArchive);
+r.put('/edit/:id', isHighestAdmin, putEditArchive);
 
 /**
  * @swagger
@@ -402,7 +402,7 @@ r.put('/edit/:id', isAdminAllLevel, putEditArchive);
  *         description: "Caught exception on server"
  */
 // eslint-disable-next-line
-r.delete('/delete/:id', isAdminAllLevel, deleteArchive);
+r.delete('/delete/:id', isHighestAdmin, deleteArchive);
 
 /**
  * @swagger
@@ -465,7 +465,7 @@ r.get('/users', isHighestAdmin, getUsers);
  *
  * /api/v1/admins:
  *   get:
- *     summary: "Get all admin or by admin role"
+ *     summary: "Get all admin or search admin by query"
  *     tags:
  *     - "archive"
  *     description: "Get admins data available in database"
@@ -481,6 +481,11 @@ r.get('/users', isHighestAdmin, getUsers);
  *         in: "query"
  *         required: "false"
  *         description: "requested page number"
+ *       - name: "q"
+ *         in: "query"
+ *         required: "false"
+ *         description: "query"
+ *         type: "string"
  *     responses:
  *       200:
  *         description: "Success operation"
@@ -493,7 +498,7 @@ r.get('/users', isHighestAdmin, getUsers);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/admins', getAdmins);
+r.get('/admins', isHighestAdmin, getAdmins);
 
 /**
  * @swagger
@@ -527,7 +532,7 @@ r.get('/admins', getAdmins);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/non-admins', getNonAdmins);
+r.get('/non-admins', isHighestAdmin, getNonAdmins);
 
 /**
  * @swagger
@@ -687,7 +692,7 @@ r.delete('/users/:id', isHighestAdmin, deleteUser);
  *       401:
  *         Unauthorized request
  */
-r.get('/statistic', getStatistic);
+r.get('/statistic', isAdminAllLevel, getStatistic);
 
 r.post('/archive/borrow', isAuthenticated, postNewBorrowRequest);
 

@@ -149,25 +149,31 @@ const findUsers = async (page, q, res) => {
   });
 };
 
-const findAdmins = async (page, role, res) => {
-  let searchQuery;
+const findAdmins = async (page, role, res, q) => {
+  let searchQuery = {};
   const limit = 10;
 
-  if (role) {
+  if (q) {
     searchQuery = {
-      role: {
-        $eq: role
-      }
-    };
-  } else {
-    searchQuery = {
-      role: {
-        $not: {
-          $eq: DEFAULT_ROLE
-        }
+      $text: {
+        $search: q
+          .split(' ')
+          .map(str => `"${str}"`)
+          .join(' ')
       }
     };
   }
+
+  if (role) {
+    searchQuery.role = { $eq: role };
+  } else {
+    searchQuery.role = {
+      $not: {
+        $eq: DEFAULT_ROLE
+      }
+    };
+  }
+
   const [countAdmin, foundAdmin] = await Promise.all([
     User.countDocuments(searchQuery),
     User.find(searchQuery)
@@ -295,9 +301,9 @@ exports.deleteUser = async (req, res) => {
 exports.getAdmins = async (req, res) => {
   try {
     let { page } = req.query;
-    const { role } = req.query;
+    const { role, q } = req.query;
     page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
-    return await findAdmins(page, role, res);
+    return await findAdmins(page, role, res, q);
   } catch (err) {
     console.error(err.message);
     return sendResponse(res, 400, 'Error. Bad request');
