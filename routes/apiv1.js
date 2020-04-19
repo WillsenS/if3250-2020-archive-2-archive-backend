@@ -1,5 +1,11 @@
 const express = require('express');
-const { isAuthenticated, isNonAuthenticated } = require('../middlewares/user');
+const {
+  isAuthenticated,
+  isNonAuthenticated,
+  isAdminAllLevel,
+  // isAdminOnly,
+  isHighestAdmin
+} = require('../middlewares/user');
 const {
   signInSSO,
   postSignout,
@@ -22,10 +28,10 @@ const {
   patchEditArchive,
   putEditArchive,
   deleteArchive,
-  uploadAudio,
-  uploadPhoto,
-  uploadText,
-  uploadVideo,
+  // uploadAudio,
+  // uploadPhoto,
+  // uploadText,
+  // uploadVideo,
   downloadArchive,
   getStatistic,
   postNewBorrowRequest
@@ -243,7 +249,7 @@ r.get('/archive/title/:id', getArchiveTitle);
  *       500:
  *         description: "Caught exception on server"
  */
-r.post('/upload', postUploadArchive);
+r.post('/upload', isAdminAllLevel, postUploadArchive);
 
 /**
  * @swagger
@@ -301,7 +307,7 @@ r.post('/upload', postUploadArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.patch('/edit/:id', patchEditArchive);
+r.patch('/edit/:id', isAdminAllLevel, patchEditArchive);
 
 /**
  * @swagger
@@ -364,7 +370,7 @@ r.patch('/edit/:id', patchEditArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.put('/edit/:id', putEditArchive);
+r.put('/edit/:id', isAdminAllLevel, putEditArchive);
 
 /**
  * @swagger
@@ -396,7 +402,7 @@ r.put('/edit/:id', putEditArchive);
  *         description: "Caught exception on server"
  */
 // eslint-disable-next-line
-r.delete('/delete/:id', deleteArchive);
+r.delete('/delete/:id', isAdminAllLevel, deleteArchive);
 
 /**
  * @swagger
@@ -452,7 +458,7 @@ r.get('/archive/download/:id', isAuthArchive, downloadArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/users', getUsers);
+r.get('/users', isHighestAdmin, getUsers);
 
 /**
  * @swagger
@@ -556,7 +562,7 @@ r.get('/non-admins', getNonAdmins);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/user-search', searchUser);
+r.get('/user-search', isHighestAdmin, searchUser);
 
 /**
  * @swagger
@@ -587,7 +593,7 @@ r.get('/user-search', searchUser);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/users/:id', getUserDetail);
+r.get('/users/:id', isHighestAdmin, getUserDetail);
 
 /**
  * @swagger
@@ -626,7 +632,7 @@ r.get('/users/:id', getUserDetail);
  *       500:
  *         description: "Caught exception on server"
  */
-r.patch('/users/:id', updateUserRole);
+r.patch('/users/:id', isHighestAdmin, updateUserRole);
 
 /**
  * @swagger
@@ -657,10 +663,10 @@ r.patch('/users/:id', updateUserRole);
  *       500:
  *         description: "Caught exception on server"
  */
-r.patch('/remove-admin/:id', removeAdminAccessFromUser);
+r.patch('/remove-admin/:id', isHighestAdmin, removeAdminAccessFromUser);
 
 // eslint-disable-next-line
-r.delete('/users/:id', deleteUser);
+r.delete('/users/:id', isHighestAdmin, deleteUser);
 
 /**
  * @swagger
@@ -683,14 +689,14 @@ r.delete('/users/:id', deleteUser);
  */
 r.get('/statistic', getStatistic);
 
+r.post('/archive/borrow', isAuthenticated, postNewBorrowRequest);
+
 /*
  * Routes for testing pages
  */
-r.get('/upload/audio', uploadAudio);
-r.get('/upload/photo', uploadPhoto);
-r.get('/upload/text', uploadText);
-r.get('/upload/video', uploadVideo);
-
-r.post('/archive/borrow', isAuthenticated, postNewBorrowRequest);
+// r.get('/upload/audio', uploadAudio);
+// r.get('/upload/photo', uploadPhoto);
+// r.get('/upload/text', uploadText);
+// r.get('/upload/video', uploadVideo);
 
 module.exports = r;
