@@ -84,7 +84,7 @@ exports.translateMongooseFilter = filterString => {
 
 /**
  * Match query string based on Google Filters Standard
- * @param filtersQueryString
+ * @param {string} filtersQueryString query string that want to translate to object
  */
 exports.translateFiltersMongoose = filtersQueryString => {
   const orArray = filtersQueryString.split(',').map(val => {

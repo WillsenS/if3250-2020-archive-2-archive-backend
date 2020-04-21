@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
-// eslint-disable-next-line no-unused-vars
 
 /**
- * Document Interface
- * @typedef {Object} Document
+ * Text Interface
+ * @typedef {Object} Text
  * @property {String} textual_archive_number Nomor arsip tekstual
  * @property {String} author penulis/pembuat arsip tekstual
  */

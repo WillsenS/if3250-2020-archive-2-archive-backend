@@ -3,7 +3,6 @@ const {
   isAuthenticated,
   isNonAuthenticated,
   isAdminAllLevel,
-  // isAdminOnly,
   isHighestAdmin
 } = require('../middlewares/user');
 const {
@@ -28,10 +27,6 @@ const {
   patchEditArchive,
   putEditArchive,
   deleteArchive,
-  // uploadAudio,
-  // uploadPhoto,
-  // uploadText,
-  // uploadVideo,
   downloadArchive,
   getStatistic,
   postNewBorrowRequest
@@ -126,7 +121,7 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
 /**
  * @swagger
  *
- * /api/v1/search:
+ * /api/v1/archive/search:
  *   get:
  *     summary: "Search archive by query"
  *     tags:
@@ -149,21 +144,41 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  *         description: "Success operation"
  *       400:
  *         description: "Bad request"
- *       401:
- *         description: "Not authenticated"
  *       404:
  *         description: "Not found"
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/search', searchArchive);
+r.get('/archive/search', searchArchive);
 
+/**
+ * @swagger
+ *
+ * /api/v1/archive/latest:
+ *   get:
+ *     summary: "Show latest archive"
+ *     tags:
+ *     - "archive"
+ *     description: "Show 5 latest public archive"
+ *     produces:
+ *     - application/json
+ *     parameters:
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       404:
+ *         description: "Not found"
+ *       500:
+ *         description: "Caught exception on server"
+ */
 r.get('/archive/latest', latestArchive);
 
 /**
  * @swagger
  *
- * /api/v1/detail:
+ * /api/v1/archive/detail/{id}:
  *   get:
  *     summary: "Get archive detail by id"
  *     tags:
@@ -189,14 +204,84 @@ r.get('/archive/latest', latestArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/detail/:id', isAuthArchive, getArchiveDetail);
+r.get('/archive/detail/:id', isAuthArchive, getArchiveDetail);
 
+/**
+ * @swagger
+ *
+ * /api/v1/archive/title/{id}:
+ *   get:
+ *     summary: "Get archive title by id"
+ *     tags:
+ *     - "archive"
+ *     description: "Retrieve archive title by id given"
+ *     produces:
+ *     - application/json
+ *     parameters:
+ *       - name: "id"
+ *         in: "path"
+ *         required: "true"
+ *         description: "archive id"
+ *         type: "string"
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       404:
+ *         description: "Not found"
+ *       500:
+ *         description: "Caught exception on server"
+ */
 r.get('/archive/title/:id', getArchiveTitle);
 
 /**
  * @swagger
  *
- * /api/v1/upload:
+ * /api/v1/archive/borrow:
+ *   post:
+ *     summary: "Upload new request to borrow archive"
+ *     tags:
+ *     - "archive"
+ *     description: "Upload new borrow archive request based on form fields"
+ *     produces:
+ *     - application/json
+ *     parameters:
+ *       - in: body
+ *         name: borrow
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *              archive:
+ *                description: test
+ *                type: string
+ *              borrower:
+ *                type: string
+ *              phone:
+ *                type: string
+ *              email:
+ *                type: string
+ *              reason:
+ *                type: string
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       401:
+ *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
+ *       500:
+ *         description: "Caught exception on server"
+ */
+r.post('/archive/borrow', isAuthenticated, postNewBorrowRequest);
+
+/**
+ * @swagger
+ *
+ * /api/v1/archive/upload:
  *   post:
  *     summary: "Upload new archive"
  *     tags:
@@ -249,12 +334,12 @@ r.get('/archive/title/:id', getArchiveTitle);
  *       500:
  *         description: "Caught exception on server"
  */
-r.post('/upload', isAdminAllLevel, postUploadArchive);
+r.post('/archive/upload', isAdminAllLevel, postUploadArchive);
 
 /**
  * @swagger
  *
- * /api/v1/edit:
+ * /api/v1/archive/edit:
  *   patch:
  *     summary: "Update archive by id"
  *     tags:
@@ -307,12 +392,12 @@ r.post('/upload', isAdminAllLevel, postUploadArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.patch('/edit/:id', isHighestAdmin, patchEditArchive);
+r.patch('/archive/edit/:id', isHighestAdmin, patchEditArchive);
 
 /**
  * @swagger
  *
- * /api/v1/edit:
+ * /api/v1/archive/edit:
  *   put:
  *     summary: "Replace archive by id"
  *     tags:
@@ -370,12 +455,12 @@ r.patch('/edit/:id', isHighestAdmin, patchEditArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.put('/edit/:id', isHighestAdmin, putEditArchive);
+r.put('/archive/edit/:id', isHighestAdmin, putEditArchive);
 
 /**
  * @swagger
  *
- * /api/v1/delete:
+ * /api/v1/archive/delete:
  *   delete:
  *     summary: "Delete archive by id"
  *     tags:
@@ -401,13 +486,12 @@ r.put('/edit/:id', isHighestAdmin, putEditArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-// eslint-disable-next-line
-r.delete('/delete/:id', isHighestAdmin, deleteArchive);
+r.delete('/archive/delete/:id', isHighestAdmin, deleteArchive);
 
 /**
  * @swagger
  *
- * /api/v1/download:
+ * /api/v1/archive/download:
  *   get:
  *     summary: "Download archive by id"
  *     tags:
@@ -467,7 +551,7 @@ r.get('/users', isHighestAdmin, getUsers);
  *   get:
  *     summary: "Get all admin or search admin by query"
  *     tags:
- *     - "archive"
+ *     - "user"
  *     description: "Get admins data available in database"
  *     produces:
  *     - application/json
@@ -507,7 +591,7 @@ r.get('/admins', isHighestAdmin, getAdmins);
  *   get:
  *     summary: "Get all user that's not given admin access"
  *     tags:
- *     - "archive"
+ *     - "user"
  *     description: "Get admins data available in database"
  *     produces:
  *     - application/json
@@ -537,7 +621,7 @@ r.get('/non-admins', isHighestAdmin, getNonAdmins);
 /**
  * @swagger
  *
- * /api/v1/user-search:
+ * /api/v1/users/search:
  *   get:
  *     summary: "Search users"
  *     tags:
@@ -567,7 +651,7 @@ r.get('/non-admins', isHighestAdmin, getNonAdmins);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/user-search', isHighestAdmin, searchUser);
+r.get('/users/search', isHighestAdmin, searchUser);
 
 /**
  * @swagger
@@ -670,7 +754,6 @@ r.patch('/users/:id', isHighestAdmin, updateUserRole);
  */
 r.patch('/remove-admin/:id', isHighestAdmin, removeAdminAccessFromUser);
 
-// eslint-disable-next-line
 r.delete('/users/:id', isHighestAdmin, deleteUser);
 
 /**
@@ -693,15 +776,5 @@ r.delete('/users/:id', isHighestAdmin, deleteUser);
  *         Unauthorized request
  */
 r.get('/statistic', isAdminAllLevel, getStatistic);
-
-r.post('/archive/borrow', isAuthenticated, postNewBorrowRequest);
-
-/*
- * Routes for testing pages
- */
-// r.get('/upload/audio', uploadAudio);
-// r.get('/upload/photo', uploadPhoto);
-// r.get('/upload/text', uploadText);
-// r.get('/upload/video', uploadVideo);
 
 module.exports = r;

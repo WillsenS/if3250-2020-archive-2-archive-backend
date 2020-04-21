@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 /**
- * Document Interface
- * @typedef {Object} Document
+ * Video Interface
+ * @typedef {Object} Video
  * @property {String} narrator Narrator dari berkas arsip
  * @property {String} reporter Reporter dari berkas arsip
  * @property {String} activity_description Deskripsi kegiatan pada video

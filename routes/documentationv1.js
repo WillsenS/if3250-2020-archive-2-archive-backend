@@ -7,7 +7,7 @@ const r = express.Router();
 
 r.get('/swagger.json', getSwaggerConfiguration);
 r.get('/index.html', getIndexContent);
-r.use('/', express['static'](pathToSwaggerUi));
+r.use('/', express.static(pathToSwaggerUi));
 r.get('/', getIndexContent);
 
 module.exports = r;

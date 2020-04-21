@@ -90,7 +90,7 @@ describe('Edit archive with invalid id and without login', () => {
 
 describe('Delete archive with invalid id and without login', () => {
   it('should return error response with status 401', async () => {
-    const res = await request(app)['delete']('/api/v1/delete/abcd');
+    const res = await request(app).delete('/api/v1/delete/abcd');
 
     expect(res.statusCode).toEqual(401);
   });

@@ -1,9 +1,13 @@
-const secret = 'mysecretsshhh';
 const jwt = require('jsonwebtoken');
-
 const User = require('../models/User');
 const { sendResponse } = require('../helpers');
 
+const secret = process.env.SESSION_SECRET;
+
+/**
+ * Check is user is valid. Valid means all of his information is equal with DB.
+ * @param {object} user Data of user given from sso ITB response.
+ */
 const isValid = async user => {
   const { _id } = user;
   const foundUser = await User.findById(_id);
@@ -20,7 +24,7 @@ const isValid = async user => {
 
 /**
  * Middleware that checks if the request comes from authenticated user
- * @param {object} req.session.user User object that was created by passport
+ * @param {object} req.header.authorization Bearer header from user's request.
  */
 exports.isAuthenticated = async (req, res, next) => {
   try {
@@ -39,49 +43,26 @@ exports.isAuthenticated = async (req, res, next) => {
       }
     }
 
-    return res.json({
-      apiVersion: res.locals.apiVersion,
-      error: {
-        code: 401,
-        message: 'You are not allowed.'
-      }
-    });
+    return sendResponse(res, 401, 'Error. You are not allowed');
   } catch (e) {
     if (e.name === 'JsonWebTokenError') {
-      return res.json({
-        apiVersion: res.locals.apiVersion,
-        error: {
-          code: 401,
-          message: 'You are not allowed.'
-        }
-      });
+      return sendResponse(res, 401, 'Error. You are not allowed');
     }
 
-    return res.json({
-      apiVersion: res.locals.apiVersion,
-      error: {
-        code: 500,
-        message: `Error: ${e.message}`
-      }
-    });
+    return sendResponse(res, 500, `Error: ${e.message}`);
   }
 };
 
 /**
  * Middleware that checks if the request comes from non authenticated user
- * @param {object} req.session.user User object that was created by passport
+ * @param {object} req.session.user User object that was created
  */
 exports.isNonAuthenticated = (req, res, next) => {
   if (!req.session || !req.session.user) {
     return next();
   }
-  return res.json({
-    apiVersion: res.locals.apiVersion,
-    error: {
-      code: 401,
-      message: 'You are not allowed.'
-    }
-  });
+
+  return sendResponse(res, 401, 'Error. You are not allowed');
 };
 
 const HIGHEST_ADMIN_REQUEST = 'highest';
@@ -143,7 +124,7 @@ const validateAdmin = async (req, res, next, code) => {
     return sendResponse(res, 401, 'Error. You are not allowed');
   } catch (e) {
     console.error(e);
-    return sendResponse(res, 500, `Error: ${e}`);
+    return sendResponse(res, 500, `Error: ${e.message}`);
   }
 };
 

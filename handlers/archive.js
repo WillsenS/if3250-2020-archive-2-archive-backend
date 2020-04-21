@@ -12,7 +12,7 @@ const User = require('../models/User');
 const Borrow = require('../models/Borrow');
 const { translateFiltersMongoose, sendResponse } = require('../helpers');
 
-const secret = 'mysecretsshhh';
+const secret = process.env.SESSION_SECRET;
 
 const isValid = async user => {
   const { _id } = user;
@@ -72,6 +72,14 @@ exports.isAuthArchive = async (req, res, next) => {
   }
 };
 
+/**
+ * Get archives based on query, page, and filters
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ * @param {number} req.query.q Query from user.
+ * @param {number} req.query.page Page number.
+ * @param {number} req.query.flter Filter from user (google standard).
+ */
 exports.searchArchive = async (req, res) => {
   try {
     let { q, page } = req.query;
@@ -112,7 +120,6 @@ exports.searchArchive = async (req, res) => {
 
     findArchive.forEach(async element => {
       if (element.keamanan_terbuka) {
-        // eslint-disable-next-line
         element.file = await File.findById(element.file);
       }
     });
@@ -171,6 +178,28 @@ exports.latestArchive = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+    return sendResponse(res, 400, 'Error. Bad request');
+  }
+};
+
+exports.postNewBorrowRequest = async (req, res) => {
+  try {
+    const { user } = req.session;
+    const { idArchive, phone, email, reason } = req.body;
+
+    const data = {
+      archive: idArchive,
+      borrower: user._id,
+      phone,
+      email,
+      reason,
+      status: 0
+    };
+
+    const createBorrow = await Borrow.create(data);
+    return sendResponse(res, 200, 'OK', createBorrow);
+  } catch (e) {
+    console.error(e);
     return sendResponse(res, 400, 'Error. Bad request');
   }
 };
@@ -247,12 +276,10 @@ const buildArchive = async (file, fields) => {
 
   const fileDoc = await File.create(dataFile);
 
-  // eslint-disable-next-line
   dataArchive.file = fileDoc._id;
 
   const metadataDoc = await saveMetadata(fields);
 
-  /* eslint-disable */
   switch (fields.tipe) {
     case 'Audio':
       dataArchive.audio = metadataDoc._id;
@@ -269,7 +296,6 @@ const buildArchive = async (file, fields) => {
     default:
       throw new Error('Invalid archive type');
   }
-  /* eslint-enable */
 
   // Create new archive
   // Attr 'file' referenced to the newly uploaded file
@@ -628,26 +654,4 @@ exports.uploadVideo = (req, res) => {
 
   uploadLowerLayout(res);
   return res.end();
-};
-
-exports.postNewBorrowRequest = async (req, res) => {
-  try {
-    const { user } = req.session;
-    const { idArchive, phone, email, reason } = req.body;
-
-    const data = {
-      archive: idArchive,
-      borrower: user._id,
-      phone,
-      email,
-      reason,
-      status: 0
-    };
-
-    const createBorrow = await Borrow.create(data);
-    return sendResponse(res, 200, 'OK', createBorrow);
-  } catch (e) {
-    console.error(e);
-    return sendResponse(res, 400, 'Error. Bad request');
-  }
 };

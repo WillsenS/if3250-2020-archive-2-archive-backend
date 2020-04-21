@@ -1,4 +1,3 @@
-/* eslint-disable */
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const User = require('../models/User');
@@ -18,13 +17,13 @@ const connect = new Promise((resolve, reject) => {
   resolve('Mongoose is connected');
 });
 
-const seeder = (connector, resource, data) =>
+const seeder = (connector, Resource, data) =>
   new Promise(async (resolve, reject) => {
     try {
       const connection = await connector;
       if (connection) {
         const promiseArray = data.map(item => {
-          const newItem = new resource(item);
+          const newItem = new Resource(item);
           return newItem.save();
         });
 
@@ -114,5 +113,4 @@ const execute = async () => {
   }
 };
 
-/* eslint-enable */
 execute();

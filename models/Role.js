@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 /**
- * Document Interface
- * @typedef {Object} Document
+ * Role Interface
+ * @typedef {Object} Role
  * @property {Number} kode Kode role
  * @property {String} nama Nama role
  * @property {String} deskripsi Deskripsi role

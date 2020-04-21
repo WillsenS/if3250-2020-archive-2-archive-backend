@@ -81,7 +81,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(
   '/',
-  express['static'](path.join(__dirname, 'public'), {
+  express.static(path.join(__dirname, 'public'), {
     maxAge: 31557600000
   })
 );

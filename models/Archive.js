@@ -1,14 +1,14 @@
+/* eslint-disable no-unused-vars */
 const mongoose = require('mongoose');
-/* eslint-disable */
-const Audio = require('../models/Audio');
-const Video = require('../models/Video');
-const Text = require('../models/Text');
-const Photo = require('../models/Photo');
-const File = require('../models/File');
-/* eslint-enable */
+const Audio = require('./Audio');
+const Video = require('./Video');
+const Text = require('./Text');
+const Photo = require('./Photo');
+const File = require('./File');
+
 /**
- * Document Interface
- * @typedef {Object} Document
+ * Archibe Interface
+ * @typedef {Object} Archive
  * @property {String} judul Judul arsip
  * @property {String} tipe Tipe arsip Audio/Video/Text/Photo
  * @property {String} nomor Nomor arsip

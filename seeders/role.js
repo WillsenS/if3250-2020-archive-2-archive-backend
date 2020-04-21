@@ -1,4 +1,3 @@
-/* eslint-disable */
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const Role = require('../models/Role');
@@ -18,13 +17,13 @@ const connect = new Promise((resolve, reject) => {
   resolve('Mongoose is connected');
 });
 
-const seeder = (connector, resource, data) =>
+const seeder = (connector, Resource, data) =>
   new Promise(async (resolve, reject) => {
     try {
       const connection = await connector;
       if (connection) {
         const promiseArray = data.map(item => {
-          const newItem = new resource(item);
+          const newItem = new Resource(item);
           return newItem.save();
         });
 
@@ -42,13 +41,13 @@ const execute = async () => {
     const data = [
       {
         kode: 1,
-        nama: "Admin Pusat",
-        deskripsi: "Admin Terpusat ITB"
+        nama: 'Admin Pusat',
+        deskripsi: 'Admin Terpusat ITB'
       },
       {
         kode: 2,
-        nama: "Internal ITB",
-        deskripsi: "Pemilik akun INA yang telah mendaftar ADIC"
+        nama: 'Internal ITB',
+        deskripsi: 'Pemilik akun INA yang telah mendaftar ADIC'
       }
     ];
 
@@ -61,5 +60,4 @@ const execute = async () => {
   }
 };
 
-/* eslint-enable */
 execute();

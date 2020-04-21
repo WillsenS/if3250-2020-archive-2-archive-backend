@@ -1,17 +1,15 @@
-/* eslint-disable dot-notation */
-const secret = 'mysecretsshhh';
-
 const axios = require('axios');
 const convert = require('xml-js');
 const jwt = require('jsonwebtoken');
 const formidable = require('formidable');
 const User = require('../models/User');
-// const Role = require('../models/Role');
 const { defaultURL } = require('../config');
 const { sendResponse } = require('../helpers');
 
 // const HIGHEST_ADMIN_ROLE = 1; // Admin Terpusat
 const DEFAULT_ROLE = 2; // Internal ITB Non-Admin
+
+const secret = process.env.SESSION_SECRET;
 
 /**
  * Router that will check ticket from SSO ITB
@@ -38,18 +36,18 @@ exports.checkSSORedirect = () => {
         }
 
         const successResponse = serviceResponse['cas:authenticationSuccess'];
-        const username = successResponse['cas:user']['_text'];
+        const username = successResponse['cas:user']._text;
         const foundUser = await User.findOne({ username });
 
         let payload;
 
         if (!foundUser) {
           const successAttributes = successResponse['cas:attributes'];
-          const fullname = successAttributes['cas:cn']['_text'];
-          const mail = successAttributes['cas:mail']['_text'];
-          const mailNonITB = successAttributes['cas:itbEmailNonITB']['_text'];
-          const ou = successAttributes['cas:ou']['_text'];
-          const status = successAttributes['cas:itbStatus']['_text'];
+          const fullname = successAttributes['cas:cn']._text;
+          const mail = successAttributes['cas:mail']._text;
+          const mailNonITB = successAttributes['cas:itbEmailNonITB']._text;
+          const ou = successAttributes['cas:ou']._text;
+          const status = successAttributes['cas:itbStatus']._text;
           const role = 2; // Default role is 'Internal ITB'
 
           const userData = {
