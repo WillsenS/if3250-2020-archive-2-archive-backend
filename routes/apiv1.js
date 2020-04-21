@@ -18,7 +18,7 @@ const {
   getNonAdmins
 } = require('../handlers/user');
 const {
-  getMostSearchKeyword
+  getMostSearchKeyword,
   searchArchive,
   latestArchive,
   getArchiveDetail,
