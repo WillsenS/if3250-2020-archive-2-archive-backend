@@ -8,6 +8,7 @@ const Text = require('../models/Text');
 const Photo = require('../models/Photo');
 const User = require('../models/User');
 const Borrow = require('../models/Borrow');
+const Search = require('../models/Search');
 const { translateFiltersMongoose, sendResponse } = require('../helpers');
 
 /**
@@ -26,6 +27,27 @@ exports.searchArchive = async (req, res) => {
 
     q = q || '';
     page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
+
+    if (q !== '') {
+      const foundSearch = await Search.find({ keyword: q });
+
+      const optionsUpdate = {
+        upsert: false,
+        useFindAndModify: false
+      };
+
+      if (foundSearch) {
+        foundSearch.count += 1;
+        await Search.findByIdAndUpdate(foundSearch._id, foundSearch, optionsUpdate);
+      } else {
+        const data = {
+          keyword: q,
+          count: 0
+        };
+
+        await Search.create(data);
+      }
+    }
 
     const limit = 10;
     const searchQuery = {
@@ -72,7 +94,7 @@ exports.searchArchive = async (req, res) => {
     });
 
     const totalPages = Math.ceil(countArchive / limit);
-    const baseLink = `${process.env.BASE_URL}/api/v1/search`;
+    const baseLink = `${process.env.BASE_URL}/api/v1/archive/search`;
     const nextLink = totalPages > page ? `${baseLink}${qs}&page=${page + 1}` : '#';
     const prevLink = page > 1 ? `${baseLink}${qs}&page=${page - 1}` : '#';
 
