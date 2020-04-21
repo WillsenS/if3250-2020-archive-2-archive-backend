@@ -72,26 +72,26 @@ describe('Search Endpoints with Query and Filter', () => {
  * ARCHIVE TEST
  */
 
-describe('Upload archive without login and without data', () => {
-  it('should return error response with status 401', async () => {
+describe('Upload archive without data', () => {
+  it('should return error response with status 400', async () => {
     const res = await request(app).post('/api/v1/upload');
 
-    expect(res.statusCode).toEqual(401);
+    expect(res.statusCode).toEqual(400);
   });
 });
 
-describe('Edit archive with invalid id and without login', () => {
-  it('should return error response with status 401', async () => {
+describe('Edit archive with invalid id', () => {
+  it('should return error response with status 400', async () => {
     const res = await request(app).patch('/api/v1/edit/abcd');
 
-    expect(res.statusCode).toEqual(401);
+    expect(res.statusCode).toEqual(400);
   });
 });
 
-describe('Delete archive with invalid id and without login', () => {
-  it('should return error response with status 401', async () => {
+describe('Delete archive with invalid id', () => {
+  it('should return error response with status 400', async () => {
     const res = await request(app)['delete']('/api/v1/delete/abcd');
 
-    expect(res.statusCode).toEqual(401);
+    expect(res.statusCode).toEqual(400);
   });
 });

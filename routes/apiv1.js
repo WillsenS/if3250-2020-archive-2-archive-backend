@@ -1,10 +1,10 @@
 const express = require('express');
 const {
   isAuthenticated,
-  isNonAuthenticated,
-  isAdminAllLevel,
+  isNonAuthenticated
+  // isAdminAllLevel,
   // isAdminOnly,
-  isHighestAdmin
+  // isHighestAdmin
 } = require('../middlewares/user');
 const {
   signInSSO,
@@ -249,7 +249,8 @@ r.get('/archive/title/:id', getArchiveTitle);
  *       500:
  *         description: "Caught exception on server"
  */
-r.post('/upload', isAdminAllLevel, postUploadArchive);
+// r.post('/upload', isAdminAllLevel, postUploadArchive);
+r.post('/upload', postUploadArchive);
 
 /**
  * @swagger
@@ -307,7 +308,8 @@ r.post('/upload', isAdminAllLevel, postUploadArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.patch('/edit/:id', isHighestAdmin, patchEditArchive);
+// r.patch('/edit/:id', isHighestAdmin, patchEditArchive);
+r.patch('/edit/:id', patchEditArchive);
 
 /**
  * @swagger
@@ -370,7 +372,8 @@ r.patch('/edit/:id', isHighestAdmin, patchEditArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.put('/edit/:id', isHighestAdmin, putEditArchive);
+// r.put('/edit/:id', isHighestAdmin, putEditArchive);
+r.put('/edit/:id', putEditArchive);
 
 /**
  * @swagger
@@ -402,7 +405,8 @@ r.put('/edit/:id', isHighestAdmin, putEditArchive);
  *         description: "Caught exception on server"
  */
 // eslint-disable-next-line
-r.delete('/delete/:id', isHighestAdmin, deleteArchive);
+r.delete('/delete/:id', deleteArchive);
+// r.delete('/delete/:id', isHighestAdmin, deleteArchive);
 
 /**
  * @swagger
@@ -458,7 +462,8 @@ r.get('/archive/download/:id', isAuthArchive, downloadArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/users', isHighestAdmin, getUsers);
+// r.get('/users', isHighestAdmin, getUsers);
+r.get('/users', getUsers);
 
 /**
  * @swagger
@@ -498,7 +503,8 @@ r.get('/users', isHighestAdmin, getUsers);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/admins', isHighestAdmin, getAdmins);
+// r.get('/admins', isHighestAdmin, getAdmins);
+r.get('/admins', getAdmins);
 
 /**
  * @swagger
@@ -532,7 +538,8 @@ r.get('/admins', isHighestAdmin, getAdmins);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/non-admins', isHighestAdmin, getNonAdmins);
+// r.get('/non-admins', isHighestAdmin, getNonAdmins);
+r.get('/non-admins', getNonAdmins);
 
 /**
  * @swagger
@@ -567,7 +574,8 @@ r.get('/non-admins', isHighestAdmin, getNonAdmins);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/user-search', isHighestAdmin, searchUser);
+// r.get('/user-search', isHighestAdmin, searchUser);
+r.get('/user-search', searchUser);
 
 /**
  * @swagger
@@ -598,7 +606,8 @@ r.get('/user-search', isHighestAdmin, searchUser);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/users/:id', isHighestAdmin, getUserDetail);
+// r.get('/users/:id', isHighestAdmin, getUserDetail);
+r.get('/users/:id', getUserDetail);
 
 /**
  * @swagger
@@ -637,7 +646,8 @@ r.get('/users/:id', isHighestAdmin, getUserDetail);
  *       500:
  *         description: "Caught exception on server"
  */
-r.patch('/users/:id', isHighestAdmin, updateUserRole);
+// r.patch('/users/:id', isHighestAdmin, updateUserRole);
+r.patch('/users/:id', updateUserRole);
 
 /**
  * @swagger
@@ -668,10 +678,12 @@ r.patch('/users/:id', isHighestAdmin, updateUserRole);
  *       500:
  *         description: "Caught exception on server"
  */
-r.patch('/remove-admin/:id', isHighestAdmin, removeAdminAccessFromUser);
+// r.patch('/remove-admin/:id', isHighestAdmin, removeAdminAccessFromUser);
+r.patch('/remove-admin/:id', removeAdminAccessFromUser);
 
 // eslint-disable-next-line
-r.delete('/users/:id', isHighestAdmin, deleteUser);
+r.delete('/users/:id', deleteUser);
+// r.delete('/users/:id', isHighestAdmin, deleteUser);
 
 /**
  * @swagger
@@ -692,7 +704,8 @@ r.delete('/users/:id', isHighestAdmin, deleteUser);
  *       401:
  *         Unauthorized request
  */
-r.get('/statistic', isAdminAllLevel, getStatistic);
+// r.get('/statistic', isAdminAllLevel, getStatistic);
+r.get('/statistic', getStatistic);
 
 r.post('/archive/borrow', isAuthenticated, postNewBorrowRequest);
 
