@@ -8,8 +8,10 @@
   "rules": {
     "no-await-in-loop": 0,
     "no-console": "off",
-    "no-underscore-dangle": ["error", { "allow": ["_id"] }],
+    "no-underscore-dangle": ["error", { "allow": ["_id", "_text"] }],
     "prettier/prettier": ["error"],
-    "dot-location": [2, "property"]
+    "dot-location": [2, "property"],
+    "no-param-reassign": "off",
+    "no-async-promise-executor": "off"
   }
 }

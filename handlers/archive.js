@@ -296,7 +296,6 @@ const buildArchive = async (file, fields) => {
     default:
       throw new Error('Invalid archive type');
   }
-  /* eslint-enable */
 
   // Create new archive
   // Attr 'file' referenced to the newly uploaded file
