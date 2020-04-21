@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-/* eslint-disable */
 const Audio = require('../models/Audio');
 const Video = require('../models/Video');
 const Text = require('../models/Text');

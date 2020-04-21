@@ -1,4 +1,3 @@
-/* eslint-disable dot-notation */
 const secret = 'mysecretsshhh';
 
 const axios = require('axios');

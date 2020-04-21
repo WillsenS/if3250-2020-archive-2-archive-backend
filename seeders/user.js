@@ -1,4 +1,3 @@
-/* eslint-disable */
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const User = require('../models/User');

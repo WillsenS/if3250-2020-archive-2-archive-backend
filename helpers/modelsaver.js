@@ -1,5 +1,4 @@
 exports.saveModel = (Resource, data) =>
-  // eslint-disable-next-line
   new Promise(async (resolve, reject) => {
     try {
       const promiseArray = data.map(item => {

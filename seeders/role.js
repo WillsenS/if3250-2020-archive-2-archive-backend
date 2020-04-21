@@ -1,4 +1,3 @@
-/* eslint-disable */
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const Role = require('../models/Role');
@@ -42,13 +41,13 @@ const execute = async () => {
     const data = [
       {
         kode: 1,
-        nama: "Admin Pusat",
-        deskripsi: "Admin Terpusat ITB"
+        nama: 'Admin Pusat',
+        deskripsi: 'Admin Terpusat ITB'
       },
       {
         kode: 2,
-        nama: "Internal ITB",
-        deskripsi: "Pemilik akun INA yang telah mendaftar ADIC"
+        nama: 'Internal ITB',
+        deskripsi: 'Pemilik akun INA yang telah mendaftar ADIC'
       }
     ];
 
