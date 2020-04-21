@@ -89,25 +89,6 @@ exports.signInSSO = (req, res) => {
   res.redirect(`https://login.itb.ac.id/cas/login?service=${redirectURL}`);
 };
 
-/**
- * Handling user sign out by removing user session from database.
- */
-exports.postSignout = async (req, res) => {
-  try {
-    return req.session.destroy(err => {
-      if (err) {
-        return sendResponse(res, 500, 'Error occured during signing out process');
-      }
-
-      req.session.user = null;
-      return sendResponse(res, 200, 'Successfully logged out');
-    });
-  } catch (e) {
-    console.error(`User could not log out: ${e.message}`);
-    return sendResponse(res, 400, 'Error occured during sign out process');
-  }
-};
-
 const findUsers = async (page, q, res) => {
   let baseLink;
   let searchQuery;
@@ -218,8 +199,7 @@ exports.getUsers = async (req, res) => {
 
     return await findUsers(page, null, res);
   } catch (err) {
-    console.error(err.message);
-    return sendResponse(res, 400, 'Error. Bad request');
+    return sendResponse(res, 500, 'Error. Bad request when get user');
   }
 };
 
@@ -229,8 +209,7 @@ exports.searchUser = async (req, res) => {
 
     return await findUsers(page, q, res);
   } catch (err) {
-    console.error(err.message);
-    return sendResponse(res, 400, 'Error. Bad request');
+    return sendResponse(res, 500, 'Error. Bad request when search user');
   }
 };
 
@@ -243,8 +222,7 @@ exports.getUserDetail = async (req, res) => {
       data: foundUser
     });
   } catch (err) {
-    console.error(err.message);
-    return sendResponse(res, 400, 'Error. User not found');
+    return sendResponse(res, 500, 'Error. Bad request when get user detail');
   }
 };
 
@@ -262,8 +240,7 @@ exports.updateUserRole = async (req, res) => {
 
       return sendResponse(res, 200, 'Successfully edited user');
     } catch (e) {
-      console.error(e);
-      return sendResponse(res, 400, 'Error. User not found');
+      return sendResponse(res, 500, "Error. Bad request when update  user's role");
     }
   });
 };
@@ -278,9 +255,8 @@ exports.removeAdminAccessFromUser = async (req, res) => {
     await User.findByIdAndUpdate(id, dataUser);
 
     return sendResponse(res, 200, 'Successfully removed admin access from user');
-  } catch (e) {
-    console.error(e);
-    return sendResponse(res, 400, 'Error. User not found');
+  } catch (err) {
+    return sendResponse(res, 500, 'Error. Bad request when remove admin access');
   }
 };
 
@@ -291,8 +267,7 @@ exports.deleteUser = async (req, res) => {
     await User.findByIdAndDelete(id);
     return sendResponse(res, 200, 'Successfully deleted user');
   } catch (err) {
-    console.error(err.message);
-    return sendResponse(res, 400, 'Error. User not found');
+    return sendResponse(res, 500, 'Error. Bad request when delete user');
   }
 };
 
@@ -303,8 +278,7 @@ exports.getAdmins = async (req, res) => {
     page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
     return await findAdmins(page, role, res, q);
   } catch (err) {
-    console.error(err.message);
-    return sendResponse(res, 400, 'Error. Bad request');
+    return sendResponse(res, 500, 'Error. Bad request when get admin');
   }
 };
 
@@ -316,7 +290,6 @@ exports.getNonAdmins = async (req, res) => {
     const limitFilter = limit ? parseInt(limit, 10) : null;
     return await findNonAdmins(page, limitFilter, res);
   } catch (err) {
-    console.error(err.message);
-    return sendResponse(res, 400, 'Error. Bad request');
+    return sendResponse(res, 500, 'Error. Bad request when get non admin');
   }
 };

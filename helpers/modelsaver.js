@@ -8,7 +8,7 @@ exports.saveModel = (Resource, data) =>
 
       const result = await Promise.all(promiseArray);
       resolve(result);
-    } catch (e) {
-      reject(e);
+    } catch (err) {
+      reject(err);
     }
   });

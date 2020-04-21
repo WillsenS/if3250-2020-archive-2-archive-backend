@@ -44,12 +44,12 @@ exports.isAuthenticated = async (req, res, next) => {
     }
 
     return sendResponse(res, 401, 'Error. You are not allowed');
-  } catch (e) {
-    if (e.name === 'JsonWebTokenError') {
+  } catch (err) {
+    if (err.name === 'JsonWebTokenError') {
       return sendResponse(res, 401, 'Error. You are not allowed');
     }
 
-    return sendResponse(res, 500, `Error: ${e.message}`);
+    return sendResponse(res, 500, `Error: ${err.message}`);
   }
 };
 
@@ -122,9 +122,8 @@ const validateAdmin = async (req, res, next, code) => {
     }
 
     return sendResponse(res, 401, 'Error. You are not allowed');
-  } catch (e) {
-    console.error(e);
-    return sendResponse(res, 500, `Error: ${e.message}`);
+  } catch (err) {
+    return sendResponse(res, 500, `Error: ${err.message}`);
   }
 };
 

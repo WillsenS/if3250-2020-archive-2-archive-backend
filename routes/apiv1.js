@@ -7,7 +7,6 @@ const {
 } = require('../middlewares/user');
 const {
   signInSSO,
-  postSignout,
   getUsers,
   deleteUser,
   removeAdminAccessFromUser,
@@ -64,31 +63,6 @@ r.get('/', isAuthenticated, (req, res) => {
  *         description: "Caught exception on server"
  */
 r.get('/auth/signin', isNonAuthenticated, signInSSO);
-
-/**
- * @swagger
- *
- * /api/v1/auth/signout:
- *   post:
- *     summary: "Sign out user from application"
- *     description: "Removing user session from database"
- *     tags:
- *     - "auth"
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: "Success operation"
- *       400:
- *         description: "Bad request"
- *       401:
- *         description: "Not authenticated"
- *       404:
- *         description: "Not found"
- *       500:
- *         description: "Caught exception on server"
- */
-r.post('/auth/signout', isAuthenticated, postSignout);
 
 /**
  * @swagger

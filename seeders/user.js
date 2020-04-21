@@ -31,8 +31,8 @@ const seeder = (connector, Resource, data) =>
         resolve(result);
       }
       throw new Error('Connection could not be established');
-    } catch (e) {
-      reject(e);
+    } catch (err) {
+      reject(err);
     }
   });
 
@@ -106,8 +106,8 @@ const execute = async () => {
 
     const result = await seeder(connect, User, data);
     console.info(result);
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    console.error(err);
   } finally {
     process.exit();
   }

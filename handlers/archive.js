@@ -64,7 +64,6 @@ exports.isAuthArchive = async (req, res, next) => {
 
     return next();
   } catch (e) {
-    console.error(e);
     if (e.name === 'JsonWebTokenError')
       return sendResponse(res, 401, "You're not allowed to acces this archive");
 
@@ -159,8 +158,7 @@ exports.searchArchive = async (req, res) => {
       prevLink
     });
   } catch (err) {
-    console.error(err);
-    return sendResponse(res, 400, 'Error. Bad request');
+    return sendResponse(res, 500, 'Error. Bad request when searching arcive');
   }
 };
 
@@ -177,8 +175,7 @@ exports.latestArchive = async (req, res) => {
       data: findArchive
     });
   } catch (err) {
-    console.error(err);
-    return sendResponse(res, 400, 'Error. Bad request');
+    return sendResponse(res, 500, 'Error. Bad request when get latest archive ');
   }
 };
 
@@ -199,8 +196,7 @@ exports.postNewBorrowRequest = async (req, res) => {
     const createBorrow = await Borrow.create(data);
     return sendResponse(res, 200, 'OK', createBorrow);
   } catch (e) {
-    console.error(e);
-    return sendResponse(res, 400, 'Error. Bad request');
+    return sendResponse(res, 500, 'Error. Bad request when post new borrow reuest');
   }
 };
 
@@ -300,8 +296,7 @@ const buildArchive = async (file, fields) => {
   // Create new archive
   // Attr 'file' referenced to the newly uploaded file
   // Metadata attr referenced to object with metadata of file
-  const archiveDoc = await Archive.create(dataArchive);
-  console.info(archiveDoc);
+  await Archive.create(dataArchive);
 };
 
 exports.getArchiveTitle = async (req, res) => {
@@ -313,8 +308,7 @@ exports.getArchiveTitle = async (req, res) => {
       data: foundArchive.judul
     });
   } catch (err) {
-    console.error(err);
-    return sendResponse(res, 400, 'Error. Bad request');
+    return sendResponse(res, 500, 'Error. Bad request while get archive title');
   }
 };
 
@@ -332,8 +326,7 @@ exports.getArchiveDetail = async (req, res) => {
       data: foundArchive
     });
   } catch (err) {
-    console.error(err);
-    return sendResponse(res, 400, 'Error. Bad request');
+    return sendResponse(res, 500, 'Error. Bad request when get archive detail');
   }
 };
 
@@ -350,14 +343,12 @@ exports.downloadArchive = async (req, res) => {
 
     return res.download(file, err => {
       if (err) {
-        console.error(err);
-        return sendResponse(res, 400, 'Error. Bad request');
+        return sendResponse(res, 500, 'Error. Bad request when downloading file');
       }
       return sendResponse(res, 200, 'Successfully downloaded');
     });
   } catch (err) {
-    console.error(err);
-    return sendResponse(res, 400, 'Error. Bad request');
+    return sendResponse(res, 500, 'Error. Bad request when downloading file');
   }
 };
 
@@ -371,6 +362,7 @@ const buildArchiveFromForm = async (req, res) => {
       if (!file.filetoupload) {
         throw new Error('Uploaded file not found');
       }
+
       const oldpath = file.filetoupload.path;
       const newpath =
         process.env.NODE_PATH +
@@ -378,15 +370,13 @@ const buildArchiveFromForm = async (req, res) => {
         process.env.UPLOAD_DIR +
         file.filetoupload.name;
 
-      console.log(newpath);
       mv(oldpath, newpath, () => {
         return 1;
       });
 
       return sendResponse(res, 200, 'Successfully added and uploaded archive');
     } catch (e) {
-      console.error(e);
-      return sendResponse(res, 400, 'Error. Bad request');
+      return sendResponse(res, 500, 'Error. Bad request while build archive');
     }
   });
 };
@@ -473,8 +463,7 @@ exports.patchEditArchive = async (req, res) => {
 
       return sendResponse(res, 200, 'Successfully edited archive');
     } catch (e) {
-      console.error(e);
-      return sendResponse(res, 400, 'Error. Bad request');
+      return sendResponse(res, 500, 'Error. Bad request while edit archive');
     }
   });
 };
@@ -514,8 +503,7 @@ exports.putEditArchive = async (req, res) => {
 
     return sendResponse(res, 200, 'Successfully replaced archive');
   } catch (e) {
-    console.error(e);
-    return sendResponse(res, 400, 'Error. Bad request');
+    return sendResponse(res, 500, 'Error. Bad request when edit archive');
   }
 };
 
@@ -526,8 +514,7 @@ exports.deleteArchive = async (req, res) => {
 
     return sendResponse(res, 200, 'Successfully deleted archive data. Archive file still exist');
   } catch (err) {
-    console.error(err);
-    return sendResponse(res, 400, 'Error. Bad request');
+    return sendResponse(res, 500, 'Error. Bad request when delete archive');
   }
 };
 
@@ -564,8 +551,7 @@ exports.getStatistic = async (req, res) => {
       }
     });
   } catch (e) {
-    console.error(e);
-    return sendResponse(res, 400, 'Error. Bad request');
+    return sendResponse(res, 500, 'Error. Bad request when get statistic');
   }
 };
 
