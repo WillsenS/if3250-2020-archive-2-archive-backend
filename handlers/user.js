@@ -1,5 +1,3 @@
-const secret = 'mysecretsshhh';
-
 const axios = require('axios');
 const convert = require('xml-js');
 const jwt = require('jsonwebtoken');
@@ -10,6 +8,8 @@ const { sendResponse } = require('../helpers');
 
 // const HIGHEST_ADMIN_ROLE = 1; // Admin Terpusat
 const DEFAULT_ROLE = 2; // Internal ITB Non-Admin
+
+const secret = process.env.SESSION_SECRET;
 
 /**
  * Router that will check ticket from SSO ITB

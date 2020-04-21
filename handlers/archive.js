@@ -12,7 +12,7 @@ const User = require('../models/User');
 const Borrow = require('../models/Borrow');
 const { translateFiltersMongoose, sendResponse } = require('../helpers');
 
-const secret = 'mysecretsshhh';
+const secret = process.env.SESSION_SECRET;
 
 const isValid = async user => {
   const { _id } = user;

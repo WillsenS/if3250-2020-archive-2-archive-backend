@@ -7,8 +7,8 @@ const Photo = require('./Photo');
 const File = require('./File');
 
 /**
- * Document Interface
- * @typedef {Object} Document
+ * Archibe Interface
+ * @typedef {Object} Archive
  * @property {String} judul Judul arsip
  * @property {String} tipe Tipe arsip Audio/Video/Text/Photo
  * @property {String} nomor Nomor arsip

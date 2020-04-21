@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 /**
- * Document Interface
- * @typedef {Object} Document
+ * Text Interface
+ * @typedef {Object} Text
  * @property {String} textual_archive_number Nomor arsip tekstual
  * @property {String} author penulis/pembuat arsip tekstual
  */

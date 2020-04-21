@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 /**
- * Document Interface
- * @typedef {Object} Document
+ * Photo Interface
+ * @typedef {Object} Photo
  * @property {String} photographer Fotografer dari foto
  * @property {String} photo_type Jenis foto
  * @property {String} photo_size Ukuran foto
