@@ -11,7 +11,7 @@ const filterCandidate = ['tipe', 'pola', 'lokasi_kegiatan', 'lokasi_simpan_arsip
 
 describe('Search Endpoints without Query', () => {
   it('should create search archive without query', async () => {
-    const res = await request(app).get('/api/v1/search');
+    const res = await request(app).get('/api/v1/archive/search');
     const { data, count, currentPage, totalPages, filtersCandidate, nextLink, prevLink } = res.body;
 
     expect(res.statusCode).toEqual(200);
@@ -33,7 +33,7 @@ let countWithFilter = 0;
 
 describe('Search Endpoints with Query', () => {
   it('should create search archive with query', async () => {
-    const res = await request(app).get('/api/v1/search?q=1tb');
+    const res = await request(app).get('/api/v1/archive/search?q=itb');
     const { data, count, currentPage, totalPages, filtersCandidate } = res.body;
     countWithoutFilter = count;
 
@@ -51,7 +51,7 @@ describe('Search Endpoints with Query', () => {
 
 describe('Search Endpoints with Query and Filter', () => {
   it('should create search archive with query and filter', async () => {
-    const res = await request(app).get('/api/v1/search?q=1tb&filters=pola==PB.03');
+    const res = await request(app).get('/api/v1/archive/search?q=1tb&filters=pola==PB.03');
     const { data, count, currentPage, totalPages, filtersCandidate } = res.body;
     countWithFilter = count;
 
@@ -74,7 +74,7 @@ describe('Search Endpoints with Query and Filter', () => {
 
 describe('Upload archive without login and without data', () => {
   it('should return error response with status 401', async () => {
-    const res = await request(app).post('/api/v1/upload');
+    const res = await request(app).post('/api/v1/archive/upload');
 
     expect(res.statusCode).toEqual(401);
   });
@@ -82,7 +82,7 @@ describe('Upload archive without login and without data', () => {
 
 describe('Edit archive with invalid id and without login', () => {
   it('should return error response with status 401', async () => {
-    const res = await request(app).patch('/api/v1/edit/abcd');
+    const res = await request(app).patch('/api/v1/archive/edit/abcd');
 
     expect(res.statusCode).toEqual(401);
   });
@@ -90,7 +90,7 @@ describe('Edit archive with invalid id and without login', () => {
 
 describe('Delete archive with invalid id and without login', () => {
   it('should return error response with status 401', async () => {
-    const res = await request(app).delete('/api/v1/delete/abcd');
+    const res = await request(app).delete('/api/v1/archive/delete/abcd');
 
     expect(res.statusCode).toEqual(401);
   });
