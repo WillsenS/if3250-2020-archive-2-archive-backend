@@ -12,6 +12,26 @@ const Search = require('../models/Search');
 const { translateFiltersMongoose, sendResponse } = require('../helpers');
 
 /**
+ * Get 10 most search keyword for archive
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ */
+exports.getMostSearchKeyword = async (req, res) => {
+  try {
+    const limit = 10;
+    const findSearch = await Search.find()
+      .sort({ count: 1 })
+      .limit(limit);
+
+    return sendResponse(res, 200, 'OK', {
+      data: findSearch
+    });
+  } catch (err) {
+    return sendResponse(res, 500, 'Error. Bad request when get most keyword ');
+  }
+};
+
+/**
  * Get archives based on query, page, and filters
  * @param {express.Request} req Express request object.
  * @param {express.Response} res Express response object.
