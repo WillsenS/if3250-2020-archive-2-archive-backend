@@ -5,6 +5,7 @@ const {
   isAdminAllLevel,
   isHighestAdmin
 } = require('../middlewares/user');
+const { isAuthArchive } = require('../middlewares/achive');
 const {
   signInSSO,
   getUsers,
@@ -17,7 +18,6 @@ const {
   getNonAdmins
 } = require('../handlers/user');
 const {
-  isAuthArchive,
   searchArchive,
   latestArchive,
   getArchiveDetail,

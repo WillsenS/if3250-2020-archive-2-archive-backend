@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 /**
- * Document Interface
- * @typedef {Object} Document
+ * Audio Interface
+ * @typedef {Object} Audio
  * @property {String} narrator Narrator dari berkas arsip
  * @property {String} reporter Reporter dari berkas arsip
  * @property {String} activity_description Deskripsi kegiatan / topik dari berkas audio
