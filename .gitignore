@@ -1,6 +1,8 @@
 #config
 config/index.js
 
+out/
+
 # Logs
 logs
 *.log
