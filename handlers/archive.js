@@ -1,5 +1,6 @@
 const formidable = require('formidable');
 const mv = require('mv');
+const fs = require('fs');
 const Archive = require('../models/Archive');
 const File = require('../models/File');
 const Audio = require('../models/Audio');
@@ -10,6 +11,43 @@ const User = require('../models/User');
 const Borrow = require('../models/Borrow');
 const Search = require('../models/Search');
 const { translateFiltersMongoose, sendResponse } = require('../helpers');
+const keywords = require('../config/mostSearch.json');
+
+exports.getMostSearchKeywordOnFile = async (req, res) => {
+  return sendResponse(res, 200, 'OK', {
+    data: keywords
+  });
+};
+
+exports.changeMostSearchKeywordOnFile = async (req, res) => {
+  const data = req.body;
+
+  fs.writeFile('./config/mostSearch.json', JSON.stringify(data), err => {
+    console.error(err);
+  });
+
+  return sendResponse(res, 200, 'OK');
+};
+
+/**
+ * Get 10 most search keyword for archive
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ */
+exports.getMostSearchKeyword = async (req, res) => {
+  try {
+    const limit = 10;
+    const findSearch = await Search.find()
+      .sort({ count: 1 })
+      .limit(limit);
+
+    return sendResponse(res, 200, 'OK', {
+      data: findSearch
+    });
+  } catch (err) {
+    return sendResponse(res, 500, 'Error. Bad request when get most keyword ');
+  }
+};
 
 /**
  * Get archives based on query, page, and filters

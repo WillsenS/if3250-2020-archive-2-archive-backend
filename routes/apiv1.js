@@ -18,6 +18,9 @@ const {
   getNonAdmins
 } = require('../handlers/user');
 const {
+  getMostSearchKeywordOnFile,
+  changeMostSearchKeywordOnFile,
+  getMostSearchKeyword,
   searchArchive,
   latestArchive,
   getArchiveDetail,
@@ -91,6 +94,33 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
   const { user } = req.session;
   res.json({ data: user });
 });
+
+/**
+ * @swagger
+ *
+ * /api/v1/keyword/most:
+ *   get:
+ *     summary: "Get most search keyword"
+ *     tags:
+ *     - "archive"
+ *     description: "Retrieve 10 most search keyword"
+ *     produces:
+ *     - application/json
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       404:
+ *         description: "Not found"
+ *       500:
+ *         description: "Caught exception on server"
+ */
+r.get('/archive/search/most', getMostSearchKeyword);
+
+r.get('/keyword/most', getMostSearchKeywordOnFile);
+
+r.patch('/keyword/most', changeMostSearchKeywordOnFile);
 
 /**
  * @swagger
@@ -556,7 +586,7 @@ r.get('/users', isHighestAdmin, getUsers);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/admins', isHighestAdmin, getAdmins);
+r.get('/admins', getAdmins);
 
 /**
  * @swagger
@@ -590,7 +620,7 @@ r.get('/admins', isHighestAdmin, getAdmins);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/non-admins', isHighestAdmin, getNonAdmins);
+r.get('/non-admins', getNonAdmins);
 
 /**
  * @swagger
