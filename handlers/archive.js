@@ -188,6 +188,17 @@ exports.getArchiveDetail = async (req, res) => {
   }
 };
 
+exports.getBorrowRequest = async (req, res) => {
+  try {
+    const foundRequest = await Borrow.find().sort({ createdAt: 1 });
+    return sendResponse(res, 200, 'Successfully retrieved archive', {
+      data: foundRequest
+    });
+  } catch (e) {
+    return sendResponse(res, 500, 'Error. Bad request when post new borrow reuest');
+  }
+};
+
 /**
  * Post new request to borrowarchive
  * @param {express.Request} req Express request object.
