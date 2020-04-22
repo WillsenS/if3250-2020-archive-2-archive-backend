@@ -9,8 +9,6 @@ const { sendResponse } = require('../helpers');
 // const HIGHEST_ADMIN_ROLE = 1; // Admin Terpusat
 const DEFAULT_ROLE = 2; // Internal ITB Non-Admin
 
-const secret = process.env.SESSION_SECRET;
-
 /**
  * Router that will check ticket from SSO ITB
  * if the ticket is match, then user is authentication.
@@ -67,12 +65,13 @@ exports.checkSSORedirect = () => {
           payload = { user: foundUser };
         }
 
-        const token = await jwt.sign(payload, secret, {
+        const token = await jwt.sign(payload, process.env.SESSION_SECRET, {
           expiresIn: '1h'
         });
 
         return sendResponse(res, 200, 'OK', { username, token });
       } catch (err) {
+        console.log();
         return sendResponse(res, 500, 'Error occured during sign in process');
       }
     }

@@ -2,8 +2,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { sendResponse } = require('../helpers');
 
-const secret = process.env.SESSION_SECRET;
-
 /**
  * Check is user is valid. Valid means all of his information is equal with DB.
  * @param {object} user Data of user given from sso ITB response.
@@ -34,7 +32,7 @@ exports.isAuthenticated = async (req, res, next) => {
       const bearer = bearerHeader.split(' ');
       const bearerToken = bearer[1];
 
-      const decode = jwt.verify(bearerToken, secret);
+      const decode = jwt.verify(bearerToken, process.env.SESSION_SECRET);
       const valid = await isValid(decode.user);
 
       if (decode.user && valid) {
@@ -79,7 +77,7 @@ const bearerChecker = async (req, code) => {
     const bearer = bearerHeader.split(' ');
     const bearerToken = bearer[1];
 
-    const decode = jwt.verify(bearerToken, secret);
+    const decode = jwt.verify(bearerToken, process.env.SESSION_SECRET);
     const valid = await isValid(decode.user);
 
     if (decode.user && valid) {
