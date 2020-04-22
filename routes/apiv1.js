@@ -18,6 +18,8 @@ const {
   getNonAdmins
 } = require('../handlers/user');
 const {
+  getMostSearchKeywordOnFile,
+  changeMostSearchKeywordOnFile,
   getMostSearchKeyword,
   searchArchive,
   latestArchive,
@@ -114,7 +116,11 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/keyword/most', getMostSearchKeyword);
+r.get('/archive/search/most', getMostSearchKeyword);
+
+r.get('/keyword/most', getMostSearchKeywordOnFile);
+
+r.patch('/keyword/most', changeMostSearchKeywordOnFile);
 
 /**
  * @swagger
@@ -580,7 +586,7 @@ r.get('/users', isHighestAdmin, getUsers);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/admins', isHighestAdmin, getAdmins);
+r.get('/admins', getAdmins);
 
 /**
  * @swagger
@@ -614,7 +620,7 @@ r.get('/admins', isHighestAdmin, getAdmins);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/non-admins', isHighestAdmin, getNonAdmins);
+r.get('/non-admins', getNonAdmins);
 
 /**
  * @swagger

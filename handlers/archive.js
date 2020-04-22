@@ -1,5 +1,6 @@
 const formidable = require('formidable');
 const mv = require('mv');
+const fs = require('fs');
 const Archive = require('../models/Archive');
 const File = require('../models/File');
 const Audio = require('../models/Audio');
@@ -10,6 +11,23 @@ const User = require('../models/User');
 const Borrow = require('../models/Borrow');
 const Search = require('../models/Search');
 const { translateFiltersMongoose, sendResponse } = require('../helpers');
+const keywords = require('../config/mostSearch.json');
+
+exports.getMostSearchKeywordOnFile = async (req, res) => {
+  return sendResponse(res, 200, 'OK', {
+    data: keywords
+  });
+};
+
+exports.changeMostSearchKeywordOnFile = async (req, res) => {
+  const data = req.body;
+
+  fs.writeFile('./config/mostSearch.json', JSON.stringify(data), err => {
+    console.error(err);
+  });
+
+  return sendResponse(res, 200, 'OK');
+};
 
 /**
  * Get 10 most search keyword for archive
