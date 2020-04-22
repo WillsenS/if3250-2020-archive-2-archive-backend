@@ -1,5 +1,10 @@
 const express = require('express');
-const { isAuthenticated, isNonAuthenticated } = require('../middlewares/user');
+const {
+  isAuthenticated,
+  isNonAuthenticated,
+  isAdminAllLevel,
+  isHighestAdmin
+} = require('../middlewares/user');
 const { isAuthArchive } = require('../middlewares/achive');
 const {
   signInSSO,
@@ -333,7 +338,7 @@ r.post('/archive/borrow', isAuthenticated, postNewBorrowRequest);
  *       500:
  *         description: "Caught exception on server"
  */
-r.post('/archive/upload', postUploadArchive);
+r.post('/archive/upload', isAdminAllLevel, postUploadArchive);
 
 /**
  * @swagger
@@ -391,7 +396,7 @@ r.post('/archive/upload', postUploadArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.patch('/archive/edit/:id', patchEditArchive);
+r.patch('/archive/edit/:id', isHighestAdmin, patchEditArchive);
 
 /**
  * @swagger
@@ -454,7 +459,7 @@ r.patch('/archive/edit/:id', patchEditArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.put('/archive/edit/:id', putEditArchive);
+r.put('/archive/edit/:id', isHighestAdmin, putEditArchive);
 
 /**
  * @swagger
@@ -485,7 +490,7 @@ r.put('/archive/edit/:id', putEditArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.delete('/archive/delete/:id', deleteArchive);
+r.delete('/archive/delete/:id', isHighestAdmin, deleteArchive);
 
 /**
  * @swagger
@@ -541,7 +546,7 @@ r.get('/archive/download/:id', isAuthArchive, downloadArchive);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/users', getUsers);
+r.get('/users', isHighestAdmin, getUsers);
 
 /**
  * @swagger
@@ -650,7 +655,7 @@ r.get('/non-admins', getNonAdmins);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/users/search', searchUser);
+r.get('/users/search', isHighestAdmin, searchUser);
 
 /**
  * @swagger
@@ -681,7 +686,7 @@ r.get('/users/search', searchUser);
  *       500:
  *         description: "Caught exception on server"
  */
-r.get('/users/:id', getUserDetail);
+r.get('/users/:id', isHighestAdmin, getUserDetail);
 
 /**
  * @swagger
@@ -720,7 +725,7 @@ r.get('/users/:id', getUserDetail);
  *       500:
  *         description: "Caught exception on server"
  */
-r.patch('/users/:id', updateUserRole);
+r.patch('/users/:id', isHighestAdmin, updateUserRole);
 
 /**
  * @swagger
@@ -751,9 +756,9 @@ r.patch('/users/:id', updateUserRole);
  *       500:
  *         description: "Caught exception on server"
  */
-r.patch('/remove-admin/:id', removeAdminAccessFromUser);
+r.patch('/remove-admin/:id', isHighestAdmin, removeAdminAccessFromUser);
 
-r.delete('/users/:id', deleteUser);
+r.delete('/users/:id', isHighestAdmin, deleteUser);
 
 /**
  * @swagger
@@ -774,6 +779,6 @@ r.delete('/users/:id', deleteUser);
  *       401:
  *         Unauthorized request
  */
-r.get('/statistic', getStatistic);
+r.get('/statistic', isAdminAllLevel, getStatistic);
 
 module.exports = r;
