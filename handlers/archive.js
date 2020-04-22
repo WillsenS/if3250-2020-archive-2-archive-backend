@@ -67,7 +67,7 @@ exports.searchArchive = async (req, res) => {
     page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
 
     if (q !== '') {
-      const foundSearch = await Search.find({ keyword: q });
+      const foundSearch = await Search.findOne({ keyword: q });
 
       const optionsUpdate = {
         upsert: false,
@@ -80,8 +80,10 @@ exports.searchArchive = async (req, res) => {
       } else {
         const data = {
           keyword: q,
-          count: 0
+          count: 1
         };
+
+        console.log(data);
 
         await Search.create(data);
       }
@@ -228,7 +230,10 @@ exports.getArchiveDetail = async (req, res) => {
 
 exports.getBorrowRequest = async (req, res) => {
   try {
-    const foundRequest = await Borrow.find().sort({ createdAt: 1 });
+    const foundRequest = await Borrow.find()
+      .populate('archive', 'judul')
+      .populate('borrower', 'fullname')
+      .sort({ createdAt: 1 });
     return sendResponse(res, 200, 'Successfully retrieved archive', {
       data: foundRequest
     });
