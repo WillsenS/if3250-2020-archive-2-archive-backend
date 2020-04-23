@@ -80,8 +80,10 @@ exports.searchArchive = async (req, res) => {
       } else {
         const data = {
           keyword: q,
-          count: 0
+          count: 1
         };
+
+        console.log(data);
 
         await Search.create(data);
       }
@@ -223,6 +225,37 @@ exports.getArchiveDetail = async (req, res) => {
     });
   } catch (err) {
     return sendResponse(res, 500, 'Error. Bad request when get archive detail');
+  }
+};
+
+exports.getBorrowRequest = async (req, res) => {
+  try {
+    const foundRequest = await Borrow.find()
+      .populate('archive', 'judul')
+      .populate('borrower', 'fullname')
+      .sort({ createdAt: 1 });
+    return sendResponse(res, 200, 'Successfully retrieved archive', {
+      data: foundRequest
+    });
+  } catch (e) {
+    return sendResponse(res, 500, 'Error. Bad request when get borrow request');
+  }
+};
+
+exports.editBorrowRequest = async (req, res) => {
+  try {
+    const data = req.body;
+    const options = {
+      upsert: false,
+      useFindAndModify: false
+    };
+    const response = await Borrow.findByIdAndUpdate(data._id, data, options);
+
+    return sendResponse(res, 200, 'Successfully edit borrow request', {
+      data: response
+    });
+  } catch (e) {
+    return sendResponse(res, 500, 'Error. Bad request when edit borrow request');
   }
 };
 

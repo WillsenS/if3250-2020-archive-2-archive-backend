@@ -26,6 +26,8 @@ const {
   deleteArchive,
   downloadArchive,
   getStatistic,
+  getBorrowRequest,
+  editBorrowRequest,
   postNewBorrowRequest
 } = require('../handlers/archive');
 
@@ -233,6 +235,9 @@ r.get('/archive/detail/:id', isAuthArchive, getArchiveDetail);
  *         description: "Caught exception on server"
  */
 r.get('/archive/title/:id', getArchiveTitle);
+
+r.get('/archive/borrow', getBorrowRequest);
+r.patch('/archive/borrow/:id', editBorrowRequest);
 
 /**
  * @swagger
