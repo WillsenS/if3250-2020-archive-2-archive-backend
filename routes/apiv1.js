@@ -1,5 +1,5 @@
 const express = require('express');
-const { isAuthenticated, isNonAuthenticated } = require('../middlewares/user');
+const { isAuthenticated, isNonAuthenticated, isHighestAdmin } = require('../middlewares/user');
 const { isAuthArchive } = require('../middlewares/achive');
 const {
   signInSSO,
@@ -720,7 +720,7 @@ r.get('/users/:id', getUserDetail);
  *       500:
  *         description: "Caught exception on server"
  */
-r.patch('/users/:id', updateUserRole);
+r.patch('/users/:id', isHighestAdmin, updateUserRole);
 
 /**
  * @swagger
@@ -751,9 +751,9 @@ r.patch('/users/:id', updateUserRole);
  *       500:
  *         description: "Caught exception on server"
  */
-r.patch('/remove-admin/:id', removeAdminAccessFromUser);
+r.patch('/remove-admin/:id', isHighestAdmin, removeAdminAccessFromUser);
 
-r.delete('/users/:id', deleteUser);
+r.delete('/users/:id', isHighestAdmin, deleteUser);
 
 /**
  * @swagger

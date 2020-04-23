@@ -119,8 +119,10 @@ const validateAdmin = async (req, res, next, code) => {
       return next();
     }
 
+    console.log('You are not allowed');
     return sendResponse(res, 401, 'Error. You are not allowed');
   } catch (err) {
+    console.log(err);
     return sendResponse(res, 500, `Error: ${err.message}`);
   }
 };
