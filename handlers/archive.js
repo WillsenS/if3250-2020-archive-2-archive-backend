@@ -228,6 +228,11 @@ exports.getArchiveDetail = async (req, res) => {
   }
 };
 
+/**
+ * Give list of request of borrow archive
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ */
 exports.getBorrowRequest = async (req, res) => {
   try {
     const foundRequest = await Borrow.find()
@@ -242,6 +247,16 @@ exports.getBorrowRequest = async (req, res) => {
   }
 };
 
+/**
+ * Edit an request to borrowarchive
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ * @param {String} req.session.user User logged in.
+ * @param {String} req.body.idArchive Archive id that want to borrow.
+ * @param {String} req.body.phone Phone number from user.
+ * @param {String} req.body.email Email from user.
+ * @param {String} req.body.reason Reason why user want to request.
+ */
 exports.editBorrowRequest = async (req, res) => {
   try {
     const data = req.body;

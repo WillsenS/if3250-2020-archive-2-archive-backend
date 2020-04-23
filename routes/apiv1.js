@@ -115,9 +115,51 @@ r.get('/auth/check', isAuthenticated, (req, res) => {
  */
 r.get('/archive/search/most', getMostSearchKeyword);
 
+/**
+ * @swagger
+ *
+ * /api/v1/keyword/most:
+ *   get:
+ *     summary: "Get most search keyword on file /config/mostSearch"
+ *     tags:
+ *     - "archive"
+ *     description: "Retrieve 10 most search keyword"
+ *     produces:
+ *     - application/json
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       404:
+ *         description: "Not found"
+ *       500:
+ *         description: "Caught exception on server"
+ */
 r.get('/keyword/most', getMostSearchKeywordOnFile);
 
-r.patch('/keyword/most', changeMostSearchKeywordOnFile);
+/**
+ * @swagger
+ *
+ * /api/v1/keyword/most:
+ *   patch:
+ *     summary: "Edit most search keyword configuration on file /config/mostSearch"
+ *     tags:
+ *     - "archive"
+ *     description: "Edit most search keyword configuration"
+ *     produces:
+ *     - application/json
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       404:
+ *         description: "Not found"
+ *       500:
+ *         description: "Caught exception on server"
+ */
+r.patch('/keyword/most', isHighestAdmin, changeMostSearchKeywordOnFile);
 
 /**
  * @swagger
@@ -236,8 +278,71 @@ r.get('/archive/detail/:id', isAuthArchive, getArchiveDetail);
  */
 r.get('/archive/title/:id', getArchiveTitle);
 
-r.get('/archive/borrow', getBorrowRequest);
-r.patch('/archive/borrow/:id', editBorrowRequest);
+/**
+ * @swagger
+ *
+ * /api/v1/archive/borrow:
+ *   get:
+ *     summary: "Get all of borrow archive request"
+ *     tags:
+ *     - "archive"
+ *     description: "Retrieve borrow archive request"
+ *     produces:
+ *     - application/json
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       404:
+ *         description: "Not found"
+ *       500:
+ *         description: "Caught exception on server"
+ */
+r.get('/archive/borrow', isHighestAdmin, getBorrowRequest);
+
+/**
+ * @swagger
+ *
+ * /api/v1/archive/borrow:
+ *   patch:
+ *     summary: "Change data request to borrow archive"
+ *     tags:
+ *     - "archive"
+ *     description: "Change data borrow archive request based on form fields"
+ *     produces:
+ *     - application/json
+ *     parameters:
+ *       - in: body
+ *         name: data
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *              archive:
+ *                description: test
+ *                type: string
+ *              borrower:
+ *                type: string
+ *              phone:
+ *                type: string
+ *              email:
+ *                type: string
+ *              reason:
+ *                type: string
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       401:
+ *         description: "Not authenticated"
+ *       404:
+ *         description: "Not found"
+ *       500:
+ *         description: "Caught exception on server"
+ */
+r.patch('/archive/borrow/:id', isHighestAdmin, editBorrowRequest);
 
 /**
  * @swagger
