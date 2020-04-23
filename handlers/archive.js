@@ -238,7 +238,24 @@ exports.getBorrowRequest = async (req, res) => {
       data: foundRequest
     });
   } catch (e) {
-    return sendResponse(res, 500, 'Error. Bad request when post new borrow reuest');
+    return sendResponse(res, 500, 'Error. Bad request when get borrow request');
+  }
+};
+
+exports.editBorrowRequest = async (req, res) => {
+  try {
+    const data = req.body;
+    const options = {
+      upsert: false,
+      useFindAndModify: false
+    };
+    const response = await Borrow.findByIdAndUpdate(data._id, data, options);
+
+    return sendResponse(res, 200, 'Successfully edit borrow request', {
+      data: response
+    });
+  } catch (e) {
+    return sendResponse(res, 500, 'Error. Bad request when edit borrow request');
   }
 };
 
