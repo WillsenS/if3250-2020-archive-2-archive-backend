@@ -1,6 +1,7 @@
 const config = {
-  // defaultURL: 'https://a7587aec.ngrok.io'
-  defaultURL: 'https://demoapp.my.id'
+  defaultURL: 'http://localhost:3000'
+  // defaultURL: 'https://aec87051.ngrok.io'
+  // defaultURL: 'https://demoapp.my.id'
 };
 
 module.exports = config;
