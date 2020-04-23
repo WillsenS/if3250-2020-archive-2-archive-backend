@@ -753,7 +753,7 @@ r.patch('/users/:id', isHighestAdmin, updateUserRole);
  */
 r.patch('/remove-admin/:id', isHighestAdmin, removeAdminAccessFromUser);
 
-r.delete('/users/:id', deleteUser);
+r.delete('/users/:id', isHighestAdmin, deleteUser);
 
 /**
  * @swagger
