@@ -67,7 +67,7 @@ exports.searchArchive = async (req, res) => {
     page = parseInt(page, 10) > 0 ? parseInt(page, 10) : 1;
 
     if (q !== '') {
-      const foundSearch = await Search.find({ keyword: q });
+      const foundSearch = await Search.findOne({ keyword: q });
 
       const optionsUpdate = {
         upsert: false,
