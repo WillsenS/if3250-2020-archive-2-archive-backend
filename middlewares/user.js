@@ -30,18 +30,20 @@ exports.isAuthenticated = async (req, res, next) => {
       const bearerToken = bearer[1];
 
       const decode = jwt.verify(bearerToken, process.env.SESSION_SECRET);
+      const { user } = decode;
 
       let foundUser;
-      if (decode.user) {
-        const { _id } = decode.user;
+
+      if (user) {
+        const { _id } = user;
         foundUser = await User.findById(_id);
-        decode.user.role = foundUser.role;
+        user.role = foundUser.role;
       }
 
-      const valid = await isValid(decode.user, foundUser);
+      const valid = await isValid(user, foundUser);
 
-      if (decode.user && valid) {
-        req.session.user = decode.user;
+      if (user && valid) {
+        req.session.user = user;
         return next();
       }
     }
@@ -83,19 +85,17 @@ const bearerChecker = async (req, code) => {
     const bearerToken = bearer[1];
 
     const decode = jwt.verify(bearerToken, process.env.SESSION_SECRET);
-
     const { user } = decode;
-    let foundUser;
-    if (decode.user) {
-      const { _id } = decode.user;
-      foundUser = await User.findById(_id);
-      decode.user.role = foundUser.role;
-    }
 
-    const valid = await isValid(decode.user, foundUser);
+    let foundUser;
+    if (user) {
+      foundUser = await User.findById(user._id);
+      user.role = foundUser.role;
+    }
+    const valid = await isValid(user, foundUser);
 
     if (decode.user && valid) {
-      req.session.user = decode.user;
+      req.session.user = user;
       let isRoleValid = false;
 
       switch (code) {
