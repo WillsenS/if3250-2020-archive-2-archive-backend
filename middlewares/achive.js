@@ -46,15 +46,15 @@ exports.isAuthArchive = async (req, res, next) => {
 
         if (decode.user && valid) {
           req.session.user = decode.user;
-          let isRoleValid = false;
+          let isHighestAdmin = false;
           const { user } = decode;
 
           const { _id } = user;
           const foundUser = await User.findById(_id);
 
-          isRoleValid = user.role === HIGHEST_ADMIN_ROLE && foundUser.role === user.role;
+          isHighestAdmin = user.role === HIGHEST_ADMIN_ROLE && foundUser.role === user.role;
 
-          if (isRoleValid) {
+          if (isHighestAdmin) {
             return next();
           }
         }
