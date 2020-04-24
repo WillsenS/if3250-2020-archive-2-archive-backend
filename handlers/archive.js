@@ -479,10 +479,20 @@ const buildArchiveFromForm = async (req, res) => {
   });
 };
 
+/**
+ * Upload archive and save Archive model, Metadata model, File model based on POST request
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ */
 exports.postUploadArchive = async (req, res) => {
   await buildArchiveFromForm(req, res);
 };
 
+/**
+ * Edit archive and it's metadata that already exist based on PATCH request
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ */
 exports.patchEditArchive = async (req, res) => {
   const { id } = req.params;
   const form = new formidable.IncomingForm();
@@ -566,6 +576,10 @@ exports.patchEditArchive = async (req, res) => {
   });
 };
 
+/**
+ * Execute deletion on archive by id
+ * @param {string} id id of archive that going to be deleted
+ */
 const deleteArchiveById = async id => {
   const foundArchive = await Archive.findById(id);
 
@@ -593,6 +607,11 @@ const deleteArchiveById = async id => {
   return result;
 };
 
+/**
+ * Replace old archive data based on PUT request
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ */
 exports.putEditArchive = async (req, res) => {
   const { id } = req.params;
   try {
@@ -605,6 +624,11 @@ exports.putEditArchive = async (req, res) => {
   }
 };
 
+/**
+ * Delete archive based on DELETE request
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ */
 exports.deleteArchive = async (req, res) => {
   try {
     const { id } = req.params;
@@ -616,6 +640,11 @@ exports.deleteArchive = async (req, res) => {
   }
 };
 
+/**
+ * Retrieve user statistics
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ */
 exports.getStatistic = async (req, res) => {
   try {
     const [totalArchive, audio, video, text, photo, totalUsers, admin] = await Promise.all([
