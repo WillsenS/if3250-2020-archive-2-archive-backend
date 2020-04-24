@@ -130,7 +130,6 @@ const validateAdmin = async (req, res, next, code) => {
     }
     return sendResponse(res, 401, 'Error. You are not allowed');
   } catch (err) {
-    console.log(err);
     if (err.name === 'JsonWebTokenError')
       return sendResponse(res, 401, "You're not allowed to access");
     return sendResponse(res, 500, `Error: ${err.message}`);
