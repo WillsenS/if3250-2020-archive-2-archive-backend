@@ -462,12 +462,23 @@ const buildArchiveFromForm = async (req, res) => {
         throw new Error('Uploaded file not found');
       }
 
+      const ts = Date.now();
+
+      const dateObj = new Date(ts);
+      const date = dateObj.getDate();
+      const month = dateObj.getMonth() + 1;
+      const year = dateObj.getFullYear();
+      const randomInt = Math.floor(Math.random() * 10000);
+      const uniqueStamp = `${year}-${month}-${date}-${randomInt}`;
+      console.log(uniqueStamp);
+
       const oldpath = file.filetoupload.path;
       const newpath =
         process.env.NODE_PATH +
         process.env.PUBLIC_DIR +
         process.env.UPLOAD_DIR +
-        file.filetoupload.name;
+        file.filetoupload.name +
+        uniqueStamp;
 
       mv(oldpath, newpath, () => {
         return 1;
