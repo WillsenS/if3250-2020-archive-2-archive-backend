@@ -365,11 +365,6 @@ const buildArchive = async (file, fields) => {
     throw new Error('Uploaded file not found');
   }
 
-  const date = fields.waktu_kegiatan;
-  const datearray = date.split('/');
-
-  const newdate = `${datearray[1]}/${datearray[0]}/${datearray[2]}`;
-
   const dataArchive = {
     judul: fields.judul,
     tipe: fields.tipe,
@@ -377,7 +372,7 @@ const buildArchive = async (file, fields) => {
     pola: fields.pola,
     lokasi_kegiatan: fields.lokasi_kegiatan,
     keterangan: fields.keterangan,
-    waktu_kegiatan: newdate,
+    waktu_kegiatan: fields.waktu_kegiatan,
     keamanan_terbuka: fields.keamanan_terbuka > 0,
     lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
     mime: fields.mime
@@ -459,6 +454,8 @@ const buildArchiveFromForm = async (req, res) => {
 
   form.parse(req, async (err, fields, file) => {
     try {
+      await buildArchive(file, fields);
+
       if (!file.filetoupload) {
         throw new Error('Uploaded file not found');
       }
@@ -470,7 +467,7 @@ const buildArchiveFromForm = async (req, res) => {
       const month = dateObj.getMonth() + 1;
       const year = dateObj.getFullYear();
       const randomInt = Math.floor(Math.random() * 10000);
-      const uniqueStamp = `-${year}-${month}-${date}-${randomInt}`;
+      const uniqueStamp = `${year}-${month}-${date}-${randomInt}`;
       console.log(uniqueStamp);
 
       const oldpath = file.filetoupload.path;
@@ -481,16 +478,12 @@ const buildArchiveFromForm = async (req, res) => {
         file.filetoupload.name +
         uniqueStamp;
 
-      file.filetoupload.name += uniqueStamp;
-      await buildArchive(file, fields);
-
       mv(oldpath, newpath, () => {
         return 1;
       });
 
       return sendResponse(res, 200, 'Successfully added and uploaded archive');
     } catch (e) {
-      console.log(e);
       return sendResponse(res, 500, 'Error. Bad request while build archive');
     }
   });
@@ -519,11 +512,6 @@ exports.patchEditArchive = async (req, res) => {
     try {
       const foundArchive = await Archive.findById(id);
 
-      const date = fields.waktu_kegiatan;
-      const datearray = date.split('/');
-
-      const newdate = `${datearray[1]}/${datearray[0]}/${datearray[2]}`;
-
       const dataArchive = {
         judul: fields.judul,
         tipe: fields.tipe,
@@ -531,7 +519,7 @@ exports.patchEditArchive = async (req, res) => {
         pola: fields.pola,
         lokasi_kegiatan: fields.lokasi_kegiatan,
         keterangan: fields.keterangan,
-        waktu_kegiatan: newdate,
+        waktu_kegiatan: fields.waktu_kegiatan,
         keamanan_terbuka: fields.keamanan_terbuka > 0,
         lokasi_simpan_arsip: fields.lokasi_simpan_arsip,
         mime: fields.mime,
