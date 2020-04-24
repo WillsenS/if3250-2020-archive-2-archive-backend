@@ -310,6 +310,10 @@ exports.postNewBorrowRequest = async (req, res) => {
   }
 };
 
+/**
+ * Save file metadata based data submitted form. Save either Audio/Photo/Text/Video
+ * @param {Object[]} fields Array of object submitted in forms
+ */
 const saveMetadata = async fields => {
   let metadataDoc;
   let data;
@@ -353,6 +357,11 @@ const saveMetadata = async fields => {
   return metadataDoc;
 };
 
+/**
+ * Build archive model, create File model and metadata model
+ * @param {Object} file Formidable file submitted in form
+ * @param {Object[]} fields Array of object submitted in forms
+ */
 const buildArchive = async (file, fields) => {
   if (!file.filetoupload) {
     throw new Error('Uploaded file not found');
@@ -409,6 +418,11 @@ const buildArchive = async (file, fields) => {
   await Archive.create(dataArchive);
 };
 
+/**
+ * Send file to client to be downloaded
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ */
 exports.downloadArchive = async (req, res) => {
   const { id } = req.params;
   try {
@@ -431,6 +445,11 @@ exports.downloadArchive = async (req, res) => {
   }
 };
 
+/**
+ * Save archive, file, and metadata model based on form data
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ */
 const buildArchiveFromForm = async (req, res) => {
   const form = new formidable.IncomingForm();
 
