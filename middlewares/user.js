@@ -83,15 +83,20 @@ const bearerChecker = async (req, code) => {
     const bearerToken = bearer[1];
 
     const decode = jwt.verify(bearerToken, process.env.SESSION_SECRET);
-    const valid = await isValid(decode.user);
+
+    const { user } = decode;
+    let foundUser;
+    if (decode.user) {
+      const { _id } = decode.user;
+      foundUser = await User.findById(_id);
+      decode.user.role = foundUser.role;
+    }
+
+    const valid = await isValid(decode.user, foundUser);
 
     if (decode.user && valid) {
       req.session.user = decode.user;
       let isRoleValid = false;
-      const { user } = decode;
-
-      const { _id } = user;
-      const foundUser = await User.findById(_id);
 
       switch (code) {
         case HIGHEST_ADMIN_REQUEST:
