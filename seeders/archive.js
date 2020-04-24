@@ -99,8 +99,7 @@ const execute = async () => {
       }
     ];
 
-    const result = await seeder(connect, File, data);
-    console.info(result);
+    await seeder(connect, File, data);
 
     const dataPhoto = [
       {

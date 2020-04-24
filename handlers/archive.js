@@ -88,8 +88,6 @@ exports.searchArchive = async (req, res) => {
           count: 1
         };
 
-        console.log(data);
-
         await Search.create(data);
       }
     }
