@@ -122,7 +122,7 @@ const validateAdmin = async (req, res, next, code) => {
   } catch (err) {
     console.log(err);
     if (err.name === 'JsonWebTokenError')
-      return sendResponse(res, 401, "You're not allowed to acces this archive");
+      return sendResponse(res, 401, "You're not allowed to access");
     return sendResponse(res, 500, `Error: ${err.message}`);
   }
 };
