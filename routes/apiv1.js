@@ -889,6 +889,6 @@ r.delete('/users/:id', isHighestAdmin, deleteUser);
  *       401:
  *         Unauthorized request
  */
-r.get('/statistic', getStatistic);
+r.get('/statistic', isAdminAllLevel, getStatistic);
 
 module.exports = r;

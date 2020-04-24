@@ -23,6 +23,8 @@ const isValid = async user => {
   );
 };
 
+const HIGHEST_ADMIN_ROLE = 1; // Admin Terpusat
+
 /**
  * Middleware that checks if user is authorized for archive
  * @param {object} req.header.authorization Bearer header from user's request.
@@ -44,6 +46,17 @@ exports.isAuthArchive = async (req, res, next) => {
 
         if (decode.user && valid) {
           req.session.user = decode.user;
+          let isRoleValid = false;
+          const { user } = decode;
+
+          const { _id } = user;
+          const foundUser = await User.findById(_id);
+
+          isRoleValid = user.role === HIGHEST_ADMIN_ROLE && foundUser.role === user.role;
+
+          if (isRoleValid) {
+            return next();
+          }
         }
       }
 
