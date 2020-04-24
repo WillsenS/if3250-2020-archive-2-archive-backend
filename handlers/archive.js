@@ -14,9 +14,13 @@ const { translateFiltersMongoose, sendResponse } = require('../helpers');
 const keywords = require('../config/mostSearch.json');
 
 exports.getMostSearchKeywordOnFile = async (req, res) => {
-  return sendResponse(res, 200, 'OK', {
-    data: keywords
-  });
+  try {
+    return sendResponse(res, 200, 'OK', {
+      data: keywords
+    });
+  } catch (err) {
+    return sendResponse(res, 500, 'Error. Bad request when get most keyword on file ');
+  }
 };
 
 exports.changeMostSearchKeywordOnFile = async (req, res) => {
@@ -24,6 +28,7 @@ exports.changeMostSearchKeywordOnFile = async (req, res) => {
 
   fs.writeFile('./config/mostSearch.json', JSON.stringify(data), err => {
     console.error(err);
+    return sendResponse(res, 500, 'Error. Bad request when edit most keyword on file ');
   });
 
   return sendResponse(res, 200, 'OK');
