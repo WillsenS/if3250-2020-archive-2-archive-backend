@@ -58,7 +58,7 @@ exports.getMostSearchKeyword = async (req, res) => {
  * Get archives based on query, page, and filters
  * @param {express.Request} req Express request object.
  * @param {express.Response} res Express response object.
- * @param {number} req.query.q Query from user.
+ * @param {string} req.query.q Query from user.
  * @param {number} req.query.page Page number.
  * @param {number} req.query.flter Filter from user (google standard).
  */
@@ -422,6 +422,7 @@ const buildArchive = async (file, fields) => {
  * Send file to client to be downloaded
  * @param {express.Request} req Express request object.
  * @param {express.Response} res Express response object.
+ * @param {string} req.params.id Id of archive that requested to be downloaded.
  */
 exports.downloadArchive = async (req, res) => {
   const { id } = req.params;
@@ -492,6 +493,7 @@ exports.postUploadArchive = async (req, res) => {
  * Edit archive and it's metadata that already exist based on PATCH request
  * @param {express.Request} req Express request object.
  * @param {express.Response} res Express response object.
+ * @param {string} req.params.id Id of archive that requested to be edited.
  */
 exports.patchEditArchive = async (req, res) => {
   const { id } = req.params;
@@ -611,6 +613,7 @@ const deleteArchiveById = async id => {
  * Replace old archive data based on PUT request
  * @param {express.Request} req Express request object.
  * @param {express.Response} res Express response object.
+ * @param {string} req.params.id Id of archive that requested to be replaced.
  */
 exports.putEditArchive = async (req, res) => {
   const { id } = req.params;
@@ -628,6 +631,7 @@ exports.putEditArchive = async (req, res) => {
  * Delete archive based on DELETE request
  * @param {express.Request} req Express request object.
  * @param {express.Response} res Express response object.
+ * @param {string} req.params.id Id of archive that requested to be deleted.
  */
 exports.deleteArchive = async (req, res) => {
   try {

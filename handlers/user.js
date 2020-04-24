@@ -81,13 +81,21 @@ exports.checkSSORedirect = () => {
 };
 
 /**
- * Handling user sign in by redirect to SSO ITB.
+ * Handling user sign in by redirecting to SSO ITB.
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
  */
 exports.signInSSO = (req, res) => {
   const redirectURL = `https%3A%2F%2F${req.headers.host}${req.baseUrl}`;
   res.redirect(`https://login.itb.ac.id/cas/login?service=${redirectURL}`);
 };
 
+/**
+ * Find user based  query
+ * @param {number} page Number of page of request.
+ * @param {string} q Filter search to only find admin that match with query query.
+ * @param {express.Response} res Express response object.
+ */
 const findUsers = async (page, q, res) => {
   let baseLink;
   let searchQuery;
@@ -127,6 +135,13 @@ const findUsers = async (page, q, res) => {
   });
 };
 
+/**
+ * Find admins based on role or query
+ * @param {number} page Number of page of request.
+ * @param {number} role Filter search to only find admin within certain role.
+ * @param {express.Response} res Express response object.
+ * @param {string} q Filter search to only find admin that match with query query.
+ */
 const findAdmins = async (page, role, res, q) => {
   let searchQuery = {};
   const limit = 10;
@@ -168,6 +183,12 @@ const findAdmins = async (page, role, res, q) => {
   });
 };
 
+/**
+ * Handling user sign in by redirecting to SSO ITB.
+ * @param {number} page Number of page of request.
+ * @param {number} limit Limit of result per page.
+ * @param {express.Response} res Express response object.
+ */
 const findNonAdmins = async (page, limit, res) => {
   const searchQuery = {
     role: {
@@ -191,6 +212,12 @@ const findNonAdmins = async (page, limit, res) => {
   });
 };
 
+/**
+ * Get all the users exist in DB.
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ * @param {string} req.query.q Query from user.
+ */
 exports.getUsers = async (req, res) => {
   try {
     let { page } = req.query;
@@ -202,6 +229,13 @@ exports.getUsers = async (req, res) => {
   }
 };
 
+/**
+ * Search user based on query
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ * @param {string} req.query.q Query from user.
+ * @param {number} req.query.page Pagination number of data.
+ */
 exports.searchUser = async (req, res) => {
   try {
     const { q, page } = req.query;
@@ -212,6 +246,12 @@ exports.searchUser = async (req, res) => {
   }
 };
 
+/**
+ * Get detail of user by user id
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ * @param {string} req.query.id User id.
+ */
 exports.getUserDetail = async (req, res) => {
   const { id } = req.params;
   try {
@@ -225,6 +265,12 @@ exports.getUserDetail = async (req, res) => {
   }
 };
 
+/**
+ * Update role of a user
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ * @param {string} req.params.id User id.
+ */
 exports.updateUserRole = async (req, res) => {
   const { id } = req.params;
   const form = new formidable.IncomingForm();
@@ -244,6 +290,12 @@ exports.updateUserRole = async (req, res) => {
   });
 };
 
+/**
+ * Remove admin access from user, change role to non admin
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ * @param {string} req.params.id User id.
+ */
 exports.removeAdminAccessFromUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -259,6 +311,12 @@ exports.removeAdminAccessFromUser = async (req, res) => {
   }
 };
 
+/**
+ * Delete user from database
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ * @param {string} req.params.id User id.
+ */
 exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -270,6 +328,14 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+/**
+ * Get all admin in DB
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ * @param {number} req.query.page Page number.
+ * @param {number} req.query.role Role code.
+ * @param {string} req.query.q User query.
+ */
 exports.getAdmins = async (req, res) => {
   try {
     let { page } = req.query;
@@ -281,6 +347,13 @@ exports.getAdmins = async (req, res) => {
   }
 };
 
+/**
+ * Get all non-admin user in DB
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ * @param {number} req.query.page Page number.
+ * @param {number} req.query.limit Limit data per page.
+ */
 exports.getNonAdmins = async (req, res) => {
   try {
     let { page } = req.query;
