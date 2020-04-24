@@ -6,10 +6,7 @@ const { sendResponse } = require('../helpers');
  * Check is user is valid. Valid means all of his information is equal with DB.
  * @param {object} user Data of user given from sso ITB response.
  */
-const isValid = async user => {
-  const { _id } = user;
-  const foundUser = await User.findById(_id);
-
+const isValid = async (user, foundUser) => {
   return (
     user.username === foundUser.username &&
     user.fullname === foundUser.fullname &&
@@ -33,7 +30,15 @@ exports.isAuthenticated = async (req, res, next) => {
       const bearerToken = bearer[1];
 
       const decode = jwt.verify(bearerToken, process.env.SESSION_SECRET);
-      const valid = await isValid(decode.user);
+
+      let foundUser;
+      if (decode.user) {
+        const { _id } = decode.user;
+        foundUser = await User.findById(_id);
+        decode.user.role = foundUser.role;
+      }
+
+      const valid = await isValid(decode.user, foundUser);
 
       if (decode.user && valid) {
         req.session.user = decode.user;
