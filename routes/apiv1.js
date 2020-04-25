@@ -15,7 +15,8 @@ const {
   getUserDetail,
   searchUser,
   getAdmins,
-  getNonAdmins
+  getNonAdmins,
+  getUserRoles
 } = require('../handlers/user');
 const {
   getMostSearchKeywordOnFile,
@@ -890,5 +891,27 @@ r.delete('/users/:id', isHighestAdmin, deleteUser);
  *         Unauthorized request
  */
 r.get('/statistic', isAdminAllLevel, getStatistic);
+
+/**
+ * @swagger
+ *
+ * /api/v1/user/roles:
+ *   get:
+ *     summary: "Get user role list"
+ *     tags:
+ *     - "user"
+ *     description: "Get user role list"
+ *     produces:
+ *     - application/json
+ *     responses:
+ *       200:
+ *         description: "Success operation"
+ *       400:
+ *         description: "Bad request"
+ *       401:
+ *         Unauthorized request
+ *       500: Server exception
+ */
+r.get('/user/roles', getUserRoles);
 
 module.exports = r;

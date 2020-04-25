@@ -5,6 +5,7 @@ const formidable = require('formidable');
 const User = require('../models/User');
 const { defaultURL } = require('../config');
 const { sendResponse } = require('../helpers');
+const Role = require('../models/Role');
 
 // const HIGHEST_ADMIN_ROLE = 1; // Admin Terpusat
 const DEFAULT_ROLE = 2; // Internal ITB Non-Admin
@@ -363,5 +364,22 @@ exports.getNonAdmins = async (req, res) => {
     return await findNonAdmins(page, limitFilter, res);
   } catch (err) {
     return sendResponse(res, 500, 'Error. Bad request when get non admin');
+  }
+};
+
+/**
+ * Get all user role
+ * @param {express.Request} req Express request object.
+ * @param {express.Response} res Express response object.
+ */
+exports.getUserRoles = async (req, res) => {
+  try {
+    const [roles, totalRoles] = await Promise.all([Role.find({}), Role.countDocuments({})]);
+    return sendResponse(res, 200, 'Sucessfully retrieved user role list', {
+      count: totalRoles,
+      data: roles
+    });
+  } catch (err) {
+    return sendResponse(res, 500, 'Caught exception on server');
   }
 };
