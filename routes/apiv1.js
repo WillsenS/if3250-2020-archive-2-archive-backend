@@ -912,6 +912,6 @@ r.get('/statistic', isAdminAllLevel, getStatistic);
  *         Unauthorized request
  *       500: Server exception
  */
-r.get('/user/roles', getUserRoles);
+r.get('/user/roles', isAdminAllLevel, getUserRoles);
 
 module.exports = r;
