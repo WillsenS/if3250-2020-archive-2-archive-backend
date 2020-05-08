@@ -63,7 +63,6 @@ exports.isAuthArchive = async (req, res, next) => {
       const foundBorrow = await Borrow.find({
         borrower: req.session.user._id,
         archive: id,
-        updatedAt: { $gte: moment().subtract(7, 'days') },
         status: 1
       });
 
