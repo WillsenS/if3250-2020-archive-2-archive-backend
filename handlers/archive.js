@@ -454,12 +454,6 @@ const buildArchiveFromForm = async (req, res) => {
 
   form.parse(req, async (err, fields, file) => {
     try {
-      await buildArchive(file, fields);
-
-      if (!file.filetoupload) {
-        throw new Error('Uploaded file not found');
-      }
-
       const ts = Date.now();
 
       const dateObj = new Date(ts);
@@ -469,13 +463,20 @@ const buildArchiveFromForm = async (req, res) => {
       const randomInt = Math.floor(Math.random() * 10000);
       const uniqueStamp = `${year}-${month}-${date}-${randomInt}-`;
       console.log(uniqueStamp);
+      
+      file.filetoupload.name = uniqueStamp + file.filetoupload.name;
+        
+      await buildArchive(file, fields);
+
+      if (!file.filetoupload) {
+        throw new Error('Uploaded file not found');
+      }
 
       const oldpath = file.filetoupload.path;
       const newpath =
         process.env.NODE_PATH +
         process.env.PUBLIC_DIR +
         process.env.UPLOAD_DIR +
-        uniqueStamp +
         file.filetoupload.name;
 
       mv(oldpath, newpath, () => {
