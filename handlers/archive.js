@@ -463,9 +463,9 @@ const buildArchiveFromForm = async (req, res) => {
       const randomInt = Math.floor(Math.random() * 10000);
       const uniqueStamp = `${year}-${month}-${date}-${randomInt}-`;
       console.log(uniqueStamp);
-      
+
       file.filetoupload.name = uniqueStamp + file.filetoupload.name;
-        
+
       await buildArchive(file, fields);
 
       if (!file.filetoupload) {
