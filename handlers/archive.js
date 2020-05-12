@@ -467,7 +467,7 @@ const buildArchiveFromForm = async (req, res) => {
       const month = dateObj.getMonth() + 1;
       const year = dateObj.getFullYear();
       const randomInt = Math.floor(Math.random() * 10000);
-      const uniqueStamp = `${year}-${month}-${date}-${randomInt}`;
+      const uniqueStamp = `${year}-${month}-${date}-${randomInt}-`;
       console.log(uniqueStamp);
 
       const oldpath = file.filetoupload.path;
@@ -475,8 +475,8 @@ const buildArchiveFromForm = async (req, res) => {
         process.env.NODE_PATH +
         process.env.PUBLIC_DIR +
         process.env.UPLOAD_DIR +
-        file.filetoupload.name +
-        uniqueStamp;
+        uniqueStamp +
+        file.filetoupload.name;
 
       mv(oldpath, newpath, () => {
         return 1;
