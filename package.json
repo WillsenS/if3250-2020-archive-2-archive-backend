@@ -35,7 +35,7 @@
     "express-status-monitor": "^1.2.8",
     "formidable": "^1.2.2",
     "jsdoc": "^3.6.4",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "moment": "^2.24.0",
     "mongoose": "^5.8.11",
     "mv": "^2.1.1",
